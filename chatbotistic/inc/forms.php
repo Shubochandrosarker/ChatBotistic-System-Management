@@ -173,6 +173,103 @@ add_action( 'admin_post_nopriv_cb_demo', 'cb_handle_demo' );
 add_action( 'admin_post_cb_demo', 'cb_handle_demo' );
 
 /**
+ * Demo qualification request (V4 23-field form, posted from
+ * page-demo.php). Distinct from the legacy 4-field cb_demo handler
+ * above so existing integrations don't break.
+ *
+ * Fields are captured into WPistic Contact Form (when present) and
+ * emailed to the admin for manual review per the docx 14-day-demo
+ * approval policy. Honeypot + nonce protect against bots.
+ */
+function cb_handle_demo_request() {
+	$back = home_url( '/book-demo/' );
+
+	// Nonce
+	if ( ! isset( $_POST['cb_demo_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['cb_demo_nonce'] ) ), 'cb_demo_request' ) ) {
+		wp_safe_redirect( add_query_arg( 'demo', 'error', $back ) );
+		exit;
+	}
+	// Honeypot — bots fill it, humans ignore it.
+	if ( ! empty( $_POST['cb_company_alt'] ) ) {
+		wp_safe_redirect( add_query_arg( 'demo', 'submitted', $back ) );
+		exit;
+	}
+	// Consent must be present.
+	if ( empty( $_POST['consent'] ) ) {
+		wp_safe_redirect( add_query_arg( 'demo', 'error', $back ) );
+		exit;
+	}
+
+	$fields = array(
+		'full_name'      => 'sanitize_text_field',
+		'work_email'     => 'sanitize_email',
+		'phone'          => 'sanitize_text_field',
+		'company'        => 'sanitize_text_field',
+		'website'        => 'esc_url_raw',
+		'market'         => 'sanitize_text_field',
+		'biz_type'       => 'sanitize_text_field',
+		'visitors'       => 'sanitize_text_field',
+		'lead_source'    => 'sanitize_text_field',
+		'wa_usage'       => 'sanitize_text_field',
+		'wp'             => 'sanitize_text_field',
+		'woo'            => 'sanitize_text_field',
+		'wl'             => 'sanitize_text_field',
+		'current_tools'  => 'sanitize_text_field',
+		'need'           => 'sanitize_text_field',
+		'domains'        => 'sanitize_text_field',
+		'team_size'      => 'sanitize_text_field',
+		'problem'        => 'sanitize_textarea_field',
+		'expected'       => 'sanitize_textarea_field',
+		'preferred_time' => 'sanitize_text_field',
+		'budget'         => 'sanitize_text_field',
+		'notes'          => 'sanitize_textarea_field',
+	);
+	$data = array();
+	foreach ( $fields as $key => $sanitizer ) {
+		$raw          = isset( $_POST[ $key ] ) ? wp_unslash( $_POST[ $key ] ) : '';
+		$data[ $key ] = call_user_func( $sanitizer, $raw );
+	}
+
+	if ( ! is_email( $data['work_email'] ) || '' === $data['full_name'] || '' === $data['company'] ) {
+		wp_safe_redirect( add_query_arg( 'demo', 'error', $back ) );
+		exit;
+	}
+
+	$body  = "New Chatbotistic demo request — manual review required.\n\n";
+	$body .= "Reviewed against the 14-day demo policy.\n\n";
+	foreach ( $data as $k => $v ) {
+		$body .= str_pad( $k, 16, ' ', STR_PAD_RIGHT ) . ': ' . $v . "\n";
+	}
+
+	wp_mail(
+		get_option( 'admin_email' ),
+		'[Chatbotistic] Demo request — ' . $data['full_name'] . ' (' . $data['company'] . ')',
+		$body,
+		array( 'Reply-To: ' . $data['work_email'] )
+	);
+
+	cb_capture_wpistic_contact_form(
+		'Chatbotistic Demo Request (qualified)',
+		array_merge(
+			$data,
+			array(
+				'name'    => $data['full_name'],
+				'email'   => $data['work_email'],
+				'subject' => 'Qualified demo request',
+				'message' => trim( $data['problem'] . "\n\nExpected:\n" . $data['expected'] . "\n\nNotes:\n" . $data['notes'] ),
+			)
+		)
+	);
+
+	do_action( 'cb_demo_request_received', $data );
+
+	wp_safe_redirect( add_query_arg( 'demo', 'submitted', $back ) );
+	exit;
+}
+add_action( 'admin_post_nopriv_cb_demo_request', 'cb_handle_demo_request' );
+add_action( 'admin_post_cb_demo_request', 'cb_handle_demo_request' );
+
+/**
  * Newsletter opt-in.
  */
 function cb_handle_newsletter() {

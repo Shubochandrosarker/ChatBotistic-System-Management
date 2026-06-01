@@ -39,6 +39,7 @@ function cb_page_map() {
 		'tutorials'           => array( 'title' => 'Tutorials', 'template' => 'page-tutorials.php' ),
 		'faqs'                => array( 'title' => 'FAQs', 'template' => 'page-faqs.php' ),
 		'demo'                => array( 'title' => 'Book a Demo', 'template' => 'page-demo.php' ),
+		'book-demo'           => array( 'title' => 'Book a Demo', 'template' => 'page-demo.php' ),
 		'affiliate'           => array( 'title' => 'Affiliate Program', 'template' => 'page-affiliate.php' ),
 		'about'               => array( 'title' => 'About', 'template' => 'page-about.php' ),
 		'contact'             => array( 'title' => 'Contact', 'template' => 'page-contact.php' ),
