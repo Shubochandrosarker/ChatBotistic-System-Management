@@ -1,0 +1,103 @@
+/**
+ * Card-view admin shared styles for Members / Payments / Licenses / Plans.
+ * Designed to match the Memberistic Members reference screenshot.
+ */
+.cbc-admin { color: #1f2937; }
+.cbc-admin .cbc-pg-h1 { font-size: 28px; font-weight: 700; margin: 8px 0 4px; color: #0b1f3a; }
+.cbc-admin .cbc-pg-sub { color: #6b7280; margin: 0 0 24px; font-size: 14px; }
+
+/* KPI cards */
+.cbc-kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.cbc-kpi { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 2px rgba(15,23,42,.04); border-left: 4px solid #6366f1; }
+.cbc-kpi--good { border-left-color: #10b981; }
+.cbc-kpi--warn { border-left-color: #f59e0b; }
+.cbc-kpi--bad  { border-left-color: #ef4444; }
+.cbc-kpi--neutral { border-left-color: #6366f1; }
+.cbc-kpi__label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #6b7280; margin-bottom: 6px; }
+.cbc-kpi__value { font-size: 28px; font-weight: 700; color: #0b1f3a; line-height: 1.1; }
+.cbc-kpi__sub   { font-size: 12px; color: #6b7280; margin-top: 6px; }
+
+/* Toolbar */
+.cbc-toolbar { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; background: #fff; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 12px; }
+.cbc-toolbar__left, .cbc-toolbar__right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.cbc-input { height: 36px; border: 1px solid #d1d5db; border-radius: 8px; padding: 0 12px; font-size: 13px; min-width: 180px; background: #fff; }
+.cbc-input:focus { outline: 2px solid #c7d2fe; border-color: #6366f1; }
+
+/* Buttons */
+.cbc-btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid #d1d5db; background: #fff; color: #1f2937; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s, border-color .15s; }
+.cbc-btn:hover { background: #f9fafb; }
+.cbc-btn-primary { background: #4f46e5; border-color: #4f46e5; color: #fff; }
+.cbc-btn-primary:hover { background: #4338ca; }
+.cbc-btn-ghost   { background: #fff; }
+.cbc-btn-danger  { background: #fff; border-color: #fecaca; color: #b91c1c; }
+.cbc-btn-danger:hover { background: #fee2e2; }
+.cbc-btn-link    { background: transparent; border: none; color: #4f46e5; padding: 0; height: auto; }
+
+/* Pills */
+.cbc-pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; background: #eef2ff; color: #4338ca; }
+.cbc-pill--good { background: #d1fae5; color: #047857; }
+.cbc-pill--warn { background: #fef3c7; color: #92400e; }
+.cbc-pill--bad  { background: #fee2e2; color: #991b1b; }
+.cbc-pill--neutral { background: #f3f4f6; color: #374151; }
+
+/* Notices */
+.cbc-notice { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; }
+.cbc-notice.is-error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+
+/* Table */
+.cbc-table-wrap { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
+.cbc-table { width: 100%; border-collapse: collapse; }
+.cbc-table thead th { background: #f9fafb; padding: 12px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #e5e7eb; }
+.cbc-table tbody td { padding: 14px; border-bottom: 1px solid #f3f4f6; font-size: 13px; vertical-align: middle; }
+.cbc-table tbody tr:hover { background: #fafbff; }
+.cbc-table tbody tr.is-selected { background: #eef2ff; }
+.cbc-table .cbc-w-check { width: 36px; padding-right: 0; }
+.cbc-table .cbc-w-action { text-align: right; }
+.cbc-table .cbc-loading { padding: 32px 14px; text-align: center; color: #6b7280; }
+.cbc-table code { font-size: 11px; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; color: #4338ca; }
+
+/* Pager */
+.cbc-pager { display: flex; justify-content: flex-end; gap: 6px; padding: 12px 14px; background: #f9fafb; border-top: 1px solid #e5e7eb; font-size: 13px; align-items: center; }
+.cbc-pager button { background: #fff; border: 1px solid #d1d5db; border-radius: 6px; padding: 4px 10px; font-size: 13px; cursor: pointer; }
+.cbc-pager button[disabled] { opacity: .5; cursor: not-allowed; }
+
+/* Drawer (slide-in member detail panel) */
+.cbc-drawer { position: fixed; inset: 0; z-index: 100000; }
+.cbc-drawer__shade { position: absolute; inset: 0; background: rgba(15,23,42,.45); animation: cbcFade .15s ease-out; }
+.cbc-drawer__panel { position: absolute; top: 0; right: 0; bottom: 0; width: min(680px, 92vw); background: #fff; box-shadow: -16px 0 32px rgba(15,23,42,.2); display: flex; flex-direction: column; animation: cbcSlide .2s ease-out; }
+@keyframes cbcFade { from { opacity: 0; } }
+@keyframes cbcSlide { from { transform: translateX(20px); opacity: 0; } }
+.cbc-drawer__head { display: flex; justify-content: space-between; align-items: flex-start; padding: 22px 24px 14px; border-bottom: 1px solid #e5e7eb; }
+.cbc-drawer__name { margin: 0 0 4px; font-size: 22px; color: #0b1f3a; }
+.cbc-drawer__meta { display: flex; gap: 10px; align-items: center; font-size: 13px; color: #6b7280; }
+.cbc-drawer__actions { display: flex; gap: 6px; align-items: center; }
+.cbc-drawer__x { background: transparent; border: none; font-size: 22px; line-height: 1; cursor: pointer; color: #6b7280; padding: 0 6px; }
+.cbc-drawer__body { padding: 22px 24px; overflow: auto; flex: 1; }
+.cbc-drawer__section { margin-bottom: 24px; }
+.cbc-drawer__section h3 { margin: 0 0 10px; font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #6b7280; }
+.cbc-drawer__form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cbc-drawer__form label { display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+.cbc-drawer__form input, .cbc-drawer__form select { width: 100%; }
+
+/* Plans grid */
+.cbc-plan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.cbc-plan-card { background: #0f172a; color: #e2e8f0; border-radius: 16px; padding: 24px; position: relative; box-shadow: 0 12px 28px rgba(15,23,42,.18); display: flex; flex-direction: column; }
+.cbc-plan-card.is-featured { box-shadow: 0 0 0 2px #6366f1, 0 12px 28px rgba(99,102,241,.4); }
+.cbc-plan-card__badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; padding: 4px 14px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: .08em; }
+.cbc-plan-card__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.cbc-plan-card__name { margin: 0; font-size: 22px; color: #fff; }
+.cbc-plan-card__slug { display: inline-block; margin: 8px 0 0; color: #818cf8 !important; background: rgba(99,102,241,.15) !important; font-size: 11px; padding: 2px 8px; border-radius: 6px; }
+.cbc-plan-card__desc { color: #94a3b8; margin: 12px 0 16px; font-size: 13px; }
+.cbc-plan-card__prices { display: flex; gap: 16px; margin: 12px 0; }
+.cbc-plan-card__price-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: #64748b; }
+.cbc-plan-card__price { font-size: 22px; font-weight: 700; color: #fff; }
+.cbc-plan-card__caps { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0; }
+.cbc-plan-card__caps .cbc-pill { background: rgba(99,102,241,.18); color: #c7d2fe; }
+.cbc-plan-card__benefits { list-style: none; padding: 0; margin: 12px 0 18px; color: #cbd5e1; font-size: 13px; line-height: 1.8; flex: 1; }
+.cbc-plan-card__foot { display: flex; gap: 14px; padding-top: 14px; border-top: 1px solid rgba(148,163,184,.18); }
+.cbc-plan-card__stat-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: #64748b; }
+.cbc-plan-card__stat { font-size: 22px; font-weight: 700; color: #fff; }
+.cbc-plan-card__stat--good { color: #34d399; }
+.cbc-plan-card__stat--warn { color: #fbbf24; }
+
+.cbc-empty { padding: 60px 20px; text-align: center; color: #6b7280; background: #fff; border-radius: 12px; border: 1px dashed #d1d5db; }
