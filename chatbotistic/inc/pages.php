@@ -96,6 +96,23 @@ function cb_provision_pages() {
 add_action( 'after_switch_theme', 'cb_provision_pages' );
 
 /**
+ * Auto re-provision after a theme update so any new entries added to
+ * cb_page_map() in a newer release are created without the admin needing
+ * to switch themes off and on. Compares the version we last provisioned
+ * for against the current theme version on every admin page load (cheap)
+ * and re-runs the idempotent provisioner if it has drifted.
+ */
+function cb_maybe_reprovision_on_update() {
+	$current  = defined( 'CB_VERSION' ) ? CB_VERSION : '0';
+	$last_run = (string) get_option( 'cb_pages_version', '' );
+	if ( '' === $last_run || version_compare( $last_run, $current, '<' ) ) {
+		cb_provision_pages();
+		update_option( 'cb_pages_version', $current );
+	}
+}
+add_action( 'admin_init', 'cb_maybe_reprovision_on_update', 5 );
+
+/**
  * Route wp-login / register links to branded pages when they exist.
  */
 function cb_login_url( $url ) {
