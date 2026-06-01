@@ -53,3 +53,9 @@ if ( ! function_exists( 'memberistic_get_qr_verification_label' ) ) {
 		return WordPressistic\Memberistic\memberistic_get_qr_verification_label();
 	}
 }
+
+if ( ! function_exists( 'memberistic_account_show_lane_tools' ) ) {
+	function memberistic_account_show_lane_tools() {
+		return WordPressistic\Memberistic\memberistic_account_show_lane_tools();
+	}
+}

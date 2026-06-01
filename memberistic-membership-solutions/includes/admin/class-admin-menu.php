@@ -77,13 +77,13 @@ final class Admin_Menu {
 	public static function render_integrations() {
 		self::guard_dashboard();
 		$cards = array(
-			array( 'name' => 'G2A Booking Engine', 'desc' => __( 'Member eligibility, free lane booking rules, booking activity, and front desk visibility.', 'memberistic' ), 'active' => class_exists( 'G2AB_Plugin' ), 'icon' => 'B', 'status' => class_exists( 'G2AB_Plugin' ) ? 'connected' : 'not_connected' ),
+			array( 'name' => __( 'Booking Engine', 'memberistic' ), 'desc' => __( 'Member eligibility, booking rules, booking activity, and front-desk visibility.', 'memberistic' ), 'active' => class_exists( 'G2AB_Plugin' ), 'icon' => 'B', 'status' => class_exists( 'G2AB_Plugin' ) ? 'connected' : 'not_connected' ),
 			array( 'name' => 'Stripe Checkout', 'desc' => __( 'Hosted membership subscription checkout and webhooks.', 'memberistic' ), 'active' => 'yes' === memberistic_get_setting( 'stripe_enabled', 'no' ), 'icon' => 'S', 'status' => 'yes' === memberistic_get_setting( 'stripe_enabled', 'no' ) ? 'connected' : 'not_connected' ),
 			array( 'name' => 'WooCommerce', 'desc' => __( 'Completed-order sync for membership purchases.', 'memberistic' ), 'active' => class_exists( 'WooCommerce' ) && 'yes' === memberistic_get_setting( 'woocommerce_enabled', 'no' ), 'icon' => 'W', 'status' => class_exists( 'WooCommerce' ) && 'yes' === memberistic_get_setting( 'woocommerce_enabled', 'no' ) ? 'connected' : 'not_connected' ),
 			array( 'name' => 'Email Automation', 'desc' => __( 'Lifecycle notifications for checkout, activation, failed payment, cancellation, renewals, and waivers.', 'memberistic' ), 'active' => true, 'icon' => 'M', 'status' => 'connected' ),
 			array( 'name' => 'Klaviyo Sync', 'desc' => __( 'Export member segments, renewal windows, and failed payment audiences into marketing automation.', 'memberistic' ), 'active' => false, 'icon' => 'K', 'status' => 'coming_soon' ),
 			array( 'name' => 'POS Bridge', 'desc' => __( 'Connect memberships with retail counter sales, barcode lookup, and staff checkout workflows.', 'memberistic' ), 'active' => false, 'icon' => 'P', 'status' => 'coming_soon' ),
-			array( 'name' => 'Waiver Provider', 'desc' => __( 'Connect signed range waivers with each person record and staff check-in status.', 'memberistic' ), 'active' => false, 'icon' => 'W', 'status' => 'coming_soon' ),
+			array( 'name' => __( 'Waiver Provider', 'memberistic' ), 'desc' => __( 'Connect signed waivers with each person record and staff check-in status.', 'memberistic' ), 'active' => false, 'icon' => 'W', 'status' => 'coming_soon' ),
 			array( 'name' => 'SMS Reminders', 'desc' => __( 'Send renewal, failed payment, check-in, and booking reminders by text message.', 'memberistic' ), 'active' => false, 'icon' => 'T', 'status' => 'coming_soon' ),
 		);
 		?>

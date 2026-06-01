@@ -15,16 +15,19 @@ use function WordPressistic\Memberistic\memberistic_get_page_url;
 use function WordPressistic\Memberistic\memberistic_get_setting;
 use function WordPressistic\Memberistic\memberistic_get_member_id_prefix;
 use function WordPressistic\Memberistic\memberistic_get_qr_verification_label;
+use function WordPressistic\Memberistic\memberistic_get_brand_label;
+use function WordPressistic\Memberistic\memberistic_account_show_lane_tools;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$renewal_url = memberistic_get_page_url( 'renewal_page_id', 'memberistic-renewal', home_url( '/' ) );
-$plans_url   = memberistic_get_page_url( 'plans_page_id', 'memberistic-memberships', home_url( '/' ) );
-$support_url = home_url( '/support/' );
-$lane_url    = home_url( '/account/?view=tools' );
-$waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
+$renewal_url     = memberistic_get_page_url( 'renewal_page_id', 'memberistic-renewal', home_url( '/' ) );
+$plans_url       = memberistic_get_page_url( 'plans_page_id', 'memberistic-memberships', home_url( '/' ) );
+$support_url     = home_url( '/support/' );
+$lane_url        = home_url( '/account/?view=tools' );
+$waiver_enabled  = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
+$show_lane_tools = memberistic_account_show_lane_tools();
 ?>
 <div class="memberistic-frontend memberistic-account memberistic-acct">
 <?php if ( ! $current ) : ?>
@@ -53,8 +56,8 @@ $waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
 	$status      = (string) $current['status'];
 	$status_ok   = in_array( $status, array( 'active', 'comped', 'trial' ), true );
 	$member_email = $user->user_email ? $user->user_email : ( $current['email'] ?? '' );
-	// Dynamic QR payload — encodes this member's verification details, so a
-	// scan at the range desk reveals their name, email and membership level.
+	// Dynamic QR payload — encodes this member's verification details so a
+	// scan at the front desk reveals their name, email and membership level.
 	$qr_payload  = implode( "\n", array(
 		memberistic_get_qr_verification_label(),
 		'Name: ' . $display,
@@ -98,7 +101,9 @@ $waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
 				<a href="#details"   data-tab="details"><span class="memberistic-acct-ic">◇</span><?php esc_html_e( 'Membership Details', 'memberistic' ); ?></a>
 				<a href="#billing"   data-tab="billing"><span class="memberistic-acct-ic">▭</span><?php esc_html_e( 'Billing &amp; Payments', 'memberistic' ); ?></a>
 				<a href="#members"   data-tab="members"><span class="memberistic-acct-ic">⚇</span><?php esc_html_e( 'Additional Members', 'memberistic' ); ?></a>
-				<a href="#bookings"  data-tab="bookings"><span class="memberistic-acct-ic">◷</span><?php esc_html_e( 'Booking History', 'memberistic' ); ?></a>
+				<?php if ( $show_lane_tools ) : ?>
+					<a href="#bookings"  data-tab="bookings"><span class="memberistic-acct-ic">◷</span><?php esc_html_e( 'Booking History', 'memberistic' ); ?></a>
+				<?php endif; ?>
 				<a href="#card"      data-tab="card"><span class="memberistic-acct-ic">▤</span><?php esc_html_e( 'Digital Member Card', 'memberistic' ); ?></a>
 				<span class="memberistic-acct-navsep"></span>
 				<a href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>" class="memberistic-acct-signout"><span class="memberistic-acct-ic">⤶</span><?php esc_html_e( 'Sign Out', 'memberistic' ); ?></a>
@@ -111,7 +116,7 @@ $waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
 			<section class="memberistic-acct-view is-active" data-panel="dashboard">
 				<header class="memberistic-acct-welcome">
 					<h2><?php printf( esc_html__( 'Welcome back, %s.', 'memberistic' ), esc_html( $first ) ); ?></h2>
-					<p><?php esc_html_e( 'Your range access is active and your member card is ready. Lane availability is good for today.', 'memberistic' ); ?></p>
+					<p><?php esc_html_e( 'Your membership is active. Everything you need is in the tabs below.', 'memberistic' ); ?></p>
 				</header>
 				<div class="memberistic-acct-stats">
 					<div class="memberistic-acct-stat"><span><?php esc_html_e( 'Plan', 'memberistic' ); ?></span><strong><?php echo esc_html( $current['plan_name'] ); ?></strong></div>
@@ -120,14 +125,16 @@ $waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
 					<div class="memberistic-acct-stat"><span><?php esc_html_e( 'Member Since', 'memberistic' ); ?></span><strong><?php echo esc_html( $since ); ?></strong></div>
 				</div>
 				<div class="memberistic-acct-actions">
-					<a class="memberistic-acct-action" href="<?php echo esc_url( $lane_url ); ?>">
-						<span class="memberistic-acct-ic">◷</span>
-						<span><strong><?php esc_html_e( 'Book A Lane', 'memberistic' ); ?></strong><small><?php esc_html_e( 'Reserve online 24/7', 'memberistic' ); ?></small></span>
-					</a>
-					<div class="memberistic-acct-action is-static">
-						<span class="memberistic-acct-ic">◴</span>
-						<span><strong><?php esc_html_e( 'Range Hours', 'memberistic' ); ?></strong><small><?php esc_html_e( 'Mon–Thu 10–6 · Sat 9–8 · Sun 12–6', 'memberistic' ); ?></small></span>
-					</div>
+					<?php if ( $show_lane_tools ) : ?>
+						<a class="memberistic-acct-action" href="<?php echo esc_url( $lane_url ); ?>">
+							<span class="memberistic-acct-ic">◷</span>
+							<span><strong><?php esc_html_e( 'Book A Lane', 'memberistic' ); ?></strong><small><?php esc_html_e( 'Reserve online 24/7', 'memberistic' ); ?></small></span>
+						</a>
+						<div class="memberistic-acct-action is-static">
+							<span class="memberistic-acct-ic">◴</span>
+							<span><strong><?php esc_html_e( 'Range Hours', 'memberistic' ); ?></strong><small><?php esc_html_e( 'Mon–Thu 10–6 · Sat 9–8 · Sun 12–6', 'memberistic' ); ?></small></span>
+						</div>
+					<?php endif; ?>
 					<a class="memberistic-acct-action" href="#members" data-tab="members">
 						<span class="memberistic-acct-ic">⚇</span>
 						<span><strong><?php esc_html_e( 'Manage Members', 'memberistic' ); ?></strong><small><?php esc_html_e( 'Add, edit or remove people', 'memberistic' ); ?></small></span>
@@ -153,7 +160,7 @@ $waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
 							<?php endforeach; ?>
 						</ul>
 					<?php else : ?>
-						<p class="memberistic-acct-muted"><?php esc_html_e( 'Unlimited range time and full member benefits.', 'memberistic' ); ?></p>
+						<p class="memberistic-acct-muted"><?php esc_html_e( 'Full member benefits.', 'memberistic' ); ?></p>
 					<?php endif; ?>
 					<div class="memberistic-acct-ctas">
 						<a class="memberistic-acct-cta memberistic-acct-cta--primary" href="<?php echo esc_url( $plans_url ); ?>"><?php esc_html_e( 'Change Plan', 'memberistic' ); ?></a>
@@ -250,6 +257,7 @@ $waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
 			</section>
 
 			<!-- BOOKING HISTORY -->
+			<?php if ( $show_lane_tools ) : ?>
 			<section class="memberistic-acct-view" data-panel="bookings">
 				<div class="memberistic-acct-block">
 					<h2><?php esc_html_e( 'Booking &amp; Check-In History', 'memberistic' ); ?></h2>
@@ -267,7 +275,7 @@ $waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
 								<tbody>
 									<?php foreach ( $bookings as $booking ) : ?>
 										<tr>
-											<td><?php echo esc_html( ! empty( $booking['booking_type_name'] ) ? $booking['booking_type_name'] : __( 'Lane Booking', 'memberistic' ) ); ?></td>
+											<td><?php echo esc_html( ! empty( $booking['booking_type_name'] ) ? $booking['booking_type_name'] : __( 'Booking', 'memberistic' ) ); ?></td>
 											<td><?php echo esc_html( $booking['resource_name'] ?? '—' ); ?></td>
 											<td><span class="memberistic-acct-pill"><?php echo esc_html( ucfirst( (string) ( $booking['status'] ?? 'pending' ) ) ); ?></span></td>
 											<td><?php echo esc_html( ! empty( $booking['start_at'] ) ? date_i18n( 'M j, Y', strtotime( $booking['start_at'] ) ) : '—' ); ?></td>
@@ -275,7 +283,7 @@ $waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
 									<?php endforeach; ?>
 									<?php foreach ( $checkins as $checkin ) : ?>
 										<tr>
-											<td><?php esc_html_e( 'Range Check-In', 'memberistic' ); ?></td>
+											<td><?php esc_html_e( 'Check-In', 'memberistic' ); ?></td>
 											<td><?php echo esc_html( ucwords( str_replace( '_', ' ', (string) ( $checkin['checkin_type'] ?? '' ) ) ) ); ?></td>
 											<td><span class="memberistic-acct-pill memberistic-acct-pill--ok"><?php echo esc_html( ucfirst( (string) ( $checkin['status'] ?? '' ) ) ); ?></span></td>
 											<td><?php echo esc_html( ! empty( $checkin['checked_in_at'] ) ? date_i18n( 'M j, Y', strtotime( $checkin['checked_in_at'] ) ) : '—' ); ?></td>
@@ -287,6 +295,7 @@ $waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
 					<?php endif; ?>
 				</div>
 			</section>
+			<?php endif; ?>
 
 			<!-- DIGITAL MEMBER CARD -->
 			<section class="memberistic-acct-view" data-panel="card">
@@ -294,7 +303,7 @@ $waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
 					<h2><?php esc_html_e( 'Your Digital Member Card', 'memberistic' ); ?></h2>
 					<div class="memberistic-acct-pass" id="memberistic-acct-pass">
 						<div class="memberistic-acct-pass__top">
-							<span class="memberistic-acct-pass__brand">GUNS&nbsp;2&nbsp;AMMO</span>
+							<span class="memberistic-acct-pass__brand"><?php echo esc_html( strtoupper( memberistic_get_brand_label() ) ); ?></span>
 							<span class="memberistic-acct-pass__plan"><?php echo esc_html( strtoupper( $current['plan_name'] ) ); ?></span>
 						</div>
 						<div class="memberistic-acct-pass__name"><?php echo esc_html( strtoupper( $display ) ); ?></div>
@@ -311,7 +320,7 @@ $waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
 								src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&amp;margin=0&amp;ecc=M&amp;bgcolor=ffffff&amp;data=<?php echo esc_attr( $qr_data ); ?>" />
 						</div>
 					</div>
-					<p class="memberistic-acct-mini memberistic-acct-passnote"><?php esc_html_e( 'Show at the range desk · or scan the QR', 'memberistic' ); ?></p>
+					<p class="memberistic-acct-mini memberistic-acct-passnote"><?php esc_html_e( 'Show this card or scan the QR for verification.', 'memberistic' ); ?></p>
 					<div class="memberistic-acct-ctas memberistic-acct-ctas--center">
 						<button type="button" class="memberistic-acct-cta memberistic-acct-cta--primary" data-print-card><?php esc_html_e( 'Download / Print Card', 'memberistic' ); ?></button>
 					</div>

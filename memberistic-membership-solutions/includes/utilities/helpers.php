@@ -66,6 +66,18 @@ function memberistic_get_login_cta_note() {
 }
 
 /**
+ * Whether the account template should render the "Book A Lane / Range Hours"
+ * tile bar and the Booking History section. Defaults to true so legacy
+ * (range-business) installs are unaffected; SaaS profiles set
+ * `account_show_lane_tools` to "no".
+ */
+function memberistic_account_show_lane_tools() {
+	$enabled = (string) memberistic_get_setting( 'account_show_lane_tools', 'yes' );
+	$enabled = 'no' !== strtolower( $enabled );
+	return (bool) apply_filters( 'memberistic_account_show_lane_tools', $enabled );
+}
+
+/**
  * Header label encoded into the member-verification QR payload.
  */
 function memberistic_get_qr_verification_label() {
