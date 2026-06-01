@@ -1,0 +1,338 @@
+/* =========================================================================
+   Memberistic skin — restyles the plugin's frontend into the Chatbotistic
+   design system. Loaded after memberistic-frontend so it wins on cascade.
+   No plugin files are touched; everything keys off .memberistic-* classes.
+   ========================================================================= */
+
+/* ---------- Base ---------- */
+.memberistic-frontend {
+	font-family: var(--cb-font-body);
+	color: var(--cb-text);
+	--memberistic-brand: var(--cb-indigo);
+}
+.memberistic-frontend h1,
+.memberistic-frontend h2,
+.memberistic-frontend h3,
+.memberistic-frontend h4 {
+	font-family: var(--cb-font-display);
+	letter-spacing: -0.02em;
+	color: var(--cb-text);
+}
+.memberistic-frontend a { color: var(--cb-indigo-2); }
+.memberistic-frontend p { color: var(--cb-soft); }
+
+/* ---------- Buttons ---------- */
+.memberistic-frontend .memberistic-plan-button,
+.memberistic-frontend button[type="submit"],
+.memberistic-frontend .memberistic-checkout-form button {
+	display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+	padding: 13px 22px; border: 0; border-radius: 12px;
+	font-family: var(--cb-font-body); font-weight: 600; font-size: 14.5px;
+	color: #fff; background: var(--cb-grad-btn);
+	box-shadow: var(--cb-shadow-bd); cursor: pointer; text-decoration: none;
+	transition: transform .18s ease, box-shadow .2s ease;
+}
+.memberistic-frontend .memberistic-plan-button:hover,
+.memberistic-frontend button[type="submit"]:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 16px 40px -10px rgba(120,90,255,0.7);
+}
+.memberistic-frontend .memberistic-secondary-button {
+	display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+	padding: 12px 20px; border-radius: 12px;
+	background: var(--cb-glass); border: 1px solid var(--cb-line);
+	color: var(--cb-text); font-weight: 600; font-size: 14px; text-decoration: none;
+	transition: background .2s, border-color .2s;
+}
+.memberistic-frontend .memberistic-secondary-button:hover {
+	background: rgba(255,255,255,0.08); border-color: var(--cb-line-2);
+}
+
+/* ---------- Billing toggle ---------- */
+.memberistic-billing-toggle {
+	display: inline-flex; gap: 4px; padding: 4px; margin: 0 auto 32px;
+	background: var(--cb-glass); border: 1px solid var(--cb-line); border-radius: 999px;
+}
+.memberistic-billing-toggle button {
+	padding: 9px 20px; border: 0; border-radius: 999px;
+	background: transparent; color: var(--cb-soft);
+	font-family: var(--cb-font-body); font-weight: 600; font-size: 13px; cursor: pointer;
+	transition: background .2s, color .2s;
+}
+.memberistic-billing-toggle button.is-active {
+	background: var(--cb-grad-btn); color: #fff;
+}
+
+/* ---------- Plans grid ---------- */
+.memberistic-plan-grid {
+	display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px;
+	padding-top: 14px; /* room for the featured badge that sits above the card */
+}
+.memberistic-plan-card {
+	position: relative; overflow: visible; display: flex; flex-direction: column;
+	padding: 28px; border-radius: var(--cb-r-lg);
+	border: 1px solid var(--cb-line);
+	background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.012));
+}
+.memberistic-plan-card.is-featured {
+	border-color: rgba(99,128,255,0.5);
+	background: radial-gradient(circle at 50% 0%, rgba(99,91,255,0.16), transparent 60%), rgba(255,255,255,0.04);
+	box-shadow: 0 26px 70px -22px rgba(120,90,255,0.5);
+}
+.memberistic-featured-badge {
+	position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+	padding: 5px 13px; border-radius: 999px;
+	background: var(--cb-grad-btn); color: #fff;
+	font-family: var(--cb-font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+	box-shadow: var(--cb-shadow-bd); white-space: nowrap;
+}
+.memberistic-plan-card h3 { font-size: 18px; }
+.memberistic-plan-description { font-size: 13.5px; color: var(--cb-soft); margin: 8px 0 16px; }
+.memberistic-plan-price { display: flex; align-items: baseline; gap: 6px; }
+.memberistic-price-value {
+	font-family: var(--cb-font-display); font-size: 42px; font-weight: 600;
+	letter-spacing: -0.03em; line-height: 1; color: var(--cb-text);
+}
+.memberistic-price-cycle { font-size: 14px; color: var(--cb-soft); }
+.memberistic-annual-savings {
+	display: inline-block; margin-top: 10px; padding: 3px 9px; border-radius: 999px;
+	background: rgba(63,220,255,0.1); border: 1px solid rgba(63,220,255,0.28);
+	font-family: var(--cb-font-mono); font-size: 10.5px; letter-spacing: 0.06em; color: var(--cb-cyan);
+}
+.memberistic-included-people { font-size: 12.5px; color: var(--cb-dim); margin-top: 12px; }
+.memberistic-benefits {
+	list-style: none; padding: 0; margin: 18px 0;
+	display: flex; flex-direction: column; gap: 10px; flex: 1;
+}
+.memberistic-benefits li {
+	position: relative; padding-left: 26px;
+	font-size: 13.8px; color: var(--cb-soft); line-height: 1.5;
+}
+.memberistic-benefits li::before {
+	content: ""; position: absolute; left: 0; top: 6px;
+	width: 16px; height: 16px; border-radius: 50%;
+	background: rgba(52,211,153,0.14);
+	box-shadow: inset 0 0 0 1px rgba(52,211,153,0.4);
+}
+.memberistic-benefits li::after {
+	content: ""; position: absolute; left: 5px; top: 9px;
+	width: 6px; height: 3px; border-left: 2px solid var(--cb-green);
+	border-bottom: 2px solid var(--cb-green); transform: rotate(-45deg);
+}
+.memberistic-plan-button { margin-top: auto; }
+
+/* ---------- Inputs (checkout, login, staff) ---------- */
+.memberistic-frontend input[type="text"],
+.memberistic-frontend input[type="email"],
+.memberistic-frontend input[type="password"],
+.memberistic-frontend input[type="tel"],
+.memberistic-frontend input[type="number"],
+.memberistic-frontend input[type="search"],
+.memberistic-frontend select,
+.memberistic-frontend textarea {
+	width: 100%; padding: 13px 15px;
+	background: rgba(0,0,0,0.35); border: 1px solid var(--cb-line);
+	border-radius: 12px; color: var(--cb-text);
+	font-family: var(--cb-font-body); font-size: 15px;
+	transition: border-color .18s, background .18s;
+}
+.memberistic-frontend input:focus,
+.memberistic-frontend select:focus,
+.memberistic-frontend textarea:focus {
+	outline: none; border-color: rgba(99,128,255,0.6); background: rgba(0,0,0,0.5);
+}
+.memberistic-frontend label { font-size: 13.5px; color: var(--cb-soft); font-weight: 500; }
+.memberistic-frontend ::placeholder { color: var(--cb-dim); }
+/* Keep autofilled fields on the dark theme instead of the browser's pale wash. */
+.memberistic-frontend input:-webkit-autofill,
+.memberistic-frontend input:-webkit-autofill:hover,
+.memberistic-frontend input:-webkit-autofill:focus {
+	-webkit-text-fill-color: var(--cb-text);
+	-webkit-box-shadow: 0 0 0 1000px #0b0f18 inset;
+	caret-color: var(--cb-text);
+	transition: background-color 9999s ease-in-out 0s;
+}
+.memberistic-checkbox-line {
+	display: flex; align-items: flex-start; gap: 10px;
+	font-size: 13.5px; color: var(--cb-soft);
+}
+.memberistic-checkbox-line input { width: auto; }
+
+/* ---------- Checkout ---------- */
+.memberistic-checkout {
+	display: flex; flex-direction: column; gap: 18px;
+	max-width: 540px; margin: 0 auto;
+}
+.memberistic-checkout > h2 { font-size: 22px; text-align: center; }
+.memberistic-checkout-form {
+	display: flex; flex-direction: column; gap: 16px;
+	padding: 28px; border-radius: var(--cb-r-lg);
+	background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+	border: 1px solid var(--cb-line);
+}
+.memberistic-checkout-form > label { display: flex; flex-direction: column; gap: 7px; }
+.memberistic-checkout-form > label > span {
+	font-family: var(--cb-font-mono); font-size: 11.5px; letter-spacing: 0.07em;
+	text-transform: uppercase; color: var(--cb-dim);
+}
+.memberistic-checkout-price-preview { gap: 9px; }
+.memberistic-price-summary {
+	display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+	padding: 16px 20px; border-radius: var(--cb-r);
+	background: rgba(0,0,0,0.3); border: 1px solid var(--cb-line);
+}
+.memberistic-price-summary strong {
+	font-family: var(--cb-font-display); font-size: 16px; font-weight: 600; color: var(--cb-text);
+}
+.memberistic-summary-price {
+	font-family: var(--cb-font-display); font-size: 22px; font-weight: 600;
+	letter-spacing: -0.02em; color: var(--cb-text); white-space: nowrap;
+}
+.memberistic-summary-placeholder { color: var(--cb-dim); font-size: 14px; }
+.memberistic-checkout-form .memberistic-plan-button { margin-top: 4px; }
+
+/* ---------- Account portal ---------- */
+.memberistic-account { display: grid; gap: 20px; }
+.memberistic-account-nav {
+	display: flex; flex-wrap: wrap; gap: 6px; padding: 6px;
+	background: var(--cb-glass); border: 1px solid var(--cb-line); border-radius: 14px;
+}
+.memberistic-account-nav a,
+.memberistic-account-nav button {
+	padding: 9px 15px; border-radius: 9px; border: 0; background: transparent;
+	color: var(--cb-soft); font-family: var(--cb-font-body); font-size: 13.5px; font-weight: 600;
+	cursor: pointer; text-decoration: none; transition: background .18s, color .18s;
+}
+.memberistic-account-nav a:hover,
+.memberistic-account-nav a.is-active,
+.memberistic-account-nav .is-active {
+	background: linear-gradient(135deg, rgba(99,91,255,0.26), rgba(160,112,255,0.16));
+	color: #fff;
+}
+.memberistic-account-section,
+.memberistic-account-summary,
+.memberistic-memberships,
+.memberistic-people,
+.memberistic-payments,
+.memberistic-bookings,
+.memberistic-activity,
+.memberistic-renewal {
+	padding: 24px; border-radius: var(--cb-r-lg);
+	background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012));
+	border: 1px solid var(--cb-line);
+}
+.memberistic-account-empty,
+.memberistic-placeholder { color: var(--cb-dim); font-size: 14px; }
+
+/* Tables inside the account / payment history */
+.memberistic-frontend table { width: 100%; border-collapse: collapse; }
+.memberistic-frontend th {
+	text-align: left; padding: 11px 14px;
+	font-family: var(--cb-font-mono); font-size: 10.5px; letter-spacing: 0.09em;
+	text-transform: uppercase; color: var(--cb-dim);
+	border-bottom: 1px solid var(--cb-line);
+}
+.memberistic-frontend td {
+	padding: 12px 14px; font-size: 14px; color: var(--cb-soft);
+	border-bottom: 1px solid var(--cb-line);
+}
+.memberistic-frontend tr:last-child td { border-bottom: 0; }
+
+/* ---------- Alerts ---------- */
+.memberistic-account-alert {
+	padding: 13px 16px; border-radius: 12px; font-size: 14px;
+	border: 1px solid var(--cb-line); background: var(--cb-glass); color: var(--cb-soft);
+}
+.memberistic-account-alert--info {
+	background: rgba(79,139,255,0.1); border-color: rgba(79,139,255,0.32); color: #bcd0ff;
+}
+.memberistic-account-alert--warning {
+	background: rgba(255,196,107,0.1); border-color: rgba(255,196,107,0.32); color: var(--cb-amber);
+}
+
+/* ---------- Status badges ---------- */
+.memberistic-status-badge {
+	display: inline-block; padding: 4px 12px; border-radius: 999px;
+	font-family: var(--cb-font-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+	background: var(--cb-grad-btn); color: #fff;
+}
+.memberistic-status-none {
+	background: rgba(255,255,255,0.06); color: var(--cb-dim);
+	border: 1px solid var(--cb-line);
+}
+.memberistic-expiring-notice {
+	padding: 14px 18px; border-radius: 12px;
+	background: rgba(255,196,107,0.1); border: 1px solid rgba(255,196,107,0.3);
+	color: var(--cb-amber); font-size: 14px;
+}
+
+/* ---------- Login ---------- */
+.memberistic-login-card {
+	max-width: 420px; margin: 0 auto; padding: 32px;
+	border-radius: var(--cb-r-lg);
+	background:
+		radial-gradient(circle at 0% 0%, rgba(99,91,255,0.08), transparent 55%),
+		linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+	border: 1px solid var(--cb-line);
+	display: flex; flex-direction: column; gap: 16px;
+}
+
+/* ---------- Result pages (thank you / failed) ---------- */
+.memberistic-result {
+	max-width: 520px; margin: 0 auto; text-align: center; padding: 40px 32px;
+	border-radius: var(--cb-r-lg); border: 1px solid var(--cb-line);
+	background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012));
+}
+.memberistic-result-icon {
+	width: 64px; height: 64px; margin: 0 auto 18px; border-radius: 50%;
+	display: grid; place-items: center;
+}
+.memberistic-result--success .memberistic-result-icon {
+	background: rgba(52,211,153,0.14); color: var(--cb-green);
+	box-shadow: inset 0 0 0 1px rgba(52,211,153,0.4);
+}
+.memberistic-result--failed .memberistic-result-icon {
+	background: rgba(255,90,120,0.12); color: #ff9caa;
+	box-shadow: inset 0 0 0 1px rgba(255,90,120,0.4);
+}
+.memberistic-result-actions {
+	display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 24px;
+}
+
+/* ---------- Toast ---------- */
+.memberistic-toast {
+	position: fixed; bottom: 24px; right: 24px; z-index: 200;
+	padding: 14px 18px; border-radius: 12px;
+	background: rgba(10,14,26,0.97); border: 1px solid var(--cb-line-2);
+	color: var(--cb-text); font-size: 14px;
+	box-shadow: var(--cb-shadow);
+}
+
+/* ---------- Staff dashboard (light pass) ---------- */
+.memberistic-staff-dashboard { color: var(--cb-text); }
+.memberistic-staff-panel,
+.memberistic-staff-form,
+.memberistic-staff-member,
+.memberistic-staff-table-wrap {
+	padding: 22px; border-radius: var(--cb-r-lg);
+	background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012));
+	border: 1px solid var(--cb-line);
+}
+.memberistic-staff-kpis {
+	display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 14px;
+}
+.memberistic-staff-notice {
+	padding: 13px 16px; border-radius: 12px; font-size: 14px; border: 1px solid var(--cb-line);
+}
+.memberistic-staff-notice--success {
+	background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.32); color: #a7ecdf;
+}
+.memberistic-staff-notice--error {
+	background: rgba(255,90,120,0.1); border-color: rgba(255,90,120,0.32); color: #ff9caa;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 560px) {
+	.memberistic-plan-grid { grid-template-columns: 1fr; }
+	.memberistic-account-nav { flex-direction: column; }
+}
