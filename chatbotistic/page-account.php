@@ -24,16 +24,31 @@ $cb_m      = cb_membership( $cb_uid );
 $cb_active = ! empty( $cb_m['active'] );
 
 $cb_views = array(
-	'overview'     => array( 'home',  __( 'Overview', 'chatbotistic' ) ),
-	'tools'        => array( 'bolt',  __( 'Tools', 'chatbotistic' ) ),
-	'subscription' => array( 'star',  __( 'Subscription', 'chatbotistic' ) ),
-	'invoices'     => array( 'card',  __( 'Invoices', 'chatbotistic' ) ),
-	'licenses'     => array( 'key',   __( 'Licenses', 'chatbotistic' ) ),
-	'profile'      => array( 'users', __( 'Profile', 'chatbotistic' ) ),
-	'support'      => array( 'chat',  __( 'Support', 'chatbotistic' ) ),
+	'overview' => array( 'home',  __( 'Overview', 'chatbotistic' ) ),
+	'widgets'  => array( 'bolt',  __( 'Widgets', 'chatbotistic' ) ),
+	'license'  => array( 'key',   __( 'License', 'chatbotistic' ) ),
+	'install'  => array( 'arrow-r', __( 'Install Plugin', 'chatbotistic' ) ),
+	'leads'    => array( 'users', __( 'Leads', 'chatbotistic' ) ),
+	'analytics'=> array( 'star',  __( 'Analytics', 'chatbotistic' ) ),
+	'support'  => array( 'chat',  __( 'Support', 'chatbotistic' ) ),
+	'billing'  => array( 'card',  __( 'Billing', 'chatbotistic' ) ),
+	'settings' => array( 'users', __( 'Account Settings', 'chatbotistic' ) ),
+);
+
+// Legacy view slugs from the previous nav still route to the right template,
+// so existing bookmarks / external links don't 404.
+$cb_view_aliases = array(
+	'tools'        => 'widgets',
+	'licenses'     => 'license',
+	'profile'      => 'settings',
+	'invoices'     => 'billing',
+	'subscription' => 'billing',
 );
 
 $cb_view = isset( $_GET['view'] ) ? sanitize_key( wp_unslash( $_GET['view'] ) ) : 'overview'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+if ( isset( $cb_view_aliases[ $cb_view ] ) ) {
+	$cb_view = $cb_view_aliases[ $cb_view ];
+}
 if ( ! isset( $cb_views[ $cb_view ] ) ) {
 	$cb_view = 'overview';
 }
@@ -76,7 +91,7 @@ get_header();
 							<a href="<?php echo cb_view_url( $cb_key ); ?>">
 								<?php cb_icon( $cb_v[0], 17 ); ?>
 								<span><?php echo esc_html( $cb_v[1] ); ?></span>
-								<?php if ( 'tools' === $cb_key && $cb_active ) : ?>
+								<?php if ( 'widgets' === $cb_key && $cb_active ) : ?>
 									<span class="cb-portal__nav-pill"><?php esc_html_e( 'Live', 'chatbotistic' ); ?></span>
 								<?php endif; ?>
 							</a>
@@ -107,7 +122,7 @@ get_header();
 				</div>
 				<?php
 				if ( $cb_active ) {
-					cb_button( __( 'Open Tools', 'chatbotistic' ), cb_view_url( 'tools' ), 'primary', array( 'icon' => 'arrow-r' ) );
+					cb_button( __( 'Open Widgets', 'chatbotistic' ), cb_view_url( 'widgets' ), 'primary', array( 'icon' => 'arrow-r' ) );
 				} else {
 					cb_button( __( 'Activate a plan', 'chatbotistic' ), cb_plans_url(), 'primary', array( 'icon' => 'arrow-r' ) );
 				}
