@@ -106,21 +106,40 @@ class Installer {
 		$settings = is_array( $settings ) ? $settings : [];
 
 		$override = [
-			'brand_label'        => 'Chatbotistic',
-			'admin_menu_label'   => 'Memberistic',
-			'business_name'      => 'Chatbotistic',
-			'business_phone'     => '',
-			'business_email'     => CBP_FROM_EMAIL,
-			'support_email'      => CBP_FROM_EMAIL,
-			'waiver_enabled'     => 'no',
-			'default_currency'   => 'USD',
-			'currency_symbol'    => '$',
-			'site_brand_url'     => CBP_BASE_URL,
+			'brand_label'           => 'Chatbotistic',
+			'admin_menu_label'      => 'Memberistic',
+			'business_name'         => 'Chatbotistic',
+			'business_phone'        => '',
+			'business_email'        => CBP_FROM_EMAIL,
+			'support_email'         => CBP_FROM_EMAIL,
+			'waiver_enabled'        => 'no',
+			'default_currency'      => 'USD',
+			'currency_symbol'       => '$',
+			'site_brand_url'        => CBP_BASE_URL,
+			// Wire the new brand-neutral helpers in Memberistic to Chatbotistic copy.
+			'member_id_prefix'      => 'CHT',
+			'login_tagline'         => 'Welcome back. Sign in to your Chatbotistic account.',
+			'login_cta_note'        => '',
+			'qr_verification_label' => 'Chatbotistic — Member Verification',
+			// Account template: hide the range/lane/check-in UI that ships in
+			// Memberistic by default — Chatbotistic memberships are SaaS, not
+			// range access.
+			'account_show_lane_tools' => 'no',
 		];
 
 		// Merge — never overwrite a key the admin has explicitly set, except
 		// the brand-y stuff which we want canonical.
-		$canonical = [ 'brand_label', 'business_name', 'business_email', 'support_email', 'waiver_enabled' ];
+		$canonical = [
+			'brand_label',
+			'business_name',
+			'business_email',
+			'support_email',
+			'waiver_enabled',
+			'member_id_prefix',
+			'login_tagline',
+			'qr_verification_label',
+			'account_show_lane_tools',
+		];
 		foreach ( $override as $key => $val ) {
 			if ( in_array( $key, $canonical, true ) || ! isset( $settings[ $key ] ) || '' === $settings[ $key ] ) {
 				$settings[ $key ] = $val;
