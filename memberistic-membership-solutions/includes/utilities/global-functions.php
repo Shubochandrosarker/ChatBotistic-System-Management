@@ -29,3 +29,27 @@ if ( ! function_exists( 'memberistic_get_brand_label' ) ) {
 		return WordPressistic\Memberistic\memberistic_get_brand_label();
 	}
 }
+
+if ( ! function_exists( 'memberistic_get_member_id_prefix' ) ) {
+	function memberistic_get_member_id_prefix() {
+		return WordPressistic\Memberistic\memberistic_get_member_id_prefix();
+	}
+}
+
+if ( ! function_exists( 'memberistic_get_login_tagline' ) ) {
+	function memberistic_get_login_tagline() {
+		return WordPressistic\Memberistic\memberistic_get_login_tagline();
+	}
+}
+
+if ( ! function_exists( 'memberistic_get_login_cta_note' ) ) {
+	function memberistic_get_login_cta_note() {
+		return WordPressistic\Memberistic\memberistic_get_login_cta_note();
+	}
+}
+
+if ( ! function_exists( 'memberistic_get_qr_verification_label' ) ) {
+	function memberistic_get_qr_verification_label() {
+		return WordPressistic\Memberistic\memberistic_get_qr_verification_label();
+	}
+}

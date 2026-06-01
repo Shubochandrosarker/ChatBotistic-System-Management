@@ -13,6 +13,8 @@ use WordPressistic\Memberistic\Database\Plans_Repository;
 use function WordPressistic\Memberistic\memberistic_format_price;
 use function WordPressistic\Memberistic\memberistic_get_page_url;
 use function WordPressistic\Memberistic\memberistic_get_setting;
+use function WordPressistic\Memberistic\memberistic_get_member_id_prefix;
+use function WordPressistic\Memberistic\memberistic_get_qr_verification_label;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -45,7 +47,7 @@ $waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
 	$people_have = (int) ( $current['people_count'] ?? count( $people ) );
 	$currency    = ! empty( $payments[0]['currency'] ) ? $payments[0]['currency'] : 'USD';
 	$pay_method  = ! empty( $payments[0]['payment_method'] ) ? ucwords( str_replace( '_', ' ', $payments[0]['payment_method'] ) ) : __( 'Card on file', 'memberistic' );
-	$member_id   = 'G2A-' . ( $current['start_date'] ? gmdate( 'Y', strtotime( $current['start_date'] ) ) : gmdate( 'Y' ) ) . '-' . str_pad( (string) $current['id'], 4, '0', STR_PAD_LEFT );
+	$member_id   = memberistic_get_member_id_prefix() . '-' . ( $current['start_date'] ? gmdate( 'Y', strtotime( $current['start_date'] ) ) : gmdate( 'Y' ) ) . '-' . str_pad( (string) $current['id'], 4, '0', STR_PAD_LEFT );
 	$since       = $current['start_date'] ? date_i18n( 'M Y', strtotime( $current['start_date'] ) ) : '—';
 	$renew       = $current['renewal_date'] ? date_i18n( 'M j, Y', strtotime( $current['renewal_date'] ) ) : '—';
 	$status      = (string) $current['status'];
@@ -54,7 +56,7 @@ $waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
 	// Dynamic QR payload — encodes this member's verification details, so a
 	// scan at the range desk reveals their name, email and membership level.
 	$qr_payload  = implode( "\n", array(
-		'GUNS 2 AMMO — MEMBER VERIFICATION',
+		memberistic_get_qr_verification_label(),
 		'Name: ' . $display,
 		'Email: ' . $member_email,
 		'Membership: ' . $current['plan_name'] . ' (' . ucfirst( (string) $current['billing_cycle'] ) . ')',

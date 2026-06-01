@@ -36,6 +36,49 @@ function memberistic_get_brand_label() {
 }
 
 /**
+ * Get the prefix used for human-readable member IDs (e.g. "CHT-2026-0001").
+ *
+ * Host products can override via the `memberistic_member_id_prefix` filter or
+ * by setting `member_id_prefix` in the `memberistic_settings` option.
+ */
+function memberistic_get_member_id_prefix() {
+	$prefix = (string) memberistic_get_setting( 'member_id_prefix', 'MEM' );
+	$prefix = preg_replace( '/[^A-Z0-9]/i', '', (string) $prefix );
+	$prefix = $prefix !== '' ? strtoupper( $prefix ) : 'MEM';
+	return apply_filters( 'memberistic_member_id_prefix', $prefix );
+}
+
+/**
+ * Subtitle shown under "MEMBER LOGIN" on the login shortcode.
+ */
+function memberistic_get_login_tagline() {
+	$default = __( 'Welcome back. Sign in to your account.', 'memberistic' );
+	$tagline = (string) memberistic_get_setting( 'login_tagline', $default );
+	return apply_filters( 'memberistic_login_tagline', $tagline );
+}
+
+/**
+ * Optional small print rendered under the login CTA. Empty by default.
+ */
+function memberistic_get_login_cta_note() {
+	$note = (string) memberistic_get_setting( 'login_cta_note', '' );
+	return apply_filters( 'memberistic_login_cta_note', $note );
+}
+
+/**
+ * Header label encoded into the member-verification QR payload.
+ */
+function memberistic_get_qr_verification_label() {
+	$default = sprintf(
+		/* translators: %s: brand label */
+		__( '%s — Member Verification', 'memberistic' ),
+		memberistic_get_brand_label()
+	);
+	$label = (string) memberistic_get_setting( 'qr_verification_label', $default );
+	return apply_filters( 'memberistic_qr_verification_label', $label );
+}
+
+/**
  * Resolve a mapped frontend page URL with an optional branded slug fallback.
  *
  * @param string $setting_key Page ID setting key.

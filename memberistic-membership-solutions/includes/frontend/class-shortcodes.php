@@ -216,13 +216,19 @@ final class Shortcodes {
 		$lost_url  = wp_lostpassword_url();
 		$redirect  = \WordPressistic\Memberistic\memberistic_get_page_url( 'account_page_id', 'memberistic-account', home_url( '/' ) );
 
+		$brand_label = \WordPressistic\Memberistic\memberistic_get_brand_label();
+		$tagline     = \WordPressistic\Memberistic\memberistic_get_login_tagline();
+		$cta_note    = \WordPressistic\Memberistic\memberistic_get_login_cta_note();
+
 		ob_start();
 		?>
 		<div class="memberistic-frontend memberistic-auth-shell">
 			<div class="memberistic-auth-card">
-				<div class="memberistic-auth-logo"><span class="memberistic-auth-mark"></span>GUNS 2 AMMO</div>
+				<div class="memberistic-auth-logo"><span class="memberistic-auth-mark"></span><?php echo esc_html( $brand_label ); ?></div>
 				<h2 class="memberistic-auth-title"><?php esc_html_e( 'MEMBER LOGIN', 'memberistic' ); ?></h2>
-				<p class="memberistic-auth-sub"><?php esc_html_e( 'Welcome back. Access your range account.', 'memberistic' ); ?></p>
+				<?php if ( '' !== $tagline ) : ?>
+					<p class="memberistic-auth-sub"><?php echo esc_html( $tagline ); ?></p>
+				<?php endif; ?>
 
 				<form class="memberistic-auth-form" method="post" action="<?php echo esc_url( wp_login_url() ); ?>">
 					<input type="hidden" name="redirect_to" value="<?php echo esc_attr( $redirect ); ?>">
@@ -242,7 +248,9 @@ final class Shortcodes {
 
 					<div class="memberistic-auth-divider"><?php esc_html_e( 'OR', 'memberistic' ); ?></div>
 					<a class="memberistic-auth-btn memberistic-auth-btn--secondary" href="<?php echo esc_url( $plans_url ); ?>"><?php esc_html_e( 'Join As A Member', 'memberistic' ); ?></a>
-					<div class="memberistic-auth-alt"><?php esc_html_e( 'From $29.99/mo - Cancel Anytime', 'memberistic' ); ?></div>
+					<?php if ( '' !== $cta_note ) : ?>
+						<div class="memberistic-auth-alt"><?php echo esc_html( $cta_note ); ?></div>
+					<?php endif; ?>
 				</form>
 			</div>
 		</div>
