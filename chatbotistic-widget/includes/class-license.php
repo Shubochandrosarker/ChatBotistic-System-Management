@@ -33,6 +33,7 @@ final class License {
 	const OPT_LASTSEEN = 'cbw_license_last_check';
 	const OPT_INSTANCE = 'cbw_license_instance_id';
 	const OPT_GRACE    = 'cbw_license_grace_since';
+	const OPT_WIDGETS  = 'cbw_license_widget_list';
 
 	/**
 	 * Grace window after the license server becomes unreachable. Premium
@@ -126,6 +127,12 @@ final class License {
 		update_option( self::OPT_LASTSEEN, time() );
 		delete_option( self::OPT_GRACE );
 
+		// Step 3: auto-fetch this user's widgets so the admin UI can offer a
+		// dropdown instead of a "paste widget key" field (docx Step 11
+		// "Better future method"). Best-effort: if the call fails the
+		// dropdown stays empty and the user can still paste a key.
+		self::refresh_widget_list();
+
 		return $res;
 	}
 
@@ -146,6 +153,7 @@ final class License {
 		delete_option( self::OPT_TIER );
 		delete_option( self::OPT_PAYLOAD );
 		delete_option( self::OPT_LASTSEEN );
+		delete_option( self::OPT_WIDGETS );
 
 		return is_wp_error( $res ) ? $res : true;
 	}
@@ -217,6 +225,10 @@ final class License {
 		update_option( self::OPT_PAYLOAD, self::clean_payload( $flat ) );
 		update_option( self::OPT_LASTSEEN, time() );
 		delete_option( self::OPT_GRACE );
+
+		// Refresh the widget dropdown so any widget the customer created in
+		// the Chatbotistic portal since the last heartbeat shows up.
+		self::refresh_widget_list();
 	}
 
 	/**
@@ -247,6 +259,56 @@ final class License {
 			'since'   => $since,
 			'expires' => $since ? $since + self::GRACE_PERIOD : 0,
 		];
+	}
+
+	/**
+	 * Get the cached list of widgets owned by this license's customer, ready
+	 * to render as a dropdown in the admin Widget Key screen.
+	 *
+	 * @return array<int,array{id:string,name:string,key:string}>
+	 */
+	public static function get_widget_list(): array {
+		$cached = get_option( self::OPT_WIDGETS, [] );
+		return is_array( $cached ) ? $cached : [];
+	}
+
+	/**
+	 * Pull the user's widgets from /licenseistic/v1/widgets and cache them
+	 * for the dropdown. Best-effort -- on failure the cache is unchanged
+	 * (so a brief outage doesn't wipe a working dropdown).
+	 *
+	 * @return array|\WP_Error On success the same array stored in OPT_WIDGETS.
+	 */
+	public static function refresh_widget_list() {
+		$key = self::get_key();
+		if ( '' === $key ) {
+			return new \WP_Error( 'cbw_no_license', __( 'No license key is set; cannot fetch widgets.', 'chatbotistic-widget' ) );
+		}
+
+		$res = self::request_get( '/widgets', [
+			'license_key' => $key,
+			'site_url'    => home_url(),
+			'instance_id' => self::instance_id(),
+		] );
+
+		if ( is_wp_error( $res ) || ! self::envelope_ok( $res ) ) {
+			return is_wp_error( $res ) ? $res : new \WP_Error( 'cbw_widgets_failed', self::envelope_message( $res ) ?: __( 'Could not load widgets.', 'chatbotistic-widget' ) );
+		}
+
+		$list = isset( $res['widgets'] ) && is_array( $res['widgets'] ) ? $res['widgets'] : [];
+		$clean = [];
+		foreach ( $list as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$clean[] = [
+				'id'   => isset( $row['id'] )   ? sanitize_text_field( (string) $row['id'] )   : '',
+				'name' => isset( $row['name'] ) ? sanitize_text_field( (string) $row['name'] ) : '',
+				'key'  => isset( $row['key'] )  ? sanitize_text_field( (string) $row['key'] )  : '',
+			];
+		}
+		update_option( self::OPT_WIDGETS, $clean );
+		return $clean;
 	}
 
 	// ── HTTP ──────────────────────────────────────────────────────────────────
