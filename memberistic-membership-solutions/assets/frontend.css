@@ -1207,3 +1207,41 @@
 		font-size: 30px;
 	}
 }
+
+@media (max-width: 480px) {
+	.memberistic-auth-shell {
+		margin: 12px auto;
+		padding: 16px;
+	}
+
+	.memberistic-auth-card {
+		padding: 18px;
+	}
+
+	.memberistic-auth-title {
+		font-size: 26px;
+	}
+
+	.memberistic-auth-field,
+	.memberistic-auth-btn {
+		font-size: 16px; /* keeps iOS from zooming the viewport on focus */
+	}
+
+	.memberistic-co-summary .name {
+		font-size: 20px;
+	}
+
+	.memberistic-co-summary .price {
+		font-size: 26px;
+	}
+
+	.memberistic-co-shell {
+		padding: 56px 10px 40px;
+	}
+
+	.memberistic-price-summary {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 4px;
+	}
+}

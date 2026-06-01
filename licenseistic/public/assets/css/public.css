@@ -4,10 +4,22 @@
 	margin: 20px 0;
 }
 
+/* Wrap any table inside the dashboard so it scrolls horizontally on
+   small screens instead of forcing the page to scroll. */
+.wpistic-lsi-customer-dashboard {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
 .wpistic-lsi-table {
 	width: 100%;
 	border-collapse: collapse;
 	margin: 16px 0;
+}
+
+.wpistic-lsi-table code {
+	overflow-wrap: anywhere;
+	word-break: break-all;
 }
 
 .wpistic-lsi-table th,
@@ -59,3 +71,9 @@
 .lsi-status-suspended { background: #fff3cd; color: #856404; }
 .lsi-status-pending   { background: #cce5ff; color: #004085; }
 .lsi-status-disabled  { background: #e2e3e5; color: #383d41; }
+
+@media (max-width: 560px) {
+	.wpistic-lsi-table th,
+	.wpistic-lsi-table td { padding: 8px 10px; font-size: 13px; }
+	.wpistic-lsi-deactivate { width: 100%; }
+}

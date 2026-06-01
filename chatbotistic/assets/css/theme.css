@@ -540,6 +540,12 @@ p { margin: 0; }
 	.cb-section { padding: 72px 0; }
 	.cb-posts { grid-template-columns: repeat(2,1fr); }
 }
+@media (max-width: 768px) {
+	.cb-container { padding: 0 24px; }
+	.cb-hero { padding: 60px 0 40px; }
+	.cb-page-hero { padding: 60px 0 40px; }
+	.cb-cta { padding: 56px 28px; }
+}
 @media (max-width: 620px) {
 	.cb-container { padding: 0 20px; }
 	.cb-grid--2, .cb-grid--3, .cb-grid--4, .cb-steps, .cb-pricing, .cb-posts { grid-template-columns: 1fr; }
@@ -549,6 +555,21 @@ p { margin: 0; }
 	.cb-section { padding: 60px 0; }
 	.cb-footer__bottom { flex-direction: column; align-items: flex-start; }
 	.cb-logo span:last-child { display: none; }
+}
+@media (max-width: 480px) {
+	.cb-container { padding: 0 16px; }
+	.cb-section { padding: 52px 0; }
+	.cb-section--tight { padding: 44px 0; }
+	.cb-footer__grid { grid-template-columns: 1fr; gap: 32px; }
+	.cb-cta { padding: 40px 18px; }
+	.cb-hero { padding: 48px 0 32px; }
+	.cb-page-hero { padding: 48px 0 32px; }
+	/* Long-form content defensive overflow so blog posts and docs never
+	   force a horizontal page scroll on a phone. */
+	.cb-prose img { max-width: 100%; height: auto; }
+	.cb-prose pre,
+	.cb-prose table { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+	.cb-prose code { word-break: break-word; }
 }
 
 /* =========================================================================
@@ -736,8 +757,12 @@ p { margin: 0; }
 	.cb-eco__cards { grid-template-columns: repeat(3,1fr); }
 }
 @media (max-width: 560px) {
+	.cb-eco { padding: 22px 18px; }
 	.cb-eco__cards { grid-template-columns: repeat(2,1fr); }
 	.cb-eco__title { font-size: 18px; }
+}
+@media (max-width: 380px) {
+	.cb-eco__cards { grid-template-columns: 1fr; }
 }
 
 /* =========================================================================

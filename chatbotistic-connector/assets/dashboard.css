@@ -41,7 +41,18 @@
 }
 .cbc-usage { font-family: var(--cbc-mono); font-size: 12px; color: var(--cbc-dim); }
 
-.cbc-tabs { display: flex; gap: 4px; padding: 4px; background: var(--cbc-card); border: 1px solid var(--cbc-line); border-radius: 999px; }
+.cbc-tabs {
+	display: flex; gap: 4px; padding: 4px;
+	background: var(--cbc-card); border: 1px solid var(--cbc-line); border-radius: 999px;
+	/* Allow the pill bar to scroll horizontally on narrow viewports instead
+	   of wrapping into multiple rows (which breaks the pill shape). */
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none;
+	max-width: 100%;
+}
+.cbc-tabs::-webkit-scrollbar { display: none; }
+.cbc-tab { flex-shrink: 0; }
 .cbc-tab {
 	padding: 8px 18px; border: 0; border-radius: 999px; cursor: pointer;
 	background: transparent; color: var(--cbc-soft);
@@ -209,9 +220,21 @@
 @media (max-width: 720px) {
 	.cbc-kpis { grid-template-columns: 1fr 1fr; }
 	.cbc-row { grid-template-columns: 1fr; }
+	.cbc-repeat__row { grid-template-columns: 1fr; }
 	.cbc-top { flex-direction: column; align-items: flex-start; }
 	.cbc-table thead { display: none; }
 	.cbc-table tr { display: block; border-bottom: 1px solid var(--cbc-line); padding: 8px 0; }
 	.cbc-table td { display: flex; justify-content: space-between; border: 0; padding: 5px 12px; }
 	.cbc-table td::before { content: attr(data-label); color: var(--cbc-dim); font-size: 11px; }
+	.cbc-widget__head { flex-wrap: wrap; }
+	.cbc-widget__actions { width: 100%; }
+}
+@media (max-width: 480px) {
+	.cbc-kpis { grid-template-columns: 1fr; }
+	.cbc-kpi__value { font-size: 26px; }
+	.cbc-chart { height: 140px; padding: 12px; }
+	.cbc-modal { padding: 4vh 10px; }
+	.cbc-modal__box { padding: 20px; border-radius: 14px; }
+	.cbc-form-actions { flex-direction: column; }
+	.cbc-form-actions .cbc-btn { width: 100%; }
 }

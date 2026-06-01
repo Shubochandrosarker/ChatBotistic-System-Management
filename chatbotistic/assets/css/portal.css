@@ -112,7 +112,7 @@
 /* ---------- API key ---------- */
 .cb-key { margin-top: 14px; }
 .cb-key__row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
-.cb-key code { font-family: var(--cb-font-mono); font-size: 13px; background: rgba(0,0,0,0.4); border: 1px solid var(--cb-line); padding: 11px 14px; border-radius: 10px; flex: 1; min-width: 220px; }
+.cb-key code { font-family: var(--cb-font-mono); font-size: 13px; background: rgba(0,0,0,0.4); border: 1px solid var(--cb-line); padding: 11px 14px; border-radius: 10px; flex: 1; min-width: 0; overflow-wrap: anywhere; word-break: break-all; }
 
 /* ---------- Tools frame — wraps plugin shortcode output ---------- */
 .cb-tools-frame { padding: 22px; border-radius: var(--cb-r-lg); }
@@ -123,14 +123,24 @@
 
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
-	.cb-portal__shell { grid-template-columns: 1fr; }
+	.cb-portal__shell { grid-template-columns: 1fr; gap: 22px; }
 	.cb-portal__sidebar { position: static; }
 	.cb-portal__nav ul { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
 	.cb-stats { grid-template-columns: 1fr 1fr; }
 	.cb-portal__row { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
+	.cb-portal { padding: 28px 0 64px; }
 	.cb-stats { grid-template-columns: 1fr; }
 	.cb-portal__nav ul { grid-template-columns: 1fr; }
 	.cb-defs { grid-template-columns: 1fr; }
+	.cb-panel { padding: 20px; }
+	.cb-paywall { padding: 36px 22px; }
+	.cb-portal__head { padding-bottom: 18px; margin-bottom: 22px; }
+}
+@media (max-width: 380px) {
+	.cb-panel { padding: 16px; }
+	.cb-portal__user { padding: 14px; gap: 11px; }
+	.cb-portal__user img { width: 42px; height: 42px; }
+	.cb-portal__title { font-size: 22px; }
 }
