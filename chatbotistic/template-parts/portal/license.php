@@ -68,7 +68,7 @@ $cb_product_name = static function ( $product_id ) {
 		<div class="cb-portal__actions" style="margin-top:16px;">
 			<?php
 			cb_button( __( 'Download Widget plugin', 'chatbotistic' ), $cb_download, 'primary', array( 'icon' => 'arrow-r' ) );
-			cb_button( __( 'Build / customize widgets', 'chatbotistic' ), cb_view_url( 'tools' ), 'ghost' );
+			cb_button( __( 'Build / customize widgets', 'chatbotistic' ), cb_view_url( 'widgets' ), 'ghost' );
 			?>
 		</div>
 	<?php endif; ?>

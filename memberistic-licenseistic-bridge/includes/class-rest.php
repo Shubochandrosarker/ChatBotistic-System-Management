@@ -54,6 +54,87 @@ class Rest {
 			'permission_callback' => '__return_true',
 			'args'                => $common_args,
 		] );
+
+		// Auto-fetch widgets after license activation.
+		// Returns the list of Tochat widgets owned by the license's customer
+		// so the Chatbotistic Widget plugin can render a dropdown instead of
+		// asking the customer to paste a widget key by hand (docx Step 11).
+		register_rest_route( $ns, '/widgets', [
+			'methods'             => \WP_REST_Server::READABLE,
+			'callback'            => [ $this, 'widgets_for_license' ],
+			'permission_callback' => '__return_true',
+			'args'                => array(
+				'license_key' => [ 'required' => true,  'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
+				'site_url'    => [ 'required' => false, 'type' => 'string', 'sanitize_callback' => 'esc_url_raw' ],
+				'instance_id' => [ 'required' => false, 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
+			),
+		] );
+	}
+
+	/**
+	 * GET /licenseistic/v1/widgets?license_key=...&site_url=...&instance_id=...
+	 *
+	 * Authenticated by the license itself: we re-verify the key against
+	 * Licenseistic, then resolve the license's customer_id to its Tochat
+	 * userClient and ask the Connector for that user's widgets.
+	 *
+	 * Response shape:
+	 *   { ok: true, widgets: [ { id, name, key } ], count: N }
+	 */
+	public function widgets_for_license( \WP_REST_Request $request ) {
+		$key  = (string) $request->get_param( 'license_key' );
+		$site = (string) ( $request->get_param( 'site_url' ) ?: '' );
+
+		if ( ! class_exists( '\WPistic_LSI_License_Service' ) ) {
+			return $this->error( 'licenseistic_missing', __( 'Licenseistic plugin is not active on this site.', 'memberistic-licenseistic-bridge' ), 503 );
+		}
+
+		$verify = \WPistic_LSI_License_Service::verify_license( $key, 0, $site );
+		if ( is_wp_error( $verify ) ) {
+			return $this->error( $verify->get_error_code(), $verify->get_error_message(), 400 );
+		}
+
+		$license = \WPistic_LSI_License_Service::get_license_by_key( $key );
+		$user_id = is_array( $license ) ? (int) ( $license['customer_id'] ?? 0 ) : 0;
+		if ( ! $user_id ) {
+			return $this->error( 'no_customer', __( 'No customer is linked to this license.', 'memberistic-licenseistic-bridge' ), 404 );
+		}
+
+		if ( ! class_exists( '\Chatbotistic\Connector\Store' ) || ! class_exists( '\Chatbotistic\Connector\API' ) ) {
+			return $this->error( 'connector_missing', __( 'Chatbotistic Connector is not active on this site.', 'memberistic-licenseistic-bridge' ), 503 );
+		}
+
+		$user_client = \Chatbotistic\Connector\Store::user_client( $user_id );
+		if ( '' === $user_client ) {
+			// No Tochat userClient mapped yet -- empty widget list is the
+			// honest answer, not an error.
+			return new \WP_REST_Response( [ 'ok' => true, 'widgets' => [], 'count' => 0 ], 200 );
+		}
+
+		$res = \Chatbotistic\Connector\API::widgets_list( $user_client );
+		if ( is_wp_error( $res ) ) {
+			return $this->error( $res->get_error_code(), $res->get_error_message(), 502 );
+		}
+
+		// Flatten to the shape the customer-side plugin renders. Don't leak
+		// internal Tochat fields the widget plugin doesn't need.
+		$flat = array();
+		foreach ( (array) $res as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$flat[] = array(
+				'id'   => (string) ( $row['id']   ?? $row['@id'] ?? '' ),
+				'name' => (string) ( $row['name'] ?? '' ),
+				'key'  => (string) ( $row['widgetKey'] ?? $row['key'] ?? '' ),
+			);
+		}
+
+		return new \WP_REST_Response( [
+			'ok'      => true,
+			'widgets' => $flat,
+			'count'   => count( $flat ),
+		], 200 );
 	}
 
 	public function activate( \WP_REST_Request $request ) {

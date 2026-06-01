@@ -312,7 +312,20 @@ class WPistic_LSI_License_Service {
 
 		$limit = (int) apply_filters( 'wpistic_lsi_activation_limit', (int) $license['activation_limit'], $license );
 		if ( $limit > 0 && (int) $license['activation_count'] >= $limit ) {
-			return new WP_Error( 'limit_reached', __( 'Activation limit reached.', 'licenseistic' ) );
+			return new WP_Error(
+				'limit_reached',
+				sprintf(
+					/* translators: %d: domain activation limit */
+					_n(
+						'This license is already active on its %d allowed domain. Deactivate the previous site first, or upgrade your plan to add more domains.',
+						'This license is already active on its %d allowed domains. Deactivate one of the previous sites first, or upgrade your plan to add more domains.',
+						$limit,
+						'licenseistic'
+					),
+					$limit
+				),
+				array( 'limit' => $limit, 'used' => (int) $license['activation_count'] )
+			);
 		}
 
 		$activation_id = WPistic_LSI_DB::insert( 'activations', array(

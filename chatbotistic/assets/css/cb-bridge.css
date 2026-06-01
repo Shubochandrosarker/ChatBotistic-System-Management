@@ -1,0 +1,239 @@
+/* =========================================================================
+   Chatbotistic V4 compat bridge
+   -----------------------------
+   The V4 design system (v4-styles.css / v4-portal.css) is the canonical
+   source of truth for the look and feel. It uses unprefixed selectors:
+   .btn, .card, .container, .section, etc.
+
+   The existing PHP templates render with the legacy `cb-` prefix:
+   .cb-btn, .cb-card, .cb-container, .cb-section. They predate V4.
+
+   Rather than rewriting every PHP template (high blast radius), this
+   bridge file aliases the prefixed names onto V4's unprefixed rules
+   via the @extend-style pattern: every cb-name simply mirrors the
+   shorthand version. The result is one canonical V4 ruleset with two
+   entry points.
+
+   This file MUST load AFTER v4-styles.css so its rules can reuse
+   anything V4 defines via custom properties.
+   ========================================================================= */
+
+/* ---------- Layout primitives ---------- */
+.cb-container        { max-width: 1280px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+.cb-section          { padding: 120px 0; position: relative; }
+.cb-section--tight   { padding: 80px 0; }
+.cb-center           { text-align: center; }
+.cb-narrow           { max-width: 680px; margin-left: auto; margin-right: auto; }
+.cb-stack > * + *    { margin-top: 18px; }
+
+/* ---------- Eyebrow ---------- */
+.cb-eyebrow {
+	display: inline-flex; align-items: center; gap: 8px;
+	padding: 6px 12px; border-radius: 999px;
+	background: rgba(79,139,255,0.08);
+	border: 1px solid rgba(79,139,255,0.22);
+	font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em;
+	text-transform: uppercase; color: #a8c1ff;
+}
+.cb-eyebrow .cb-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
+
+/* ---------- Typography aliases ---------- */
+.cb-display { font-size: clamp(40px, 5.6vw, 76px); line-height: 1.02; font-weight: 600; letter-spacing: -0.035em; font-family: var(--font-display); margin: 0; }
+.cb-h1      { font-size: clamp(34px, 4.2vw, 56px); line-height: 1.05; letter-spacing: -0.03em; font-family: var(--font-display); margin: 0; font-weight: 600; }
+.cb-h2      { font-size: clamp(26px, 2.6vw, 36px); line-height: 1.15; letter-spacing: -0.02em; font-family: var(--font-display); margin: 0; font-weight: 600; }
+.cb-h3      { font-size: 20px; line-height: 1.3; font-family: var(--font-display); margin: 0; font-weight: 600; }
+.cb-soft    { color: var(--text-soft); }
+.cb-dim     { color: var(--text-dim); }
+.cb-lead    { font-size: 18px; color: var(--text-soft); line-height: 1.6; max-width: 640px; }
+.cb-grad,
+.cb-grad--brand { background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* ---------- Buttons (BEM alias of V4 .btn / .btn-* ) ---------- */
+.cb-btn {
+	display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+	padding: 11px 18px; border-radius: 12px;
+	font-family: var(--font-body); font-weight: 600; font-size: 14px;
+	border: 1px solid var(--line-strong); background: var(--glass);
+	color: var(--text); cursor: pointer; text-decoration: none;
+	transition: transform .15s, background .2s, border-color .2s, box-shadow .2s;
+}
+.cb-btn:hover { transform: translateY(-1px); background: var(--glass-2); border-color: rgba(255,255,255,0.22); }
+.cb-btn--primary {
+	background: var(--grad-button); border-color: transparent; color: #fff;
+	box-shadow: 0 14px 36px -10px rgba(120,90,255,0.55);
+}
+.cb-btn--primary:hover { box-shadow: 0 18px 48px -10px rgba(120,90,255,0.7); }
+.cb-btn--ghost   { background: transparent; }
+.cb-btn--lg      { padding: 14px 22px; font-size: 15px; border-radius: 14px; }
+.cb-btn--sm      { padding: 8px 13px; font-size: 13px; border-radius: 10px; }
+.cb-btn--link    { background: transparent; border: 0; padding: 0; color: var(--blue-bright); }
+.cb-btn--block   { width: 100%; }
+
+/* ---------- Cards / glass ---------- */
+.cb-card,
+.cb-panel,
+.cb-glass {
+	background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012));
+	border: 1px solid var(--line);
+	border-radius: var(--radius-lg);
+	padding: 24px;
+	position: relative;
+}
+.cb-glass-edge { position: relative; }
+.cb-glass-edge::before {
+	content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+	background: linear-gradient(135deg, rgba(255,255,255,0.20), rgba(255,255,255,0) 42%, rgba(160,112,255,0.28) 100%);
+	-webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+	-webkit-mask-composite: xor; mask-composite: exclude;
+	pointer-events: none;
+}
+
+/* ---------- Grids (templates already use these) ---------- */
+.cb-grid       { display: grid; gap: 18px; }
+.cb-grid--2    { grid-template-columns: repeat(2, 1fr); }
+.cb-grid--3    { grid-template-columns: repeat(3, 1fr); }
+.cb-grid--4    { grid-template-columns: repeat(4, 1fr); }
+
+/* ---------- Feature / step / pricing repurposed onto V4 .card ---------- */
+.cb-feature, .cb-step {
+	background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012));
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+	padding: 22px;
+	position: relative;
+	transition: transform .2s, border-color .2s;
+}
+.cb-feature:hover { transform: translateY(-3px); border-color: rgba(99,91,255,0.34); }
+.cb-feature__ico {
+	width: 38px; height: 38px; border-radius: 11px;
+	background: linear-gradient(135deg, rgba(99,128,255,0.28), rgba(160,112,255,0.16));
+	border: 1px solid rgba(99,128,255,0.34);
+	display: grid; place-items: center; color: #c8cdff; margin-bottom: 14px;
+}
+.cb-feature h3 { font-size: 16.5px; }
+.cb-feature p  { margin-top: 7px; font-size: 14px; color: var(--text-soft); }
+
+/* ---------- Pricing grid + plan (cb-pricing / cb-plan -> V4 .pricing) ---------- */
+.cb-pricing {
+	display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 48px; align-items: stretch;
+}
+.cb-plan {
+	background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012));
+	border: 1px solid var(--line); border-radius: var(--radius-lg);
+	padding: 28px 24px; display: flex; flex-direction: column; gap: 14px; position: relative;
+}
+.cb-plan--featured { border-color: rgba(99,128,255,0.45); box-shadow: 0 30px 80px -32px rgba(99,128,255,0.55); }
+.cb-plan__cta .cb-btn { width: 100%; }
+
+/* ---------- Hero ---------- */
+.cb-hero            { padding: 76px 0 56px; }
+.cb-hero__grid      { display: grid; grid-template-columns: 1.06fr 0.94fr; gap: 60px; align-items: center; }
+.cb-hero__meta      { display: flex; gap: 22px; flex-wrap: wrap; color: var(--text-dim); font-size: 13.5px; margin-top: 22px; }
+.cb-hero__meta span { display: inline-flex; align-items: center; gap: 7px; }
+
+/* ---------- Page hero / CTA ---------- */
+.cb-page-hero       { padding: 76px 0 56px; text-align: center; border-bottom: 1px solid var(--line); }
+.cb-page-hero .cb-h1 { max-width: 860px; margin: 16px auto 14px; }
+.cb-page-hero .cb-lead { max-width: 640px; margin: 0 auto; }
+.cb-cta {
+	border-radius: var(--radius-lg); padding: 64px 40px; text-align: center;
+	background: linear-gradient(135deg, rgba(79,139,255,0.10), rgba(160,112,255,0.10));
+	border: 1px solid var(--line-strong);
+}
+.cb-cta .cb-h2 { max-width: 720px; margin: 16px auto; }
+
+/* ---------- Prose ---------- */
+.cb-prose { max-width: 760px; margin: 0 auto; color: var(--text-soft); font-size: 16px; line-height: 1.75; }
+.cb-prose h2 { color: var(--text); font-size: 24px; margin: 40px 0 14px; }
+.cb-prose h3 { color: var(--text); font-size: 18px; margin: 28px 0 10px; }
+.cb-prose p, .cb-prose li { margin: 0 0 12px; }
+.cb-prose ul, .cb-prose ol { padding-left: 22px; }
+.cb-prose a { color: var(--blue-bright); text-decoration: underline; }
+.cb-prose code { font-family: var(--font-mono); font-size: 13px; background: rgba(255,255,255,0.06); padding: 2px 7px; border-radius: 6px; }
+.cb-prose img { border-radius: var(--radius); margin: 18px 0; max-width: 100%; height: auto; }
+
+/* ---------- Fields ---------- */
+.cb-field           { margin-bottom: 14px; }
+.cb-field label     { display: block; margin-bottom: 6px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); }
+.cb-field input,
+.cb-field textarea,
+.cb-field select {
+	width: 100%; padding: 12px 14px; border-radius: 12px;
+	background: rgba(0,0,0,0.4); border: 1px solid var(--line);
+	color: var(--text); font-family: var(--font-body); font-size: 15px;
+}
+.cb-field input:focus, .cb-field textarea:focus, .cb-field select:focus {
+	outline: none; border-color: rgba(99,128,255,0.6);
+}
+.cb-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+/* ---------- Form (compose helper) ---------- */
+.cb-form { display: flex; flex-direction: column; gap: 0; }
+.cb-form .cb-btn { align-self: flex-start; }
+
+/* ---------- Stats band (used on portal overview) ---------- */
+.cb-stats         { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.cb-stat          { padding: 20px; border-radius: var(--radius-lg); background: rgba(255,255,255,0.03); border: 1px solid var(--line); }
+.cb-stat__label   { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
+.cb-stat__value   { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin: 8px 0 10px; }
+.cb-stat__value--ok { color: var(--green); }
+.cb-stat__link    { font-size: 13px; color: var(--blue-bright); }
+.cb-statband      { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+
+/* ---------- Badges ---------- */
+.cb-badge        { display: inline-block; padding: 3px 10px; border-radius: 999px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+.cb-badge--active { background: var(--grad-button); color: #fff; }
+.cb-badge--muted  { background: rgba(255,255,255,0.06); color: var(--text-dim); border: 1px solid var(--line); }
+
+/* ---------- Footer ---------- */
+.cb-footer { padding: 80px 0 28px; border-top: 1px solid var(--line); margin-top: 80px; }
+.cb-footer__grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr; gap: 44px; }
+.cb-footer__bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 13px; color: var(--text-dim); }
+.cb-footer__bottom nav { display: flex; gap: 18px; flex-wrap: wrap; }
+
+/* ---------- Responsive overrides (preserved from prior responsive pass) ---------- */
+@media (max-width: 1080px) {
+	.cb-grid--4, .cb-grid--3, .cb-pricing, .cb-footer__grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	.cb-footer__grid { grid-template-columns: 1.4fr 1fr 1fr; }
+}
+@media (max-width: 900px) {
+	.cb-hero__grid { grid-template-columns: 1fr; gap: 44px; }
+	.cb-section { padding: 84px 0; }
+	.cb-section--tight { padding: 60px 0; }
+	.cb-pricing { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+	.cb-container { padding: 0 24px; }
+	.cb-hero { padding: 60px 0 40px; }
+	.cb-page-hero { padding: 60px 0 40px; }
+	.cb-cta { padding: 56px 28px; }
+}
+@media (max-width: 620px) {
+	.cb-container { padding: 0 20px; }
+	.cb-grid--2, .cb-grid--3, .cb-grid--4, .cb-pricing { grid-template-columns: 1fr; }
+	.cb-footer__grid { grid-template-columns: 1fr 1fr; }
+	.cb-field-row { grid-template-columns: 1fr; }
+	.cb-cta { padding: 48px 22px; }
+	.cb-section { padding: 60px 0; }
+	.cb-section--tight { padding: 44px 0; }
+	.cb-stats, .cb-statband { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+	.cb-container { padding: 0 16px; }
+	.cb-hero { padding: 48px 0 32px; }
+	.cb-page-hero { padding: 48px 0 32px; }
+	.cb-cta { padding: 40px 18px; }
+	.cb-footer__grid { grid-template-columns: 1fr; gap: 32px; }
+	.cb-prose img { max-width: 100%; height: auto; }
+	.cb-prose pre, .cb-prose table { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+	.cb-prose code { word-break: break-word; }
+	.cb-stats, .cb-statband { grid-template-columns: 1fr; }
+}
+
+/* ---------- Reduced motion (V4 motion primitives must be neutralised) ---------- */
+@media (prefers-reduced-motion: reduce) {
+	.op-pulse, .op-ring, .op-flow, .op-scan, .op-queue { animation: none !important; }
+	html { scroll-behavior: auto; }
+}
