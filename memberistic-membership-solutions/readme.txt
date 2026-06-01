@@ -7,20 +7,17 @@ Tested up to: 6.6
 Stable tag: 1.10.0
 License: GPLv2 or later
 
-A modern membership operations engine for service businesses. Co-developed by WordPressistic and launch partner Guns 2 Ammo (https://guns2ammo.com).
+A modern membership operations engine for service and SaaS businesses.
 
 == Description ==
 
-Memberistic is the membership operations engine behind the Guns 2 Ammo Membership Engine — and the foundation of the Memberistic commercial product.
+Memberistic is a generic membership operations engine designed to be reskinned by a host product (Chatbotistic, future WordPressistic sub-brands, or any third-party SaaS / service business). It runs the full lifecycle of a membership — plans, signup, payment, renewals, family / linked members, check-ins, waivers, staff dashboards, REST API, and Stripe + WooCommerce integration — from a single WordPress plugin.
 
-It is co-developed in partnership with **Guns 2 Ammo (https://guns2ammo.com)**, a US-based indoor shooting range and firearms retail business. Every workflow in the plugin — the Defender / Patriot / Guardian plan tiers, the linked-member system, the staff dashboard, the booking-engine integration, the kiosk-ready waiver model, and the POS-ready schema — is battle-tested in production at Guns2Ammo.
-
-If you run a service business that combines memberships with check-ins, waivers, family / linked members, lane bookings, retail, or staff workflows — a shooting range, fitness studio, climbing gym, dive shop, golf simulator, racquet club, makerspace — Memberistic was built for you.
+Brand-specific text is controlled by `memberistic_settings` (and matching `memberistic_*` filters). The login subtitle, brand label on the digital member card, member-ID prefix, QR verification header, and whether the account template shows the booking / lane / check-in tools are all configurable per install — no template edits required.
 
 Highlights:
 
 * Custom database with 10 dedicated tables.
-* Three default membership tiers (Defender, Patriot, Guardian) seeded on first install — the canonical Guns 2 Ammo plan structure.
 * Ten membership statuses including suspended and needs-review.
 * Linked / family-member CRUD with per-person waiver, phone, DOB, relationship, and history.
 * React-driven admin: Dashboard, Members, Plans, Payments, Check-Ins, Activity, Settings, Emails, Integrations.
@@ -32,27 +29,27 @@ Highlights:
 * Six custom staff roles plus admin: Manager, Staff, Cashier, Instructor, KIOSK Operator, POS Staff.
 * Content-restriction overlay for plan-gated posts and pages.
 
-Built by [WordPressistic](https://www.wordpressistic.com) in partnership with [Guns 2 Ammo](https://guns2ammo.com).
+Built by [WordPressistic](https://www.wordpressistic.com).
 
 == Installation ==
 
 1. Upload `memberistic-membership-solutions/` to `wp-content/plugins/`.
 2. Activate Memberistic Membership Solutions in WordPress admin.
-3. Confirm Defender, Patriot, Guardian appear under Memberistic > Plans.
-4. Open Memberistic > Settings and save your client brand settings, Stripe keys, and (optionally) WooCommerce settings.
-5. Use Memberistic > Tools > Page Mapping to create the branded frontend pages.
+3. Open Memberistic > Settings and save your brand label, business name, currency, Stripe keys, and (optionally) WooCommerce settings.
+4. Use Memberistic > Tools > Page Mapping to create the branded frontend pages.
+5. (Optional) Install a host-product profile plugin (e.g. Chatbotistic Profile) to auto-configure brand label, plans, and pages.
 
 The Stripe webhook URL is `https://YOUR-SITE/wp-json/memberistic/v1/webhooks/stripe`.
 
 == Frequently Asked Questions ==
 
-= Who built this plugin? =
-
-Memberistic is co-developed by [WordPressistic](https://www.wordpressistic.com) and launch partner [Guns 2 Ammo](https://guns2ammo.com). Guns 2 Ammo is the flagship deployment; every workflow has been pressure-tested against its real US shooting-range and retail operations.
-
 = Where is the documentation? =
 
-See `README.md`, `docs/AUDIT_REPORT.md`, `docs/INSTALL.md`, `docs/HOOKS.md`, and `docs/PARTNERS.md` in the plugin directory.
+See `README.md`, `docs/AUDIT_REPORT.md`, `docs/INSTALL.md`, and `docs/HOOKS.md` in the plugin directory.
+
+= How do I rebrand the login page / member card / QR header? =
+
+Set `brand_label`, `login_tagline`, `member_id_prefix`, and `qr_verification_label` in the `memberistic_settings` option, or hook the matching `memberistic_brand_label`, `memberistic_login_tagline`, `memberistic_member_id_prefix`, and `memberistic_qr_verification_label` filters. To hide the lane/range/check-in tiles on the account template, set `account_show_lane_tools` to `no` (or filter `memberistic_account_show_lane_tools`).
 
 = How do I add a new email template? =
 
@@ -80,10 +77,10 @@ Admin-side waiver management. Each linked person row on the Members detail panel
 Member import: upload a Paid Memberships Pro members CSV or an orders export and bring the data into Memberistic with a dry-run preview before commit.
 
 = 1.7.1 =
-Documentation release. Adds a dedicated Partners page (`docs/PARTNERS.md`), expanded README with launch-partner framing, and acknowledgement of the WordPressistic × Guns 2 Ammo joint venture across the plugin docs and headers. No functional changes.
+Documentation release.
 
 = 1.7.0 =
-Full audit pass against the canonical Memberistic feature spec. Default Guns 2 Ammo plans (Defender / Patriot / Guardian) now seed automatically. Email automation gets six new templates, full merge-tag support, an email log table, and daily cron jobs for renewal reminders, auto-expire, and waiver follow-up. Stripe `invoice.payment_succeeded` now extends renewal dates. WooCommerce bridge auto-creates the six hidden products, handles refund / cancellation, and exposes a signed `/webhooks/woocommerce` REST route. Adds `PUT /people/{id}` and `DELETE /people/{id}`. Members search adds 9 filter dimensions and matches linked-member names plus Stripe / Woo / POS customer IDs. Adds KIOSK Operator and POS Staff placeholder roles. Adds `suspended` and `needs_review` statuses end to end. New `memberistic_email_logs` and `memberistic_integrations` tables. Full audit report shipped in `docs/AUDIT_REPORT.md`.
+Full audit pass against the canonical Memberistic feature spec. Default plans seed automatically. Email automation gets six new templates, full merge-tag support, an email log table, and daily cron jobs for renewal reminders, auto-expire, and waiver follow-up. Stripe `invoice.payment_succeeded` now extends renewal dates. WooCommerce bridge auto-creates the six hidden products, handles refund / cancellation, and exposes a signed `/webhooks/woocommerce` REST route. Adds `PUT /people/{id}` and `DELETE /people/{id}`. Members search adds 9 filter dimensions and matches linked-member names plus Stripe / Woo / POS customer IDs. Adds KIOSK Operator and POS Staff placeholder roles. Adds `suspended` and `needs_review` statuses end to end. New `memberistic_email_logs` and `memberistic_integrations` tables. Full audit report shipped in `docs/AUDIT_REPORT.md`.
 
 = 1.6.0 =
 Retired the legacy server-rendered views. Email automation foundation, saved-filter views, React Settings console.

@@ -2,7 +2,7 @@
 
 This guide walks through getting Memberistic Membership Solutions installed and configured for a production launch.
 
-> Memberistic is co-developed by [WordPressistic](https://www.wordpressistic.com) and launch partner [Guns 2 Ammo](https://guns2ammo.com). The defaults described below — Defender / Patriot / Guardian plans, waiver-gated check-ins, lane-booking integration — mirror the production [Guns2Ammo](https://guns2ammo.com) operation.
+> Memberistic is brand-neutral by default. The defaults described below — the seeded plan tiers, waiver-gated check-ins, and lane-booking integration — reflect the original launch-partner deployment ([Guns 2 Ammo](https://guns2ammo.com)) and can be replaced by a host-product profile plugin (e.g. Chatbotistic Profile) via the `memberistic_default_plans` filter and the `account_show_lane_tools` / `waiver_enabled` settings.
 
 ## 1. Upload and activate
 

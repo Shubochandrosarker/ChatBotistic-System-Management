@@ -1,8 +1,6 @@
 # Partners
 
-Memberistic is the result of a joint venture between two companies that bring complementary expertise to the table: a custom WordPress engineering house and an active, real-world shooting range and firearms retail business.
-
-This page documents who built Memberistic, why, and how the partnership shows up in the product.
+Memberistic is built and maintained by **[WordPressistic](https://www.wordpressistic.com)**. This page documents the original launch-partner relationship that shaped the engine.
 
 ---
 
@@ -10,59 +8,36 @@ This page documents who built Memberistic, why, and how the partnership shows up
 
 **Website:** **[wordpressistic.com](https://www.wordpressistic.com)**
 
-[WordPressistic](https://www.wordpressistic.com) is the WordPress engineering studio behind Memberistic. WordPressistic specialises in custom membership engines, booking platforms, and operational tooling for service businesses that have outgrown off-the-shelf plugins.
+[WordPressistic](https://www.wordpressistic.com) is the WordPress engineering studio behind Memberistic. WordPressistic owns the plugin architecture, database schema, Stripe + WooCommerce integration layer, REST API surface, React admin consoles, transactional email engine, cron scheduler, activity audit log, and the commercial Memberistic roadmap.
 
-What WordPressistic owns in this product:
-
-- The plugin architecture, database schema, and migrations.
-- The Stripe + WooCommerce integration layer.
-- The REST API surface and React admin consoles.
-- The transactional email engine, cron scheduler, and activity audit log.
-- Security review, ongoing maintenance, and the commercial Memberistic roadmap.
+Memberistic is intentionally brand-neutral and is the membership backbone for multiple host products in the WordPressistic ecosystem, including **Chatbotistic** (WhatsApp chatbot SaaS).
 
 ---
 
-## Guns 2 Ammo — launch partner & flagship deployment
+## Guns 2 Ammo — original launch partner (historical)
 
 **Website:** **[guns2ammo.com](https://guns2ammo.com)**
-**Also known as:** Guns2Ammo
 **Industry:** Indoor shooting range + firearms retail
 **Region:** United States
 
-[Guns 2 Ammo](https://guns2ammo.com) is the launch partner and joint-venture co-developer of Memberistic. Memberistic is not a generic plugin retrofitted to a niche — it is a membership engine designed _from the ground up_ around the operational reality of [Guns2Ammo](https://guns2ammo.com)'s indoor range and retail counter.
+[Guns 2 Ammo](https://guns2ammo.com) was the launch partner for Memberistic and the first production deployment of the engine. Their daily operations — lane bookings, range-officer staffing, per-person waivers, family memberships, walk-in retail customers, and front-desk check-ins — drove the design of features that other off-the-shelf membership plugins don't ship:
 
-### Why this partnership matters
+- Linked / family-member CRUD with per-person waiver status, phone, DOB, and relationship.
+- Waiver-gated check-ins, with a daily waiver-follow-up cron and admin bulk-action support.
+- A staff dashboard tuned for under-60-second front-desk transactions.
+- A schema ready for POS, KIOSK, and lane-booking integrations.
 
-Most "membership" plugins for WordPress are built for digital products — courses, content libraries, paywalls. They struggle the moment a business has a physical location, a waiver to track, family memberships, walk-in customers, and a staff team that needs to onboard a member in under 60 seconds at the front desk.
-
-[Guns 2 Ammo](https://guns2ammo.com) runs all of those things, every day:
-
-- **Indoor range** with lane bookings, range officers, and per-person waivers.
-- **Retail counter** selling firearms, ammunition, and accessories.
-- **Membership tiers** — the canonical **Defender / Patriot / Guardian** plans that ship as Memberistic defaults — covering solo, couple, and family memberships.
-- **Staff workflows** for front-desk check-ins, renewals, walk-in signups, and waiver review.
-- **Compliance touchpoints** — waiver signed, waiver expired, waiver needs review — that every plan must enforce.
-
-By co-developing Memberistic with [Guns2Ammo](https://guns2ammo.com), every workflow in this plugin has been **battle-tested in production**. The defaults are the choices Guns 2 Ammo's staff made after real-world iteration, not guesses from a designer's mockup.
-
-### What Guns 2 Ammo brings to the product
-
-- **Domain expertise** — what a shooting-range membership actually looks like, including the linked-member, family-plan, and waiver patterns.
-- **Operational pressure-testing** — the staff dashboard, front-desk shortcuts, and check-in flow were refined against live, daily use.
-- **Plan structure** — the **Defender ($29.99/mo) / Patriot ($39.99/mo) / Guardian ($59.99/mo)** tier system that ships as Memberistic's default catalog.
-- **Trust** — every record in this plugin's database has been verified against a real business's books, waivers, and Stripe ledger.
-
-### The joint venture
-
-WordPressistic and [Guns 2 Ammo](https://guns2ammo.com) are jointly preparing the next phase of the engine: a unified mobile + web dashboard combining membership management, POS, and KIOSK / waiver flows for a US launch. The current WordPress plugin in this repository is the foundation that engine sits on.
+These workflows are still in the codebase and are still production-tested. They're now **opt-in features**, gated by the `waiver_enabled` setting and the `account_show_lane_tools` setting — disabled by default for SaaS / digital host products like Chatbotistic, and re-enabled by a host-product profile plugin for service-business deployments.
 
 ---
 
 ## Built for businesses like yours
 
-If you operate a service business with memberships — a **shooting range, fitness studio, climbing gym, dive shop, golf simulator, racquet club, art studio, makerspace, or any business that combines memberships with check-ins or bookings** — Memberistic was built with your workflows in mind.
+Memberistic is suitable for:
 
-To see Memberistic in real-world operation, **[visit Guns 2 Ammo at guns2ammo.com](https://guns2ammo.com)**.
+- **SaaS / subscription products** — Chatbotistic and the rest of the WordPressistic ecosystem run on it.
+- **Service businesses with check-ins or waivers** — shooting ranges, fitness studios, climbing gyms, dive shops, golf simulators, racquet clubs, art studios, makerspaces.
+- **Membership-driven retail** — front-desk renewals, walk-in signups, staff dashboards.
 
 For commercial / licensing inquiries about deploying Memberistic to your own business, contact **[WordPressistic](https://www.wordpressistic.com)**.
 
@@ -70,4 +45,4 @@ For commercial / licensing inquiries about deploying Memberistic to your own bus
 
 ## Trademark notice
 
-_Guns 2 Ammo_, _Guns2Ammo_, and the Defender / Patriot / Guardian plan names are trademarks of Guns 2 Ammo, used with permission. _WordPressistic_ and _Memberistic_ are trademarks of WordPressistic. All other trademarks are property of their respective owners.
+_Guns 2 Ammo_ and _Guns2Ammo_ are trademarks of Guns 2 Ammo, used here for historical attribution. _WordPressistic_ and _Memberistic_ are trademarks of WordPressistic. All other trademarks are property of their respective owners.

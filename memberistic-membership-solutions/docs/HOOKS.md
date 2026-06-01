@@ -4,8 +4,6 @@ Memberistic ships a stable set of action and filter hooks so integrators can
 extend behaviour without forking the plugin. Hook names are stable across
 minor releases.
 
-> Memberistic is co-developed by [WordPressistic](https://www.wordpressistic.com) and launch partner [Guns 2 Ammo](https://guns2ammo.com) — see [`PARTNERS.md`](PARTNERS.md).
-
 ## Actions
 
 | Action | Args | When it fires |

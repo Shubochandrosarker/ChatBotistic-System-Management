@@ -4,7 +4,7 @@
 **Audit branch:** `claude/audit-memberistic-plugin-R9Np6`
 **Audit scope:** All 36 sections of the canonical `CORE_MEMBERSHIP_PLAN_FEATURES.txt` spec, plus security, code quality, and repo organisation.
 
-> **Built in partnership with [Guns 2 Ammo](https://guns2ammo.com).** Memberistic is co-developed by [WordPressistic](https://www.wordpressistic.com) and launch partner [Guns2Ammo](https://guns2ammo.com), the US-based indoor shooting range and firearms retail business this engine was built for and is battle-tested at. See [`PARTNERS.md`](PARTNERS.md) for the full partnership note.
+> Memberistic is built by [WordPressistic](https://www.wordpressistic.com). The audit was originally performed against the launch-partner deployment ([Guns 2 Ammo](https://guns2ammo.com)); see [`PARTNERS.md`](PARTNERS.md) for the historical note.
 
 This document is the deliverable of the audit pass and serves three purposes:
 

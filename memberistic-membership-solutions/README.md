@@ -1,32 +1,34 @@
 # Memberistic Membership Solutions
 
-A modern membership operations engine for service businesses — co-developed by **[WordPressistic](https://www.wordpressistic.com)** and launch partner **[Guns 2 Ammo](https://guns2ammo.com)**, the US-based indoor shooting range and firearms retail business.
+A modern membership operations engine for service and SaaS businesses, built by **[WordPressistic](https://www.wordpressistic.com)**.
 
-Memberistic runs the full lifecycle of a membership — plans, signup, payment, renewals, family / linked members, check-ins, waivers, staff dashboards, REST API, and Stripe + WooCommerce integration — from a single WordPress plugin. It's the membership-management backbone behind the **Guns 2 Ammo Membership Engine** and the foundation of the upcoming Memberistic commercial product.
+Memberistic runs the full lifecycle of a membership — plans, signup, payment, renewals, family / linked members, check-ins, waivers, staff dashboards, REST API, and Stripe + WooCommerce integration — from a single WordPress plugin. It's the membership backbone behind Chatbotistic and other WordPressistic products, and ships as a generic engine that any host product can reskin.
 
-- **Plugin version:** 1.7.1
+- **Plugin version:** 1.12.0
 - **WordPress:** 6.0+
 - **PHP:** 8.0+
 - **License:** GPLv2 or later
 
 ---
 
-## 🤝 Built with our launch partner
+## Brand-neutral by design
 
-Memberistic is the product of a **joint venture between [WordPressistic](https://www.wordpressistic.com) and [Guns 2 Ammo](https://guns2ammo.com)**. It is not a generic, untested membership plugin — every feature in this engine has been designed against the real day-to-day operations of an active US shooting range and retail counter.
+Memberistic is intended to be reskinned by a host product (Chatbotistic, future WordPressistic sub-brands, or any third-party SaaS / service business). Brand-specific text is **not hardcoded** — it is read from the `memberistic_settings` option and exposed as `memberistic_*` filters:
 
-**[Guns 2 Ammo](https://guns2ammo.com)** runs the kind of business this software was built for:
+| Setting / filter | Controls |
+|---|---|
+| `brand_label` / `memberistic_brand_label` | Brand name on the login card and digital member card |
+| `login_tagline` / `memberistic_login_tagline` | Subtitle under "MEMBER LOGIN" |
+| `login_cta_note` / `memberistic_login_cta_note` | Optional small print under the join CTA (hidden if empty) |
+| `member_id_prefix` / `memberistic_member_id_prefix` | Prefix on generated member IDs (default `MEM`) |
+| `qr_verification_label` / `memberistic_qr_verification_label` | Header line encoded in the verification QR |
+| `account_show_lane_tools` / `memberistic_account_show_lane_tools` | Show or hide the booking/check-in tile bar and section on the account template |
 
-- An indoor shooting range with lane bookings and waiver-gated check-ins.
-- A retail counter selling firearms, ammunition, and accessories.
-- A family-friendly membership model with primary and linked members.
-- A staff team that needs to onboard, check-in, and renew members in seconds at the front desk.
+Set these per-install via a host-product profile plugin (e.g. **Chatbotistic Profile**) or via WP-CLI, and Memberistic reskins itself without any template edits.
 
-Every workflow in this plugin — the **Defender / Patriot / Guardian** plan tiers, the linked-member system, the staff dashboard, the booking-engine integration, the kiosk-ready waiver model, the POS-ready schema — is **battle-tested in production at [Guns2Ammo](https://guns2ammo.com)**.
+### Original launch context
 
-The two companies are jointly preparing the next stage — a unified mobile + web membership and POS dashboard — for a US launch.
-
-> _If you operate a shooting range, fitness studio, climbing gym, dive shop, or any service business that runs on memberships, [visit Guns 2 Ammo](https://guns2ammo.com) to see Memberistic in real-world operation._
+Memberistic was originally co-developed with [Guns 2 Ammo](https://guns2ammo.com), a US-based indoor shooting range, as the launch partner that pressure-tested the engine in production. The range-business workflows (waiver-gated check-ins, lane bookings, per-person waivers, staff front-desk shortcuts) remain in the codebase and can be enabled for installs that need them. See [`docs/PARTNERS.md`](docs/PARTNERS.md) for the full historical note.
 
 ---
 
@@ -35,7 +37,7 @@ The two companies are jointly preparing the next stage — a unified mobile + we
 ### Core engine
 
 - Custom database with 10 dedicated tables (plans, memberships, people, payments, check-ins, notes, activity, email logs, integrations, system logs).
-- Three default membership tiers seeded on first install: **Defender**, **Patriot**, **Guardian** — the canonical [Guns 2 Ammo](https://guns2ammo.com) plan structure.
+- A default plan catalog is seeded on first install; host-product profile plugins can override it via the `memberistic_default_plans` filter (Chatbotistic Profile replaces it with Free / Pro / Agency / Lifetime).
 - Ten membership statuses including `pending`, `active`, `past_due`, `expired`, `cancelled`, `paused`, `comped`, `trial`, `suspended`, `needs_review`.
 - Linked / family member CRUD with per-person waiver, phone, DOB, relationship, and check-in history.
 - 21 tracked activity event types feeding a per-membership timeline.
@@ -143,7 +145,7 @@ See [`docs/INSTALL.md`](docs/INSTALL.md) for the full production setup walkthrou
 - **[Audit report](docs/AUDIT_REPORT.md)** — feature-by-feature compliance against the canonical Memberistic spec.
 - **[Installation guide](docs/INSTALL.md)** — production setup walkthrough.
 - **[Hook reference](docs/HOOKS.md)** — every action and filter Memberistic exposes.
-- **[Partners](docs/PARTNERS.md)** — about WordPressistic and Guns 2 Ammo.
+- **[Partners](docs/PARTNERS.md)** — historical note about the WordPressistic × Guns 2 Ammo launch partnership.
 - **[Changelog](CHANGELOG.md)** — version history.
 
 ---
@@ -203,9 +205,9 @@ uninstall.php                          Safe data removal (gated by setting)
 
 **[WordPressistic](https://www.wordpressistic.com)** — Plugin architecture, engineering, and ongoing product development. WordPressistic builds custom WordPress engines for service businesses and is the company behind Memberistic.
 
-**[Guns 2 Ammo](https://guns2ammo.com)** — Launch partner, joint-venture co-developer, and the flagship deployment of this engine. [Guns2Ammo](https://guns2ammo.com) is a US-based indoor shooting range and firearms retail business; its real-world membership and front-desk operations have shaped every workflow in Memberistic.
+**[Guns 2 Ammo](https://guns2ammo.com)** — Original launch partner; the range-business workflows in this codebase were pressure-tested against their day-to-day operations. See [`docs/PARTNERS.md`](docs/PARTNERS.md) for the historical note.
 
-For commercial inquiries or to see Memberistic in action, visit **[guns2ammo.com](https://guns2ammo.com)** or **[wordpressistic.com](https://www.wordpressistic.com)**.
+For commercial inquiries, visit **[wordpressistic.com](https://www.wordpressistic.com)**.
 
 ---
 
