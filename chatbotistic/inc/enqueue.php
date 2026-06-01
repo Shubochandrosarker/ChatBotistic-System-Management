@@ -34,12 +34,20 @@ function cb_enqueue_assets() {
 		null
 	);
 
-	// Core design system.
-	wp_enqueue_style( 'cb-theme', CB_URI . '/assets/css/theme.css', array( 'cb-fonts' ), cb_asset_ver( '/assets/css/theme.css' ) );
+	// V4 canonical design system. styles.css is the source of truth (the React
+	// prototype's CSS), cb-bridge.css aliases the existing PHP templates'
+	// .cb-* prefixed classes onto V4's unprefixed rules so we don't have to
+	// rewrite every template. theme.css (legacy) loads last so any rules
+	// that are still uniquely defined there continue to apply, but its
+	// values are overridden anywhere V4 redefines them.
+	wp_enqueue_style( 'cb-v4',     CB_URI . '/assets/css/v4-styles.css', array( 'cb-fonts' ),  cb_asset_ver( '/assets/css/v4-styles.css' ) );
+	wp_enqueue_style( 'cb-bridge', CB_URI . '/assets/css/cb-bridge.css', array( 'cb-v4' ),    cb_asset_ver( '/assets/css/cb-bridge.css' ) );
+	wp_enqueue_style( 'cb-theme',  CB_URI . '/assets/css/theme.css',     array( 'cb-bridge' ), cb_asset_ver( '/assets/css/theme.css' ) );
 
-	// Portal layer — only on the account template.
+	// Portal layer — V4 first, then legacy portal.css for any uniquely-cb rules.
 	if ( is_page_template( 'page-account.php' ) ) {
-		wp_enqueue_style( 'cb-portal', CB_URI . '/assets/css/portal.css', array( 'cb-theme' ), cb_asset_ver( '/assets/css/portal.css' ) );
+		wp_enqueue_style( 'cb-v4-portal', CB_URI . '/assets/css/v4-portal.css', array( 'cb-theme' ),     cb_asset_ver( '/assets/css/v4-portal.css' ) );
+		wp_enqueue_style( 'cb-portal',    CB_URI . '/assets/css/portal.css',    array( 'cb-v4-portal' ), cb_asset_ver( '/assets/css/portal.css' ) );
 	}
 
 	// Single interactions script. Defer so it never blocks render.
