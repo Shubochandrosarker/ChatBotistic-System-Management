@@ -4,6 +4,11 @@
   Renders both the sitemap index (<sitemapindex>) and the type-specific
   sub-sitemaps (<urlset>) as styled, readable pages in the browser, while
   staying valid XML for crawlers.
+
+  Layout mirrors the WordPressistic ecosystem reference: brand eyebrow,
+  gradient heading with trailing period, intro copy, N sub-sitemaps
+  pill, two-column table (URL · Last Modified), footer with llms.txt
+  + llms-full.txt links.
 -->
 <xsl:stylesheet version="1.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -16,7 +21,7 @@
 	<meta charset="UTF-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
 	<meta name="robots" content="noindex,follow"/>
-	<title>XML Sitemap — Chatbotistic</title>
+	<title>Chatbotistic Sitemap</title>
 	<style>
 		:root { color-scheme: dark; }
 		* { box-sizing: border-box; }
@@ -31,64 +36,77 @@
 		}
 		a { color: #6aa3ff; text-decoration: none; }
 		a:hover { text-decoration: underline; }
-		.wrap { max-width: 1080px; margin: 0 auto; padding: 56px 28px 80px; }
-		.brand { display: flex; align-items: center; gap: 12px; }
-		.mark {
-			width: 40px; height: 40px; border-radius: 11px; flex-shrink: 0;
-			display: grid; place-items: center; color: #fff;
-			background: linear-gradient(135deg,#4f8bff,#a070ff 60%,#3fdcff);
-			box-shadow: 0 10px 26px -8px rgba(120,90,255,0.7);
-		}
-		.brand b { font-family: 'Sora', system-ui, sans-serif; font-size: 20px; font-weight: 600; }
+		.wrap { max-width: 1100px; margin: 0 auto; padding: 64px 36px 80px; }
 		.eyebrow {
-			display: inline-block; margin-top: 28px;
+			display: inline-flex; align-items: center; gap: 8px;
+			padding: 7px 14px; border-radius: 999px;
+			background: rgba(79,139,255,0.10);
+			border: 1px solid rgba(79,139,255,0.30);
 			font-family: ui-monospace, monospace; font-size: 11px;
-			letter-spacing: 0.16em; text-transform: uppercase; color: #6aa3ff;
+			letter-spacing: 0.16em; text-transform: uppercase; color: #a8c1ff;
 		}
-		h1 { font-family: 'Sora', system-ui, sans-serif; font-size: 32px; letter-spacing: -0.02em; margin: 10px 0 6px; }
-		.intro { color: #a4adc4; font-size: 15px; max-width: 640px; }
+		.eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: #3fdcff; box-shadow: 0 0 10px #3fdcff; }
+		h1 {
+			font-family: 'Sora', system-ui, sans-serif;
+			font-size: clamp(36px, 4.4vw, 54px);
+			letter-spacing: -0.025em; line-height: 1.06;
+			margin: 18px 0 14px; font-weight: 600;
+		}
+		h1 .accent {
+			background: linear-gradient(120deg,#6aa3ff,#a070ff 60%,#3fdcff);
+			-webkit-background-clip: text; background-clip: text; color: transparent;
+		}
+		.intro { color: #a4adc4; font-size: 15px; max-width: 720px; line-height: 1.6; margin: 0; }
 		.count {
-			display: inline-block; margin-top: 18px; padding: 7px 14px; border-radius: 999px;
-			background: rgba(79,139,255,0.12); border: 1px solid rgba(79,139,255,0.3);
-			font-family: ui-monospace, monospace; font-size: 12px; color: #cdd6ff;
+			font-family: ui-monospace, monospace; font-size: 12px;
+			color: #6b7491; margin: 32px 0 14px; letter-spacing: 0.03em;
 		}
-		table { width: 100%; border-collapse: collapse; margin-top: 26px; }
+		table {
+			width: 100%; border-collapse: separate; border-spacing: 0;
+			border: 1px solid rgba(255,255,255,0.10); border-radius: 16px;
+			overflow: hidden; background: rgba(255,255,255,0.02);
+		}
 		thead th {
-			text-align: left; padding: 12px 16px;
+			text-align: left; padding: 14px 22px;
 			font-family: ui-monospace, monospace; font-size: 11px;
-			letter-spacing: 0.1em; text-transform: uppercase; color: #6b7491;
-			border-bottom: 1px solid rgba(255,255,255,0.12);
+			letter-spacing: 0.14em; text-transform: uppercase; color: #6b7491;
+			background: rgba(255,255,255,0.025);
+			border-bottom: 1px solid rgba(255,255,255,0.08);
 		}
-		tbody td { padding: 13px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 14px; }
-		tbody tr:hover { background: rgba(255,255,255,0.03); }
+		thead th.last { text-align: right; }
+		tbody td {
+			padding: 16px 22px;
+			border-bottom: 1px solid rgba(255,255,255,0.05);
+			font-size: 14px;
+			vertical-align: middle;
+		}
+		tbody tr:last-child td { border-bottom: 0; }
+		tbody tr:hover { background: rgba(255,255,255,0.025); }
 		.url { word-break: break-all; }
-		.meta { color: #6b7491; font-family: ui-monospace, monospace; font-size: 12px; white-space: nowrap; }
-		.num { color: #6b7491; font-family: ui-monospace, monospace; font-size: 12px; }
-		footer { margin-top: 36px; color: #6b7491; font-size: 13px; }
+		.meta { color: #6b7491; font-family: ui-monospace, monospace; font-size: 12.5px; text-align: right; white-space: nowrap; }
+		footer {
+			margin-top: 32px; color: #6b7491; font-size: 13px;
+			display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+		}
+		footer a { color: #6aa3ff; }
+		footer .sep { color: #4a546b; }
 	</style>
 </head>
 <body>
 	<div class="wrap">
-		<div class="brand">
-			<span class="mark">
-				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5C4 5 5 4 6.5 4h11C19 4 20 5 20 6.5v8c0 1.5-1 2.5-2.5 2.5H13l-4 3v-3H6.5C5 17 4 16 4 14.5z"/></svg>
-			</span>
-			<b>Chatbotistic</b>
-		</div>
+
+		<span class="eyebrow"><span class="dot"></span>XML Sitemap</span>
 
 		<xsl:choose>
-			<!-- Sitemap index -->
 			<xsl:when test="s:sitemapindex">
-				<span class="eyebrow">XML Sitemap Index</span>
-				<h1>Sitemap index</h1>
-				<p class="intro">This index links to the type-specific sitemaps below. Search engines and AI assistants follow it to crawl every public page, post and category efficiently.</p>
-				<div class="count"><xsl:value-of select="count(s:sitemapindex/s:sitemap)"/> sitemaps</div>
+				<h1>Chatbotistic <span class="accent">Sitemap.</span></h1>
+				<p class="intro">This is the master sitemap index for the site. Search engines and AI assistants use it to discover every public URL. Built for humans here, machine-readable underneath.</p>
+				<div class="count"><xsl:value-of select="count(s:sitemapindex/s:sitemap)"/> sub-sitemaps</div>
 				<table>
-					<thead><tr><th>#</th><th>Sitemap</th><th>Last modified</th></tr></thead>
+					<thead><tr><th>Sitemap</th><th class="last">Last Modified</th></tr></thead>
 					<tbody>
 						<xsl:for-each select="s:sitemapindex/s:sitemap">
 							<tr>
-								<td class="num"><xsl:value-of select="position()"/></td>
 								<td class="url"><a href="{s:loc}"><xsl:value-of select="s:loc"/></a></td>
 								<td class="meta"><xsl:value-of select="substring(s:lastmod,1,10)"/></td>
 							</tr>
@@ -96,21 +114,17 @@
 					</tbody>
 				</table>
 			</xsl:when>
-			<!-- URL set (sub-sitemap) -->
 			<xsl:otherwise>
-				<span class="eyebrow">XML Sitemap</span>
-				<h1>Every URL, mapped for search</h1>
-				<p class="intro">This sitemap lists public Chatbotistic URLs so search engines and AI assistants can crawl and index the site. Generated automatically by the Chatbotistic theme.</p>
+				<h1>Sitemap <span class="accent">URLs.</span></h1>
+				<p class="intro">Public URLs in this section of the site. Search engines and AI assistants follow this list to crawl every entry.</p>
 				<div class="count"><xsl:value-of select="count(s:urlset/s:url)"/> URLs</div>
 				<table>
-					<thead><tr><th>#</th><th>URL</th><th>Last modified</th><th>Frequency</th></tr></thead>
+					<thead><tr><th>URL</th><th class="last">Last Modified</th></tr></thead>
 					<tbody>
 						<xsl:for-each select="s:urlset/s:url">
 							<tr>
-								<td class="num"><xsl:value-of select="position()"/></td>
 								<td class="url"><a href="{s:loc}"><xsl:value-of select="s:loc"/></a></td>
 								<td class="meta"><xsl:value-of select="substring(s:lastmod,1,10)"/></td>
-								<td class="meta"><xsl:value-of select="s:changefreq"/></td>
 							</tr>
 						</xsl:for-each>
 					</tbody>
@@ -118,7 +132,16 @@
 			</xsl:otherwise>
 		</xsl:choose>
 
-		<footer>Generated by the Chatbotistic theme · Part of the WordPressistic ecosystem</footer>
+		<footer>
+			<span>Generated by the Chatbotistic theme</span>
+			<span class="sep">·</span>
+			<a href="/">chatbotistic.com</a>
+			<span class="sep">·</span>
+			<a href="/llms.txt">llms.txt</a>
+			<span class="sep">·</span>
+			<a href="/llms-full.txt">llms-full.txt</a>
+		</footer>
+
 	</div>
 </body>
 </html>

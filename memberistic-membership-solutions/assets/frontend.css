@@ -1245,3 +1245,245 @@
 		gap: 4px;
 	}
 }
+
+/* =========================================================================
+   Account template (memberistic-acct-*) — V4 design.
+   Was missing entirely before; Memberistic standalone rendered the
+   templates/account.php view with zero matching CSS, so the dashboard
+   collapsed to unstyled text. Host themes that override the account
+   page (e.g. Chatbotistic) are unaffected because they replace the
+   shortcode output, but the standalone path needs these styles to be
+   usable.
+   ========================================================================= */
+
+/* ---- Status bar + banner ---- */
+.memberistic-acct-statusbar { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; }
+.memberistic-acct-statuspill {
+	display: inline-flex; align-items: center; gap: 8px;
+	padding: 6px 12px; border-radius: 999px;
+	font-family: 'JetBrains Mono', ui-monospace, monospace;
+	font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.memberistic-acct-statuspill.is-ok    { background: rgba(52,211,153,0.12);  border: 1px solid rgba(52,211,153,0.32);  color: #9be9c8; }
+.memberistic-acct-statuspill.is-warn  { background: rgba(255,180,80,0.12);  border: 1px solid rgba(255,180,80,0.32);  color: #f3c97b; }
+.memberistic-acct-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+.memberistic-acct-banner {
+	display: flex; align-items: center; gap: 12px;
+	padding: 14px 18px; margin: 0 0 18px; border-radius: 12px;
+	background: rgba(255,180,80,0.08); border: 1px solid rgba(255,180,80,0.24);
+	color: #f3c97b; font-size: 14px;
+}
+.memberistic-acct-banner a { color: #ffd28a; font-weight: 600; text-decoration: underline; }
+
+/* ---- Shell layout ---- */
+.memberistic-acct-shell {
+	display: grid; grid-template-columns: 240px 1fr; gap: 28px; align-items: start;
+	margin-top: 8px;
+}
+.memberistic-acct-side {
+	position: sticky; top: 24px;
+	display: flex; flex-direction: column; gap: 14px;
+	padding: 18px; border-radius: 18px;
+	background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+	border: 1px solid rgba(255,255,255,0.08);
+}
+.memberistic-acct-id    { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.memberistic-acct-avatar{
+	width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+	display: grid; place-items: center;
+	background: linear-gradient(135deg, #4f8bff, #a070ff);
+	color: #fff; font-family: 'Sora', system-ui, sans-serif;
+	font-weight: 600; font-size: 14px;
+}
+.memberistic-acct-id strong { display: block; font-size: 14.5px; color: #e9ecf5; }
+.memberistic-acct-id span   { font-size: 12px; color: #a4adc4; }
+.memberistic-acct-planpill {
+	display: inline-block; padding: 4px 10px; border-radius: 999px;
+	background: linear-gradient(135deg, rgba(79,139,255,0.18), rgba(160,112,255,0.16));
+	border: 1px solid rgba(79,139,255,0.34); color: #cfdcff;
+	font-family: 'JetBrains Mono', ui-monospace, monospace;
+	font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+/* ---- Sidebar nav ---- */
+.memberistic-acct-nav { display: flex; flex-direction: column; gap: 2px; }
+.memberistic-acct-nav a {
+	display: flex; align-items: center; gap: 10px;
+	padding: 9px 12px; border-radius: 10px;
+	color: #a4adc4; font-size: 14px; font-weight: 500; text-decoration: none;
+	transition: background 0.15s, color 0.15s;
+}
+.memberistic-acct-nav a:hover   { background: rgba(255,255,255,0.04); color: #e9ecf5; }
+.memberistic-acct-nav a.is-active,
+.memberistic-acct-view.is-active ~ .memberistic-acct-nav a.is-active {
+	background: linear-gradient(135deg, rgba(99,128,255,0.22), rgba(160,112,255,0.14));
+	color: #fff; box-shadow: inset 0 0 0 1px rgba(99,128,255,0.32);
+}
+.memberistic-acct-nav .memberistic-acct-ic {
+	width: 22px; height: 22px; display: grid; place-items: center;
+	border-radius: 7px; background: rgba(255,255,255,0.04);
+	color: #c8cdff; font-size: 12px;
+}
+.memberistic-acct-navsep { height: 1px; background: rgba(255,255,255,0.06); margin: 6px 4px; }
+.memberistic-acct-signout { color: #ff9caa !important; }
+.memberistic-acct-signout:hover { background: rgba(255,107,129,0.08) !important; }
+
+/* ---- Main + welcome ---- */
+.memberistic-acct-main    { min-width: 0; display: flex; flex-direction: column; gap: 22px; }
+.memberistic-acct-welcome { margin: 0 0 4px; }
+.memberistic-acct-welcome h2 {
+	font-family: 'Sora', system-ui, sans-serif; font-weight: 600;
+	font-size: clamp(22px, 2.6vw, 30px); letter-spacing: -0.02em; margin: 0;
+	background: linear-gradient(120deg, #ffffff 0%, #c7d2ff 50%, #9aaeff 100%);
+	-webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.memberistic-acct-welcome p { color: #a4adc4; font-size: 14.5px; margin: 8px 0 0; }
+
+/* ---- Stat tiles ---- */
+.memberistic-acct-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.memberistic-acct-stat {
+	padding: 16px; border-radius: 14px;
+	background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+}
+.memberistic-acct-stat span  { display: block; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #6b7491; }
+.memberistic-acct-stat strong{ display: block; font-family: 'Sora', system-ui, sans-serif; font-size: 22px; margin-top: 6px; color: #e9ecf5; }
+
+/* ---- Action tile bar ---- */
+.memberistic-acct-actions {
+	display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 12px; margin-top: 4px;
+}
+.memberistic-acct-action {
+	display: flex; align-items: center; gap: 12px;
+	padding: 14px 16px; border-radius: 14px;
+	background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+	color: #e9ecf5; text-decoration: none;
+	transition: transform 0.18s, border-color 0.18s, background 0.18s;
+}
+.memberistic-acct-action:hover { transform: translateY(-2px); border-color: rgba(99,128,255,0.34); background: rgba(255,255,255,0.05); }
+.memberistic-acct-action.is-static { cursor: default; }
+.memberistic-acct-action.is-static:hover { transform: none; }
+.memberistic-acct-action strong { display: block; font-size: 14px; }
+.memberistic-acct-action small  { display: block; font-size: 12px; color: #a4adc4; margin-top: 3px; }
+.memberistic-acct-ic {
+	width: 28px; height: 28px; flex-shrink: 0;
+	border-radius: 9px; display: grid; place-items: center;
+	background: linear-gradient(135deg, rgba(99,128,255,0.25), rgba(160,112,255,0.16));
+	border: 1px solid rgba(99,128,255,0.32); color: #cfdcff;
+	font-size: 14px;
+}
+
+/* ---- Block / panel ---- */
+.memberistic-acct-block {
+	padding: 24px; border-radius: 18px;
+	background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+	border: 1px solid rgba(255,255,255,0.08);
+}
+.memberistic-acct-block + .memberistic-acct-block { margin-top: 14px; }
+.memberistic-acct-block--center { text-align: center; }
+.memberistic-acct-block--danger { border-color: rgba(255,107,129,0.28); background: linear-gradient(180deg, rgba(255,107,129,0.05), transparent); }
+.memberistic-acct-blockhd { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.memberistic-acct-blockhd h2 { font-family: 'Sora', system-ui, sans-serif; font-weight: 600; font-size: 18px; margin: 0; }
+.memberistic-acct-tag {
+	display: inline-block; padding: 4px 10px; border-radius: 999px;
+	background: rgba(79,139,255,0.1); border: 1px solid rgba(79,139,255,0.25);
+	font-family: 'JetBrains Mono', ui-monospace, monospace;
+	font-size: 11px; letter-spacing: 0.06em; color: #a8c1ff;
+}
+.memberistic-acct-muted { color: #a4adc4; font-size: 14px; }
+.memberistic-acct-mini  { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #6b7491; }
+
+/* ---- Benefits + ctas ---- */
+.memberistic-acct-benefits { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.memberistic-acct-benefits li { padding-left: 22px; position: relative; color: #a4adc4; font-size: 14px; }
+.memberistic-acct-benefits li::before { content: "✓"; position: absolute; left: 0; color: #34d399; font-weight: 700; }
+.memberistic-acct-ctas        { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.memberistic-acct-ctas--center{ justify-content: center; }
+.memberistic-acct-cta {
+	display: inline-flex; align-items: center; gap: 8px;
+	padding: 10px 18px; border-radius: 11px;
+	font-weight: 600; font-size: 14px; text-decoration: none;
+	border: 1px solid rgba(255,255,255,0.14); color: #e9ecf5;
+	background: rgba(255,255,255,0.04);
+	transition: background 0.18s, border-color 0.18s, transform 0.18s;
+	cursor: pointer;
+}
+.memberistic-acct-cta:hover           { transform: translateY(-1px); background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.22); }
+.memberistic-acct-cta--primary        { background: linear-gradient(135deg, #5a93ff, #9d6dff); border-color: transparent; color: #fff; }
+.memberistic-acct-cta--primary:hover  { box-shadow: 0 14px 36px -10px rgba(120,90,255,0.55); }
+.memberistic-acct-cta--ghost          { background: transparent; }
+
+/* ---- Charge / billing panel ---- */
+.memberistic-acct-charge { display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: center; }
+.memberistic-acct-amount { font-family: 'Sora', system-ui, sans-serif; font-size: 28px; font-weight: 600; color: #e9ecf5; }
+
+/* ---- Tables ---- */
+.memberistic-acct-tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.memberistic-acct-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.memberistic-acct-table th {
+	text-align: left; padding: 10px 12px;
+	font-family: 'JetBrains Mono', ui-monospace, monospace;
+	font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+	color: #6b7491; border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.memberistic-acct-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #a4adc4; }
+.memberistic-acct-table tr:last-child td { border-bottom: 0; }
+.memberistic-acct-pill {
+	display: inline-block; padding: 3px 9px; border-radius: 999px;
+	font-family: 'JetBrains Mono', ui-monospace, monospace;
+	font-size: 10.5px; letter-spacing: 0.06em;
+}
+.memberistic-acct-pill--ok    { background: rgba(52,211,153,0.14);  color: #a7ecdf; }
+.memberistic-acct-pill--warn  { background: rgba(255,180,80,0.14);  color: #f3c97b; }
+
+/* ---- Digital member card ---- */
+.memberistic-acct-pass {
+	display: grid; grid-template-columns: 1fr; gap: 14px;
+	padding: 28px; border-radius: 18px; max-width: 480px; margin: 18px auto;
+	background:
+		radial-gradient(600px 220px at 80% 0%, rgba(79,139,255,0.18), transparent 60%),
+		radial-gradient(400px 180px at 0% 100%, rgba(160,112,255,0.16), transparent 60%),
+		linear-gradient(135deg, #0d1226, #0a0f22);
+	border: 1px solid rgba(255,255,255,0.14);
+	box-shadow: 0 20px 60px -20px rgba(79,139,255,0.4);
+	text-align: left;
+}
+.memberistic-acct-pass__top   { display: flex; justify-content: space-between; align-items: center; }
+.memberistic-acct-pass__brand { font-family: 'Sora', system-ui, sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 0.06em; color: #fff; }
+.memberistic-acct-pass__plan  {
+	display: inline-block; padding: 4px 10px; border-radius: 999px;
+	background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.16);
+	font-family: 'JetBrains Mono', ui-monospace, monospace;
+	font-size: 10.5px; letter-spacing: 0.08em; color: #fff;
+}
+.memberistic-acct-pass__name {
+	font-family: 'Sora', system-ui, sans-serif; font-weight: 600;
+	font-size: 22px; letter-spacing: 0.02em; color: #fff;
+}
+.memberistic-acct-pass__body { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; }
+.memberistic-acct-pass__meta { display: grid; gap: 4px; }
+.memberistic-acct-pass__meta strong { font-size: 14px; color: #fff; }
+.memberistic-acct-pass__qr { width: 110px; height: 110px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+.memberistic-acct-passnote { text-align: center; margin-top: 12px; }
+
+/* ---- Empty state ---- */
+.memberistic-acct-empty {
+	padding: 48px 28px; text-align: center; border-radius: 18px;
+	background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.005));
+	border: 1px dashed rgba(255,255,255,0.14);
+}
+.memberistic-acct-empty h3 { font-family: 'Sora', system-ui, sans-serif; font-size: 18px; margin: 0 0 10px; }
+.memberistic-acct-empty p  { color: #a4adc4; font-size: 14.5px; margin: 0 0 18px; max-width: 460px; margin-inline: auto; }
+
+/* ---- Responsive ---- */
+@media (max-width: 900px) {
+	.memberistic-acct-shell  { grid-template-columns: 1fr; }
+	.memberistic-acct-side   { position: static; }
+	.memberistic-acct-stats  { grid-template-columns: repeat(2, 1fr); }
+	.memberistic-acct-charge { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+	.memberistic-acct-stats  { grid-template-columns: 1fr; }
+	.memberistic-acct-pass__body { grid-template-columns: 1fr; justify-items: center; }
+	.memberistic-acct-pass__qr   { margin: 0 auto; }
+}

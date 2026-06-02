@@ -169,6 +169,24 @@ class Bridge {
 			update_user_meta( $user_id, self::META_LICENSE_KEY, (string) ( $res['license_key'] ?? '' ) );
 			$this->store_caps_on_license( (int) $res['license_id'], $caps, $plan_id, $membership );
 			$this->email_license_to_user( $user, (string) $res['license_key'], $caps );
+
+			/**
+			 * Fires once a Chatbotistic membership has been fully provisioned:
+			 *   - Memberistic membership is active
+			 *   - Licenseistic license is created with the right cap row
+			 *   - cap envelope is written to the license's notes field
+			 *   - welcome email has been queued
+			 *
+			 * Use this hook to provision downstream resources (e.g. create the
+			 * matching Tochat business under the user's userClient tag,
+			 * register the user in a marketing-automation tool, etc).
+			 *
+			 * @param int   $user_id       WordPress user ID.
+			 * @param int   $license_id    Licenseistic license ID.
+			 * @param array $caps          Resolved cap row (tier / max_widgets / ...).
+			 * @param array $membership    Memberistic membership row.
+			 */
+			do_action( 'cbc_membership_activated', $user_id, (int) $res['license_id'], $caps, $membership );
 		}
 	}
 

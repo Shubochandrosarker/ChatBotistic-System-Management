@@ -46,6 +46,13 @@ class Installer {
 		// 4. Memberistic settings hardening.
 		$summary['settings'] = self::apply_settings();
 
+		// 5. WPistic Contact Form preset — reply branding, auto-responder
+		// copy, AI auto-reply rules, FAQ + KB seed for the local_rules
+		// provider. Idempotent.
+		if ( class_exists( 'WPISTIC_CF_Database' ) ) {
+			$summary['wpcf_preset'] = WPCF_Preset::apply();
+		}
+
 		return $summary;
 	}
 
@@ -64,6 +71,7 @@ class Installer {
 			'caps_synced'   => 0,
 			'product_id'    => 0,
 			'settings'      => false,
+			'wpcf_preset'   => array(),
 		];
 
 		$summary['pages_created'] = Pages::ensure_all();
@@ -77,6 +85,14 @@ class Installer {
 		$summary['caps_synced'] = Plans::sync_bridge_caps();
 		$summary['product_id']  = self::ensure_license_product();
 		$summary['settings']    = self::apply_settings();
+
+		// Push Chatbotistic-tuned defaults into WPistic Contact Form
+		// (reply branding, auto-responder copy, AI auto-reply rules, FAQ
+		// + KB seed). Idempotent — only writes keys still on their
+		// shipped default.
+		if ( class_exists( 'WPISTIC_CF_Database' ) ) {
+			$summary['wpcf_preset'] = WPCF_Preset::apply();
+		}
 
 		// Pages may be new — make sure their pretty permalinks resolve.
 		flush_rewrite_rules( false );

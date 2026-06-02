@@ -21,7 +21,27 @@ define( 'CBC_FILE',     __FILE__ );
 define( 'CBC_DIR',      plugin_dir_path( __FILE__ ) );
 define( 'CBC_URL',      plugin_dir_url( __FILE__ ) );
 define( 'CBC_BASENAME', plugin_basename( __FILE__ ) );
-define( 'CBC_API_BASE', 'https://services.tochat.be' );
+
+/**
+ * Tochat.be provider URL — where the actual API + widget script live.
+ *
+ * Can be overridden per-deployment by defining CBC_API_BASE in wp-config.php
+ * BEFORE this plugin loads (e.g. for a staging deployment pointed at a
+ * different provider host).
+ */
+if ( ! defined( 'CBC_API_BASE' ) ) {
+	define( 'CBC_API_BASE', 'https://services.tochat.be' );
+}
+
+/**
+ * White-label customer-facing URL. This is what end-users see in their
+ * dashboards, emails, and "manage widgets in app.chatbotistic.com" hints.
+ * Default is app.chatbotistic.com; sub-brands and reseller deployments
+ * override via wp-config.
+ */
+if ( ! defined( 'CBC_APP_BASE' ) ) {
+	define( 'CBC_APP_BASE', 'https://app.chatbotistic.com' );
+}
 
 /**
  * Lightweight class-map autoloader for the Chatbotistic\Connector namespace.

@@ -86,6 +86,14 @@ class Emails {
 		remove_filter( 'wp_mail_from_name', [ __CLASS__, 'from_name' ],  9999 );
 	}
 
+	/**
+	 * Public alias used by Emails_Automation to brand the From header for
+	 * a single wp_mail() call. Cleans up on shutdown via disarm_from_filter().
+	 */
+	public static function arm_from(): void {
+		self::arm_from_filter( true );
+	}
+
 	public static function from_email(): string { return CBP_FROM_EMAIL; }
 	public static function from_name():  string { return CBP_FROM_NAME; }
 

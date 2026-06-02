@@ -25,6 +25,10 @@ final class Settings_Page {
 		$configured    = count( Targeting::configured_keys() );
 		$over_quota    = ( -1 !== $max_widgets && $configured > $max_widgets );
 		$api_connected = API::is_connected();
+		// Auto-fetched widget catalog from /licenseistic/v1/widgets — feeds
+		// the default-key dropdown so customers pick from a list instead of
+		// pasting a UUID by hand.
+		$remote_widgets = method_exists( License::class, 'get_widget_list' ) ? (array) License::get_widget_list() : array();
 		?>
 		<?php settings_errors( 'cbw_settings' ); ?>
 		<?php Admin::upgrade_banner_if_free(); ?>
@@ -52,18 +56,84 @@ final class Settings_Page {
 				<h2 class="cbw-card__title"><?php esc_html_e( 'Default Widget', 'chatbotistic-widget' ); ?></h2>
 				<p class="cbw-card__sub"><?php esc_html_e( 'This widget loads on every page that doesn\'t match a more specific rule below. Leave empty to disable the widget site-wide.', 'chatbotistic-widget' ); ?></p>
 
-				<div class="cbw-field">
+				<div class="cbw-field" id="cbw-default-key-field">
 					<label for="cbw-default-key"><?php esc_html_e( 'Widget Key', 'chatbotistic-widget' ); ?></label>
-					<input type="text" id="cbw-default-key" name="default_widget_key" class="cbw-input cbw-input--mono" value="<?php echo esc_attr( $default_key ); ?>" placeholder="e.g. 8f637d8b-9409-4f0b-b2ff-9ae0617191f3" />
-					<small class="cbw-hint">
-						<?php
-						printf(
-							/* translators: %s = app.chatbotistic.com link */
-							esc_html__( 'Copy from your widget in %s.', 'chatbotistic-widget' ),
-							'<a href="' . esc_url( CBW_APP_BASE_URL ) . '" target="_blank" rel="noopener">app.chatbotistic.com</a>'
-						);
+
+					<?php if ( ! empty( $remote_widgets ) ) :
+						// Cached catalog present → dropdown. The customer's existing
+						// pasted key may not be in the catalog yet (e.g. heartbeat
+						// hasn't refreshed); preserve it as the selected option so
+						// the form still saves correctly.
+						$default_in_list = false;
+						foreach ( $remote_widgets as $rw ) {
+							if ( isset( $rw['key'] ) && $rw['key'] === $default_key ) { $default_in_list = true; break; }
+						}
 						?>
-					</small>
+						<select id="cbw-default-key" name="default_widget_key" class="cbw-input cbw-select" data-cbw-key-select>
+							<option value=""><?php esc_html_e( '— No default widget —', 'chatbotistic-widget' ); ?></option>
+							<?php foreach ( $remote_widgets as $rw ) :
+								$k = isset( $rw['key'] ) ? (string) $rw['key'] : '';
+								$n = isset( $rw['name'] ) && '' !== $rw['name'] ? (string) $rw['name'] : $k;
+								if ( '' === $k ) continue; ?>
+								<option value="<?php echo esc_attr( $k ); ?>" <?php selected( $default_key, $k ); ?>><?php echo esc_html( $n ); ?></option>
+							<?php endforeach; ?>
+							<?php if ( ! $default_in_list && '' !== $default_key ) : ?>
+								<option value="<?php echo esc_attr( $default_key ); ?>" selected><?php echo esc_html( sprintf( /* translators: %s: widget key (UUID) */ __( 'Manually entered: %s', 'chatbotistic-widget' ), $default_key ) ); ?></option>
+							<?php endif; ?>
+							<option value="__manual__"><?php esc_html_e( '… enter a key manually', 'chatbotistic-widget' ); ?></option>
+						</select>
+						<input type="text" id="cbw-default-key-manual" name="default_widget_key_manual" class="cbw-input cbw-input--mono" value="" placeholder="e.g. 8f637d8b-9409-4f0b-b2ff-9ae0617191f3" hidden />
+						<small class="cbw-hint">
+							<?php
+							/* translators: %d = widget count */
+							echo esc_html( sprintf( _n( '%d widget loaded from your Chatbotistic account.', '%d widgets loaded from your Chatbotistic account.', count( $remote_widgets ), 'chatbotistic-widget' ), count( $remote_widgets ) ) );
+							?>
+							<?php
+							printf(
+								/* translators: %s: app.chatbotistic.com link */
+								' · ' . esc_html__( 'Manage widgets in %s.', 'chatbotistic-widget' ),
+								'<a href="' . esc_url( CBW_APP_BASE_URL ) . '" target="_blank" rel="noopener">app.chatbotistic.com</a>'
+							);
+							?>
+							<?php
+							/* Inline refresh button — posts to admin-post.php?action=cbw_refresh_widgets
+							   and bounces back to the License screen with a notice. */
+							?>
+							· <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=cbw_refresh_widgets' ), 'cbw_refresh_widgets' ) ); ?>"><?php esc_html_e( 'Refresh now', 'chatbotistic-widget' ); ?></a>
+						</small>
+						<script>
+						(function () {
+							var sel = document.querySelector('[data-cbw-key-select]');
+							if (!sel) return;
+							var manual = document.getElementById('cbw-default-key-manual');
+							function sync() {
+								var isManual = (sel.value === '__manual__');
+								if (manual) {
+									manual.hidden = !isManual;
+									if (isManual) { manual.focus(); }
+								}
+							}
+							sel.addEventListener('change', sync);
+							sync();
+						})();
+						</script>
+					<?php else :
+						// No catalog yet → original paste field as fallback.
+						?>
+						<input type="text" id="cbw-default-key" name="default_widget_key" class="cbw-input cbw-input--mono" value="<?php echo esc_attr( $default_key ); ?>" placeholder="e.g. 8f637d8b-9409-4f0b-b2ff-9ae0617191f3" />
+						<small class="cbw-hint">
+							<?php
+							printf(
+								/* translators: %s = app.chatbotistic.com link */
+								esc_html__( 'Copy from your widget in %s.', 'chatbotistic-widget' ),
+								'<a href="' . esc_url( CBW_APP_BASE_URL ) . '" target="_blank" rel="noopener">app.chatbotistic.com</a>'
+							);
+							?>
+							<?php if ( License::is_active() ) : ?>
+								<br><em><?php esc_html_e( 'Your widget list will populate this field as a dropdown once the next license heartbeat completes (every ~12 hours), or you can re-save the License screen to refresh now.', 'chatbotistic-widget' ); ?></em>
+							<?php endif; ?>
+						</small>
+					<?php endif; ?>
 				</div>
 			</div>
 
@@ -221,7 +291,13 @@ final class Settings_Page {
 		if ( ! current_user_can( 'manage_options' ) ) wp_die( 'Forbidden' );
 		check_admin_referer( 'cbw_save_settings' );
 
-		Targeting::save_default( sanitize_text_field( wp_unslash( $_POST['default_widget_key'] ?? '' ) ) );
+		// If the dropdown is on `__manual__`, take the value from the
+		// adjacent text field instead — that's where the user typed.
+		$default_key = sanitize_text_field( wp_unslash( $_POST['default_widget_key'] ?? '' ) );
+		if ( '__manual__' === $default_key ) {
+			$default_key = sanitize_text_field( wp_unslash( $_POST['default_widget_key_manual'] ?? '' ) );
+		}
+		Targeting::save_default( $default_key );
 
 		$post_keys = (array) ( $_POST['by_post_widget_key'] ?? [] );
 		$post_ids  = (array) ( $_POST['by_post_post_id']    ?? [] );

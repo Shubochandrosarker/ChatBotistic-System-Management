@@ -232,8 +232,270 @@
 	.cb-stats, .cb-statband { grid-template-columns: 1fr; }
 }
 
+/* =========================================================================
+   V4 page-template shims — selectors used in the ported PHP templates that
+   V4's styles.css doesn't define (page-pricing, page-demo, front-page).
+   ========================================================================= */
+
+/* Form layout (demo + contact + register) */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+@media (max-width: 760px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+.form-section-label {
+	font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+	text-transform: uppercase; color: var(--text-dim); margin: 28px 0 12px;
+}
+.cb-form > .field + .field,
+.cb-form > .grid-2 + .grid-2,
+.cb-form > .grid-3 + .grid-3 { margin-top: 14px; }
+
+.field label {
+	font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+	text-transform: uppercase; color: var(--text-dim);
+}
+.field .req { color: var(--pink); }
+.field input,
+.field select,
+.field textarea {
+	width: 100%; padding: 12px 14px; border-radius: 12px;
+	background: rgba(0,0,0,0.4); border: 1px solid var(--line);
+	color: var(--text); font-family: var(--font-body); font-size: 15px;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus { outline: none; border-color: rgba(99,128,255,0.6); }
+.field textarea { resize: vertical; min-height: 90px; }
+
+.check-line {
+	display: flex; gap: 10px; align-items: flex-start;
+	color: var(--text-soft); font-size: 13.5px; line-height: 1.5;
+	margin-top: 12px;
+}
+.check-line input { margin-top: 3px; }
+
+/* Demo booking layout */
+.demo-layout {
+	display: grid; grid-template-columns: 1fr 360px; gap: 36px;
+	align-items: start; margin-top: 32px;
+}
+@media (max-width: 980px) { .demo-layout { grid-template-columns: 1fr; } }
+
+.demo-aside-card { padding: 24px; border-radius: 18px; }
+.demo-step {
+	display: flex; gap: 12px; align-items: flex-start; padding: 8px 0;
+	color: var(--text-soft); font-size: 13.5px; line-height: 1.5;
+}
+.demo-step .n {
+	flex-shrink: 0; width: 22px; height: 22px; border-radius: 7px;
+	background: linear-gradient(135deg, rgba(99,128,255,0.28), rgba(160,112,255,0.18));
+	border: 1px solid rgba(99,128,255,0.36); color: #c8cdff;
+	font-family: var(--font-mono); font-size: 11px;
+	display: grid; place-items: center;
+}
+.result-ico {
+	width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center;
+	font-size: 30px; font-weight: 700;
+}
+.result-ico.ok { background: rgba(52,211,153,0.14); color: var(--green); border: 1px solid rgba(52,211,153,0.34); }
+
+/* Pricing card extras V4 doesn't fully cover */
+.price-card { padding: 24px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); display: flex; flex-direction: column; position: relative; }
+.price-card.featured { border-color: rgba(99,128,255,0.45); box-shadow: 0 30px 80px -32px rgba(99,128,255,0.55); }
+.price-card.lifetime { background: linear-gradient(180deg, rgba(255,180,80,0.06), rgba(255,255,255,0.02)); border-color: rgba(255,180,80,0.35); }
+.price-card .plan-name { font-family: var(--font-display); font-weight: 600; font-size: 18px; }
+.price-card .plan-desc { color: var(--text-soft); font-size: 13.5px; margin-top: 4px; }
+.price-card .price-amount { font-family: var(--font-display); font-weight: 600; margin-top: 18px; line-height: 1; }
+.price-card .price-amount sub { color: var(--text-dim); margin-left: 4px; }
+.price-card .check { color: var(--green); font-weight: 700; margin-right: 8px; }
+.price-card .btn { margin-top: auto; }
+.btn-lifetime { background: linear-gradient(135deg, #ffd166, #ff9a3c) !important; color: #1a0f00 !important; box-shadow: 0 8px 30px -8px rgba(255,180,80,0.5), inset 0 1px 0 rgba(255,255,255,0.4) !important; }
+
+/* Recommendation cards */
+.rec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 32px; }
+.rec-card { padding: 24px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.rec-card .pick { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--text-dim); text-transform: uppercase; }
+.rec-card .pick b { color: var(--blue-bright); }
+.rec-card h3 { font-size: 17px; }
+.rec-card p { color: var(--text-soft); font-size: 13.5px; }
+.rec-card .ico { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, rgba(99,128,255,0.25), rgba(160,112,255,0.16)); }
+@media (max-width: 900px) { .rec-grid { grid-template-columns: 1fr; } }
+
+/* FAQ list (details/summary native) */
+.faq-list { display: flex; flex-direction: column; gap: 0; }
+.faq-list .faq-item {
+	padding: 16px 20px;
+	border: 1px solid var(--line);
+	border-top: 0;
+	background: rgba(255,255,255,0.02);
+}
+.faq-list .faq-item:first-child { border-top: 1px solid var(--line); border-radius: 14px 14px 0 0; }
+.faq-list .faq-item:last-child  { border-radius: 0 0 14px 14px; }
+.faq-list .faq-item summary {
+	cursor: pointer; list-style: none;
+	font-family: var(--font-display); font-weight: 600; font-size: 15px;
+	color: var(--text);
+	padding: 4px 0;
+}
+.faq-list .faq-item summary::-webkit-details-marker { display: none; }
+.faq-list .faq-item[open] summary { color: var(--blue-bright); }
+.faq-list .faq-item p { margin: 10px 0 0; color: var(--text-soft); font-size: 14px; line-height: 1.6; }
+
+/* Big CTA (final section) */
+.big-cta {
+	border-radius: 28px; padding: 64px 48px; text-align: center;
+	background:
+		radial-gradient(700px 320px at 80% 20%, rgba(160,112,255,0.18), transparent 60%),
+		radial-gradient(600px 280px at 10% 90%, rgba(63,220,255,0.12), transparent 60%),
+		linear-gradient(135deg, #0d1226 0%, #0a0f22 100%);
+	border: 1px solid var(--line-strong);
+}
+.big-cta h2 { font-size: clamp(28px, 3vw, 42px); letter-spacing: -0.025em; }
+.big-cta p { color: var(--text-soft); font-size: 16px; max-width: 540px; margin: 14px auto 0; }
+.cta-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+@media (max-width: 560px) { .big-cta { padding: 44px 22px; } }
+
+/* Use-case flow rail */
+.uc-flow {
+	display: flex; flex-wrap: wrap; align-items: stretch; justify-content: center;
+	gap: 12px; margin-top: 40px;
+}
+.uc-flow-step {
+	display: flex; align-items: center; gap: 10px;
+	padding: 14px 18px; border-radius: 12px;
+	background: rgba(255,255,255,0.03); border: 1px solid var(--line);
+	font-size: 13.5px; color: var(--text); min-width: 160px;
+}
+.uc-flow-step .n {
+	width: 28px; height: 28px; border-radius: 8px;
+	background: linear-gradient(135deg, rgba(79,139,255,0.25), rgba(160,112,255,0.18));
+	border: 1px solid rgba(79,139,255,0.36); color: #cfdcff;
+	font-family: var(--font-mono); font-size: 11px;
+	display: grid; place-items: center; flex-shrink: 0;
+}
+.uc-flow-arrow {
+	display: grid; place-items: center; color: var(--text-dim);
+	font-family: var(--font-mono); padding: 0 4px;
+}
+@media (max-width: 760px) {
+	.uc-flow { flex-direction: column; align-items: stretch; }
+	.uc-flow-arrow { transform: rotate(90deg); padding: 4px 0; }
+	.uc-flow-step { width: 100%; }
+}
+
+/* Use-cases overview row card collapses on tablets */
+@media (max-width: 900px) {
+	.use-row { grid-template-columns: 56px 1fr !important; gap: 18px !important; }
+	.use-row > .use-row-meta,
+	.use-row > .use-row-cta { grid-column: 1 / -1; }
+}
+
+/* Product page little stat-tag used in the WP plugin mock */
+.tag.won { padding: 4px 10px; border-radius: 999px; background: rgba(52,211,153,0.14); color: #a7ecdf; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; }
+
+/* Docs search input + kbd hint (V4 styles the wrapper; we polish the
+   interior so it works as a real search field on the support page too). */
+.docs-search { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--line); }
+.docs-search input { flex: 1; background: transparent; border: 0; color: var(--text); font-size: 14px; outline: none; }
+.docs-search kbd { font-family: var(--font-mono); font-size: 11px; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 6px; color: var(--text-dim); }
+
+/* ---------- Portal state component (empty / loading / error / locked / success) ---------- */
+.cb-portal-state {
+	display: flex; flex-direction: column; align-items: center; justify-content: center;
+	text-align: center; padding: 48px 28px; gap: 16px;
+	background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.005));
+	border: 1px dashed var(--line-strong); border-radius: 20px;
+}
+.cb-portal-state__ico { width: 56px; height: 56px; border-radius: 16px; font-size: 24px; font-weight: 700; }
+.cb-portal-state__ico.muted { background: rgba(255,255,255,0.04); border: 1px solid var(--line); color: var(--text-dim); }
+.cb-portal-state__title { font-family: var(--font-display); font-weight: 600; font-size: 18px; color: var(--text); margin: 0; }
+.cb-portal-state__lead { color: var(--text-soft); font-size: 14.5px; line-height: 1.6; max-width: 460px; margin: 0; }
+.cb-portal-state--loading .cb-portal-state__ico { animation: op-pulse 1.6s infinite; }
+
+/* Auth fine-tuning where V4 portal.css leaves room */
+.cb-form .field-err  { font-size: 12.5px; color: #ff8aa0; margin-top: 5px; display: flex; align-items: center; gap: 6px; }
+.cb-form .field-hint { font-size: 12.5px; color: var(--text-dim); margin-top: 5px; }
+.auth-main           { display: grid; place-items: center; padding: 48px 32px; }
+.auth-card           { max-width: 460px; width: 100%; padding: 36px 32px; border-radius: 22px; background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015)); border: 1px solid var(--line-strong); }
+.auth-card h1        { font-size: 28px; letter-spacing: -0.02em; margin: 0; }
+
+/* =========================================================================
+   Accessibility — focus-visible rings + screen-reader helpers.
+   Applies a consistent 2px focus ring across every interactive class V4
+   ships, plus the legacy .cb-* prefixed equivalents. Uses :focus-visible
+   so it only shows on keyboard navigation, not on mouse clicks.
+   ========================================================================= */
+:where(
+	a,
+	button,
+	[role="button"],
+	[role="tab"],
+	[role="menuitem"],
+	input,
+	select,
+	textarea,
+	summary,
+	details > summary,
+	.btn, .cb-btn,
+	.cbc-btn, .cbc-tab,
+	.toggle-wrap button,
+	.faq-item summary,
+	.sso-btn,
+	.cb-nav__link,
+	.cb-portal__nav a,
+	.memberistic-acct-nav a,
+	.cbw-btn
+):focus { outline: none; }
+
+:where(
+	a,
+	button,
+	[role="button"],
+	[role="tab"],
+	[role="menuitem"],
+	summary,
+	.btn, .cb-btn,
+	.cbc-btn, .cbc-tab,
+	.toggle-wrap button,
+	.faq-item summary,
+	.sso-btn,
+	.cb-nav__link,
+	.cb-portal__nav a,
+	.memberistic-acct-nav a,
+	.cbw-btn
+):focus-visible {
+	outline: 2px solid var(--blue-bright, #6aa3ff);
+	outline-offset: 3px;
+	border-radius: 8px;
+}
+
+:where(input, select, textarea):focus-visible {
+	outline: 2px solid var(--blue-bright, #6aa3ff);
+	outline-offset: 0;
+	border-color: var(--blue-bright, #6aa3ff) !important;
+}
+
+/* Screen-reader-only helper (Bootstrap pattern). */
+.sr-only,
+.screen-reader-text {
+	position: absolute !important;
+	width: 1px; height: 1px;
+	padding: 0; margin: -1px; overflow: hidden;
+	clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* aria-current="page" boost — adds an underline on top of the existing
+   .is-active class so screen-magnifier users get an extra visual cue. */
+[aria-current="page"] { font-weight: 600; }
+
 /* ---------- Reduced motion (V4 motion primitives must be neutralised) ---------- */
 @media (prefers-reduced-motion: reduce) {
-	.op-pulse, .op-ring, .op-flow, .op-scan, .op-queue { animation: none !important; }
+	.op-pulse, .op-ring, .op-flow, .op-scan, .op-queue,
+	.op-rail-flow, .op-signal { animation: none !important; }
+	/* V4 ambient site-fade-in on every page. */
+	.page-fade, #cb-main { animation: none !important; }
+	/* Hover lift transforms that count as motion. */
+	.cb-feature:hover, .cb-btn:hover, .btn:hover,
+	.use-card:hover, .cbc-btn:hover { transform: none !important; }
 	html { scroll-behavior: auto; }
 }

@@ -19,6 +19,7 @@ require_once CB_DIR . '/inc/setup.php';
 require_once CB_DIR . '/inc/helpers.php';
 require_once CB_DIR . '/inc/enqueue.php';
 require_once CB_DIR . '/inc/landing-data.php';
+require_once CB_DIR . '/inc/v4-landing-data.php';
 require_once CB_DIR . '/inc/seo.php';
 require_once CB_DIR . '/inc/sitemap.php';
 require_once CB_DIR . '/inc/llms.php';

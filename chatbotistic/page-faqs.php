@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: FAQs Page
+ * Template Name: FAQs (V4)
  *
  * @package Chatbotistic
  */
@@ -9,47 +9,82 @@ defined( 'ABSPATH' ) || exit;
 
 get_header();
 
-$cb_faqs = array(
-	array( 'q' => __( 'What is Chatbotistic?', 'chatbotistic' ), 'a' => __( 'Chatbotistic is an AI WhatsApp Agent and chat-widget platform. It puts a smart agent on your website that answers questions, qualifies leads, and books appointments 24/7 — across WhatsApp, web chat, and email.', 'chatbotistic' ) ),
-	array( 'q' => __( 'Do I need WhatsApp Business API?', 'chatbotistic' ), 'a' => __( 'For click-to-chat widgets, no. For the AI Agent that sends and receives messages automatically, you connect a WhatsApp Business API number — we guide you through it, or provision one for you on higher plans.', 'chatbotistic' ) ),
-	array( 'q' => __( 'Does it work with WordPress?', 'chatbotistic' ), 'a' => __( 'Yes. Install the free Chatbotistic Widget plugin, activate it with your license key, and your widgets appear on the site — no code snippet required.', 'chatbotistic' ) ),
-	array( 'q' => __( 'Can I use my own branding?', 'chatbotistic' ), 'a' => __( 'Paid plans remove Chatbotistic branding. The Agency plan adds full white label — your logo, your domain, and client sub-accounts.', 'chatbotistic' ) ),
-	array( 'q' => __( 'How is my data handled?', 'chatbotistic' ), 'a' => __( 'Conversations are encrypted in transit, stored securely, and never sold. You can export or delete your data at any time. See our Security and Privacy pages for details.', 'chatbotistic' ) ),
-	array( 'q' => __( 'Can I cancel any time?', 'chatbotistic' ), 'a' => __( 'Yes. Monthly plans are month-to-month with no contract. Manage or cancel your plan directly from the member portal.', 'chatbotistic' ) ),
-	array( 'q' => __( 'Do you offer support?', 'chatbotistic' ), 'a' => __( 'All plans include email support. Growth and Agency plans get priority response within one business day.', 'chatbotistic' ) ),
+$cb_groups = array(
+	array( __( 'Getting started', 'chatbotistic' ), array(
+		array( __( 'How do I sign up?', 'chatbotistic' ), __( 'Create a free account at /register/. The free plan stays free, no card required.', 'chatbotistic' ) ),
+		array( __( 'How long does setup take?', 'chatbotistic' ), __( 'About 5 minutes from signup to live widget. Install the WordPress plugin, paste your license, pick a widget.', 'chatbotistic' ) ),
+		array( __( 'Do I need a credit card?', 'chatbotistic' ), __( 'No — only when upgrading to Pro, Agency, or Lifetime.', 'chatbotistic' ) ),
+	) ),
+	array( __( 'WordPress + widgets', 'chatbotistic' ), array(
+		array( __( 'Is there a WordPress plugin?', 'chatbotistic' ), __( 'Yes — the Chatbotistic Widget addon. Download it from your account, paste your license, pick a widget.', 'chatbotistic' ) ),
+		array( __( 'Does it work with WooCommerce?', 'chatbotistic' ), __( 'Yes. Native order lookup, cart recovery, and product Q&A.', 'chatbotistic' ) ),
+		array( __( 'Can I use it on multiple domains?', 'chatbotistic' ), __( 'Free covers 1 domain, Pro covers 10, Agency covers 50, Lifetime is unlimited.', 'chatbotistic' ) ),
+	) ),
+	array( __( 'WhatsApp + leads', 'chatbotistic' ), array(
+		array( __( 'Do I need the WhatsApp Business API?', 'chatbotistic' ), __( 'No — a standard WhatsApp number works. We handle the routing.', 'chatbotistic' ) ),
+		array( __( 'Where do leads land?', 'chatbotistic' ), __( 'In your Chatbotistic inbox, exportable to CSV, with CRM integrations on Pro and above.', 'chatbotistic' ) ),
+		array( __( 'Can I set business hours?', 'chatbotistic' ), __( 'Yes, with different replies for open hours, after hours, and holidays.', 'chatbotistic' ) ),
+	) ),
+	array( __( 'Billing + licensing', 'chatbotistic' ), array(
+		array( __( 'How does billing work?', 'chatbotistic' ), __( 'Monthly or annual, in USD. Annual saves ~17%. Cancel anytime.', 'chatbotistic' ) ),
+		array( __( 'What happens if my plan expires?', 'chatbotistic' ), __( 'A 3-day grace window keeps your widget live during transient issues. After that, premium features pause but your account and data stay safe.', 'chatbotistic' ) ),
+		array( __( 'Can I get a refund?', 'chatbotistic' ), __( 'Yes — see /refund-policy/ for the full terms.', 'chatbotistic' ) ),
+	) ),
 );
-cb_add_faq_schema( $cb_faqs );
 
-while ( have_posts() ) :
-	the_post();
-	?>
-	<section class="cb-page-hero">
-		<div class="cb-container">
-			<span class="cb-eyebrow"><?php esc_html_e( 'FAQs', 'chatbotistic' ); ?></span>
-			<h1 class="cb-h1"><span class="cb-grad"><?php esc_html_e( 'Frequently asked questions', 'chatbotistic' ); ?></span></h1>
-			<p class="cb-lead"><?php esc_html_e( 'Everything you need to know before you start. Still stuck? Talk to the team.', 'chatbotistic' ); ?></p>
+// Emit one FAQPage JSON-LD covering every grouped FAQ so search + AI
+// engines can render the full set in rich-result cards.
+if ( function_exists( 'cb_add_faq_schema' ) ) {
+	$cb_faq_schema = array();
+	foreach ( $cb_groups as $g ) {
+		foreach ( $g[1] as $q ) {
+			$cb_faq_schema[] = array( 'question' => $q[0], 'answer' => $q[1] );
+		}
+	}
+	if ( $cb_faq_schema ) {
+		cb_add_faq_schema( $cb_faq_schema );
+	}
+}
+?>
+
+<main class="page-fade">
+	<section class="page-hero">
+		<div class="container" style="text-align:center;">
+			<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'FAQs', 'chatbotistic' ); ?></span>
+			<h1 class="text-grad" style="max-width:760px;margin:18px auto 0;"><?php esc_html_e( 'Common questions, plainly answered.', 'chatbotistic' ); ?></h1>
+			<p style="max-width:640px;margin:18px auto 0;"><?php esc_html_e( 'Can’t find what you’re looking for? Open a ticket and a human replies.', 'chatbotistic' ); ?></p>
 		</div>
 	</section>
 
-	<section class="cb-section">
-		<div class="cb-container">
-			<div class="cb-faq">
-				<?php foreach ( $cb_faqs as $cb_faq ) : ?>
-					<div class="cb-faq__item">
-						<button type="button" class="cb-faq__q">
-							<span><?php echo esc_html( $cb_faq['q'] ); ?></span>
-							<?php cb_icon( 'plus', 16 ); ?>
-						</button>
-						<div class="cb-faq__a"><p><?php echo esc_html( $cb_faq['a'] ); ?></p></div>
+	<section class="section">
+		<div class="container" style="display:flex;flex-direction:column;gap:48px;max-width:820px;margin:0 auto;">
+			<?php foreach ( $cb_groups as $g ) : ?>
+				<div>
+					<h2 class="h-2 text-grad"><?php echo esc_html( $g[0] ); ?></h2>
+					<div class="faq-list" style="margin-top:20px;">
+						<?php foreach ( $g[1] as $q ) : ?>
+							<details class="faq-item">
+								<summary><?php echo esc_html( $q[0] ); ?></summary>
+								<p><?php echo esc_html( $q[1] ); ?></p>
+							</details>
+						<?php endforeach; ?>
 					</div>
-				<?php endforeach; ?>
-			</div>
-			<div class="cb-center" style="margin-top:34px;">
-				<?php cb_button( __( 'Contact support', 'chatbotistic' ), home_url( '/contact/' ), 'ghost', array( 'icon' => 'arrow-r' ) ); ?>
+				</div>
+			<?php endforeach; ?>
+		</div>
+	</section>
+
+	<section class="section">
+		<div class="container">
+			<div class="big-cta">
+				<h2 class="text-grad"><?php esc_html_e( 'Still have a question?', 'chatbotistic' ); ?></h2>
+				<div class="cta-actions">
+					<a class="btn btn-primary btn-lg" href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact support', 'chatbotistic' ); ?></a>
+					<a class="btn btn-ghost btn-lg" href="<?php echo esc_url( home_url( '/docs/' ) ); ?>"><?php esc_html_e( 'Browse docs', 'chatbotistic' ); ?></a>
+				</div>
 			</div>
 		</div>
 	</section>
-	<?php
-endwhile;
+</main>
 
-get_footer();
+<?php get_footer();

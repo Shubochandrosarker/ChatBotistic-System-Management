@@ -42,9 +42,16 @@ class Admin {
 			), 30 );
 		} elseif ( 'repair' === $action ) {
 			$result = Installer::repair();
+			$wpcf = isset( $result['wpcf_preset'] ) && is_array( $result['wpcf_preset'] ) ? $result['wpcf_preset'] : array();
+			$wpcf_written = array_sum( array_map( 'intval', $wpcf ) );
 			set_transient( 'cbp_admin_notice', sprintf(
-				'Repair complete (no data deleted) — %d pages created, %d plans created, %d plans updated, %d caps synced, license product #%d.',
-				$result['pages_created'], $result['plans_created'], $result['plans_updated'], $result['caps_synced'], $result['product_id']
+				'Repair complete (no data deleted) — %d pages created, %d plans created, %d plans updated, %d caps synced, license product #%d. WPCF preset: %d setting(s) written (reply branding %d / auto-responder %d / AI rules %d / capture toggles %d).',
+				$result['pages_created'], $result['plans_created'], $result['plans_updated'], $result['caps_synced'], $result['product_id'],
+				$wpcf_written,
+				$wpcf['reply_branding']   ?? 0,
+				$wpcf['autoresponder']    ?? 0,
+				$wpcf['ai_rules']         ?? 0,
+				$wpcf['capture_toggles']  ?? 0
 			), 30 );
 		} elseif ( 'sync_caps' === $action ) {
 			$n = Plans::sync_bridge_caps();
@@ -192,7 +199,15 @@ class Admin {
 		$rows[] = [
 			'label'  => 'WPistic Contact Form',
 			'state'  => $cf ? 'ok' : 'fail',
-			'detail' => $cf ? 'Active — theme forms save to the submissions table.' : 'Not active — contact/demo/LTD forms email only, no DB record.',
+			'detail' => $cf ? 'Active — every theme form (contact, demo, support, portal tickets) saves to the submissions table for reply-from-dashboard.' : 'Not active — contact/demo/support forms email only, no DB record.',
+		];
+
+		// Newsletter (added in WPCF 1.5.1).
+		$nl = class_exists( 'WPISTIC_CF_Newsletter' );
+		$rows[] = [
+			'label'  => 'Newsletter capture',
+			'state'  => $nl ? 'ok' : 'warn',
+			'detail' => $nl ? 'Footer newsletter form persists subscribers + supports CSV export from the WPCF admin.' : 'Newsletter subscribes fire an action but are not persisted; upgrade WPistic Contact Form to 1.5.1+.',
 		];
 
 		// Stripe (payments for Pro/Agency).

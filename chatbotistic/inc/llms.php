@@ -88,10 +88,25 @@ function cb_render_llms( $full = false ) {
 		$lines[] = '';
 	}
 
+	// Machine-readable index of sub-sitemaps — lets an AI crawl the full
+	// URL set without having to parse XML.
+	$lines[] = '## Sub-sitemaps';
+	$lines[] = '';
+	$lines[] = '- [Master sitemap index](' . home_url( '/sitemap.xml' ) . ')';
+	$lines[] = '- [Pages](' . home_url( '/sitemap-pages.xml' ) . ')';
+	$lines[] = '- [Blog posts](' . home_url( '/sitemap-posts.xml' ) . ')';
+	$lines[] = '- [Use cases](' . home_url( '/sitemap-usecases.xml' ) . ')';
+	$lines[] = '- [Products](' . home_url( '/sitemap-products.xml' ) . ')';
+	$lines[] = '- [Categories](' . home_url( '/sitemap-categories.xml' ) . ')';
+	$lines[] = '- [Tags](' . home_url( '/sitemap-tags.xml' ) . ')';
+	$lines[] = '';
+
 	$lines[] = '## Contact';
 	$lines[] = '';
 	$lines[] = '- Website: ' . home_url( '/' );
 	$lines[] = '- Sitemap: ' . home_url( '/sitemap.xml' );
+	$lines[] = '- Support: ' . home_url( '/support/' );
+	$lines[] = '- Sales: hello@chatbotistic.com';
 	$lines[] = '';
 	$lines[] = 'Generated ' . gmdate( 'Y-m-d' ) . ' · Part of the WordPressistic ecosystem.';
 

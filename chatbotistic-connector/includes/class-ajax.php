@@ -613,6 +613,21 @@ class Ajax {
 		$update['plan_limits'] = $limits;
 
 		Store::update_settings( $update );
+
+		// First-time setup completion: when credentials land for the first
+		// time, fire a Bridge reconcile so any active memberships that
+		// pre-date the Connector activation get their license + caps
+		// pushed through immediately. Cheap and idempotent.
+		if ( '' !== $password && class_exists( '\WordPressistic\MLB\Bridge' ) ) {
+			do_action( 'memberistic_daily_expire_memberships' );
+		}
+
+		/**
+		 * Fires after Connector settings are saved. Plugins can listen for
+		 * this to invalidate caches, re-verify token, etc.
+		 */
+		do_action( 'cbc_settings_saved', $update );
+
 		wp_send_json_success( array( 'message' => __( 'Settings saved.', 'chatbotistic-connector' ) ) );
 	}
 

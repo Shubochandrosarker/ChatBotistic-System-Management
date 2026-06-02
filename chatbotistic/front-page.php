@@ -1,6 +1,13 @@
 <?php
 /**
- * Front page — homepage.
+ * Home page — V4 port.
+ *
+ * Sections: hero (with operational flow strip + routing layer + chat
+ * widget mock), problem grid, solution + dashboard mock, feature grid,
+ * "How it works" operational pipeline, use-case preview, WhatsApp +
+ * booking strips, integrations, pricing preview, ecosystem phases,
+ * final CTA. Uses V4's exact class names so v4-styles.css applies
+ * directly.
  *
  * @package Chatbotistic
  */
@@ -9,289 +16,422 @@ defined( 'ABSPATH' ) || exit;
 
 get_header();
 
-$cb_signup = cb_plans_url();
-
-$cb_problems = array(
-	array( __( 'Missed leads', 'chatbotistic' ),    __( 'Visitors will not fill long forms. They leave, and you never know they were there.', 'chatbotistic' ) ),
-	array( __( 'Slow replies', 'chatbotistic' ),    __( 'By the time you answer from your inbox, the buyer has already messaged a competitor.', 'chatbotistic' ) ),
-	array( __( 'Scattered tools', 'chatbotistic' ), __( 'WhatsApp, web chat, email and forms — context spread across five disconnected apps.', 'chatbotistic' ) ),
-);
+// SpeakableSpecification — flags the hero headline + lead paragraph as
+// good candidates for AI voice-assistant playback (Google Assistant,
+// etc.). The selectors target V4's hero heading + lead text classes.
+if ( function_exists( 'cb_add_speakable' ) ) {
+	cb_add_speakable( array( '.hero .h-display', '.hero .lead' ) );
+}
 
 $cb_features = array(
-	array( 'ai',    __( 'AI WhatsApp Agent', 'chatbotistic' ), __( 'A trained agent that answers, qualifies and books — 24/7, in your tone.', 'chatbotistic' ), '/ai-chatbot/' ),
-	array( 'wa',    __( 'WhatsApp Widgets', 'chatbotistic' ),  __( 'Click-to-chat with department routing and pre-chat lead capture.', 'chatbotistic' ), '/whatsapp-automation/' ),
-	array( 'cal',   __( 'Booking Forms', 'chatbotistic' ),     __( 'Consultations, demos and services with calendar sync, inside the chat.', 'chatbotistic' ), '/booking-forms/' ),
-	array( 'form',  __( 'Lead Capture', 'chatbotistic' ),      __( 'Conversion-optimised inline, popup and sidebar forms.', 'chatbotistic' ), '/features/' ),
-	array( 'inbox', __( 'Unified Inbox', 'chatbotistic' ),     __( 'One shared team inbox for WhatsApp, web chat and email.', 'chatbotistic' ), '/features/' ),
-	array( 'chart', __( 'Analytics', 'chatbotistic' ),         __( 'Conversation funnels, response times and conversion reporting.', 'chatbotistic' ), '/features/' ),
-	array( 'plug',  __( 'Integrations', 'chatbotistic' ),      __( 'WordPress, CRMs, Stripe, Google Sheets and webhooks out of the box.', 'chatbotistic' ), '/features/' ),
-	array( 'tag',   __( 'White Label', 'chatbotistic' ),       __( 'Your brand, your domain. Resell to clients with full ownership.', 'chatbotistic' ), '/agency-white-label/' ),
+	array( 'ai',    __( 'AI Chatbot Widgets', 'chatbotistic' ),    __( 'Trained on your site, FAQs, and services. Answers in your tone, 24/7.', 'chatbotistic' ) ),
+	array( 'wa',    __( 'WhatsApp Chat Widgets', 'chatbotistic' ), __( 'Click-to-chat with department routing and pre-chat lead capture.', 'chatbotistic' ) ),
+	array( 'form',  __( 'Lead Capture Forms', 'chatbotistic' ),    __( 'Conversion-optimized inline, popup, and sidebar lead forms.', 'chatbotistic' ) ),
+	array( 'cal',   __( 'Booking Forms', 'chatbotistic' ),         __( 'Consultations, services, and strategy calls with calendar sync.', 'chatbotistic' ) ),
+	array( 'inbox', __( 'Multi-Agent Inbox', 'chatbotistic' ),     __( 'Shared team inbox for live chat, WhatsApp, and email replies.', 'chatbotistic' ) ),
+	array( 'mail',  __( 'Email Notifications', 'chatbotistic' ),   __( 'Instant pings to your team the moment a new lead lands.', 'chatbotistic' ) ),
+	array( 'plug',  __( 'CRM Integrations', 'chatbotistic' ),      __( 'HubSpot, Zoho, Pipedrive, Google Sheets, and more out of the box.', 'chatbotistic' ) ),
+	array( 'card',  __( 'Stripe & PayPal', 'chatbotistic' ),       __( 'Take deposits or payments inside the same chatbot flow.', 'chatbotistic' ) ),
+	array( 'page',  __( 'Landing Page Tools', 'chatbotistic' ),    __( 'Spin up high-converting micro-pages with built-in chat.', 'chatbotistic' ) ),
+	array( 'tag',   __( 'White Label', 'chatbotistic' ),           __( 'Your logo, your domain, your brand. Resell with full ownership.', 'chatbotistic' ) ),
+	array( 'code',  __( 'API & Webhooks', 'chatbotistic' ),        __( 'Push leads anywhere. Custom flows with REST and webhooks.', 'chatbotistic' ) ),
+	array( 'chart', __( 'Analytics & Reports', 'chatbotistic' ),   __( 'Conversion funnels, agent performance, and ROI dashboards.', 'chatbotistic' ) ),
 );
 
-$cb_steps = array(
-	array( __( 'Create your widget', 'chatbotistic' ), __( 'Pick chat, WhatsApp or booking. Match your brand in seconds.', 'chatbotistic' ) ),
-	array( __( 'Connect WhatsApp', 'chatbotistic' ),   __( 'Link your number or provision a new business line.', 'chatbotistic' ) ),
-	array( __( 'Embed anywhere', 'chatbotistic' ),     __( 'One snippet, or install the WordPress plugin — done.', 'chatbotistic' ) ),
-	array( __( 'Capture & automate', 'chatbotistic' ), __( 'Leads flow into your inbox, CRM and follow-ups automatically.', 'chatbotistic' ) ),
+$cb_problems = array(
+	array( '01', __( 'No conversation starts', 'chatbotistic' ),        __( 'Visitors leave without ever opening a chat. You never learn they were interested.', 'chatbotistic' ) ),
+	array( '02', __( 'Forms create friction', 'chatbotistic' ),         __( 'Long contact forms ask for too much, too early — so most people simply don’t.', 'chatbotistic' ) ),
+	array( '03', __( 'Replies happen too late', 'chatbotistic' ),       __( 'By the time someone answers from a shared inbox, the buyer has moved on.', 'chatbotistic' ) ),
+	array( '04', __( 'WhatsApp leads aren’t tracked', 'chatbotistic' ), __( 'Chats happen on phones, off the record, with no source, stage, or follow-up.', 'chatbotistic' ) ),
+	array( '05', __( 'Site and sales are disconnected', 'chatbotistic' ), __( 'Website traffic and WhatsApp conversations live in two separate worlds.', 'chatbotistic' ) ),
+	array( '06', __( 'Agencies deploy too slowly', 'chatbotistic' ),    __( 'Every client site needs chat wired up by hand — there’s no fast, repeatable system.', 'chatbotistic' ) ),
 );
 
-$cb_uses = array(
-	array( 'users',  __( 'Agencies', 'chatbotistic' ),       __( 'Resell to clients', 'chatbotistic' ), 'agencies' ),
-	array( 'store',  __( 'Local business', 'chatbotistic' ), __( 'Capture walk-ins', 'chatbotistic' ), 'local-business' ),
-	array( 'cal',    __( 'Clinics & spas', 'chatbotistic' ), __( 'Appointment intake', 'chatbotistic' ), 'clinics-spas' ),
-	array( 'home',   __( 'Real estate', 'chatbotistic' ),    __( 'Property leads', 'chatbotistic' ), 'real-estate' ),
-	array( 'cart',   __( 'eCommerce', 'chatbotistic' ),      __( 'Cart recovery', 'chatbotistic' ), 'ecommerce' ),
-	array( 'rocket', __( 'Coaches', 'chatbotistic' ),        __( 'Discovery flows', 'chatbotistic' ), 'coaches' ),
-	array( 'wp',     __( 'WordPress sites', 'chatbotistic' ),__( 'Native plugin', 'chatbotistic' ), 'wordpress-sites' ),
-	array( 'spark',  __( 'SaaS founders', 'chatbotistic' ),  __( 'Onboarding bots', 'chatbotistic' ), 'saas-founders' ),
+$cb_how = array(
+	array( '01', 'card',  __( 'Choose a plan', 'chatbotistic' ),         __( 'Pick the Chatbotistic plan that fits your business or agency.', 'chatbotistic' ) ),
+	array( '02', 'user',  __( 'Enter your portal', 'chatbotistic' ),     __( 'Your branded member dashboard — widgets, leads, and settings.', 'chatbotistic' ) ),
+	array( '03', 'wa',    __( 'Create your widget', 'chatbotistic' ),    __( 'Configure a WhatsApp chatbot widget with routing and capture.', 'chatbotistic' ) ),
+	array( '04', 'lock',  __( 'Get your license', 'chatbotistic' ),      __( 'Chatbotistic issues a Licenseistic key for your approved domains.', 'chatbotistic' ) ),
+	array( '05', 'wp',    __( 'Install the addon', 'chatbotistic' ),     __( 'Add the lightweight WordPress addon and activate your license.', 'chatbotistic' ) ),
+	array( '06', 'check', __( 'Activate and go live', 'chatbotistic' ),  __( 'The widget appears on your site and starts capturing leads.', 'chatbotistic' ), true ),
 );
 
-$cb_integrations = array( 'WordPress', 'WhatsApp', 'WooCommerce', 'HubSpot', 'Stripe', 'PayPal', 'Zoho', 'Pipedrive', 'Google Sheets', 'Webhooks' );
-
-$cb_faqs = array(
-	array( 'q' => __( 'What exactly is Chatbotistic?', 'chatbotistic' ), 'a' => __( 'An AI WhatsApp Agent and chat-widget platform. It puts a smart agent on your website that answers questions, qualifies leads and books appointments 24/7 — across WhatsApp, web chat and email.', 'chatbotistic' ) ),
-	array( 'q' => __( 'How long does setup take?', 'chatbotistic' ), 'a' => __( 'Most businesses are live in under an hour. Describe your business, pick a widget, embed one snippet or install the WordPress plugin — no developer required.', 'chatbotistic' ) ),
-	array( 'q' => __( 'Do I need WhatsApp Business API?', 'chatbotistic' ), 'a' => __( 'Not for click-to-chat widgets. For the automated AI agent you connect a WhatsApp Business API number — we guide you through it, or provision one on higher plans.', 'chatbotistic' ) ),
-	array( 'q' => __( 'Is there a free plan?', 'chatbotistic' ), 'a' => __( 'Yes — Free is free forever, with one widget and 200 conversations a month. Paid plans start at $19/month. See the pricing page for details.', 'chatbotistic' ) ),
-	array( 'q' => __( 'Does it work with my CRM and WordPress?', 'chatbotistic' ), 'a' => __( 'Yes. There is a native WordPress plugin, and integrations for HubSpot, Zoho, Pipedrive, Stripe, Google Sheets and webhooks.', 'chatbotistic' ) ),
+$cb_solutions = array(
+	array( 'wa',    __( 'Create widgets from the dashboard', 'chatbotistic' ),  __( 'Build WhatsApp chatbot widgets in your Chatbotistic portal.', 'chatbotistic' ) ),
+	array( 'wp',    __( 'Connect a lightweight WordPress addon', 'chatbotistic' ), __( 'Install once, no heavy plugin — the addon links your site to the system.', 'chatbotistic' ) ),
+	array( 'lock',  __( 'Validate usage with Licenseistic', 'chatbotistic' ),   __( 'Each deployment is licensed and scoped to your approved domains.', 'chatbotistic' ) ),
+	array( 'chat',  __( 'Route visitors into WhatsApp', 'chatbotistic' ),       __( 'Turn website visits into real conversations with pre-chat capture.', 'chatbotistic' ) ),
+	array( 'inbox', __( 'Manage leads from one branded portal', 'chatbotistic' ), __( 'Leads, automation, and settings in a single Chatbotistic dashboard.', 'chatbotistic' ) ),
+	array( 'users', __( 'Scale to agency-level deployment', 'chatbotistic' ),   __( 'Go from one business site to many client domains, cleanly.', 'chatbotistic' ) ),
 );
-cb_add_faq_schema( $cb_faqs );
+
+$cb_usecases = array(
+	array( 'agencies',         __( 'Agencies', 'chatbotistic' ),         __( 'Resell to clients', 'chatbotistic' ) ),
+	array( 'local-business',   __( 'Local businesses', 'chatbotistic' ), __( 'Capture walk-ins', 'chatbotistic' ) ),
+	array( 'clinics-spas',     __( 'Clinics & spas', 'chatbotistic' ),   __( 'Service booking', 'chatbotistic' ) ),
+	array( 'coaches',          __( 'Coaches', 'chatbotistic' ),          __( 'Discovery flows', 'chatbotistic' ) ),
+	array( 'real-estate',      __( 'Real estate', 'chatbotistic' ),      __( 'Property leads', 'chatbotistic' ) ),
+	array( 'ecommerce',        __( 'eCommerce', 'chatbotistic' ),        __( 'Cart recovery', 'chatbotistic' ) ),
+	array( 'travel-agencies',  __( 'Travel agencies', 'chatbotistic' ),  __( 'Trip enquiries', 'chatbotistic' ) ),
+	array( 'wordpress-sites',  __( 'WordPress sites', 'chatbotistic' ),  __( 'Native plugin', 'chatbotistic' ) ),
+	array( 'saas-founders',    __( 'SaaS founders', 'chatbotistic' ),    __( 'Onboarding bots', 'chatbotistic' ) ),
+);
+
+$cb_integrations = array(
+	__( 'WordPress', 'chatbotistic' ),
+	__( 'WooCommerce', 'chatbotistic' ),
+	__( 'HubSpot', 'chatbotistic' ),
+	__( 'Zoho', 'chatbotistic' ),
+	__( 'Stripe', 'chatbotistic' ),
+	__( 'PayPal', 'chatbotistic' ),
+	__( 'Google Sheets', 'chatbotistic' ),
+	__( 'Email', 'chatbotistic' ),
+	__( 'WhatsApp', 'chatbotistic' ),
+	__( 'Webhooks', 'chatbotistic' ),
+);
+
+$cb_public_flow = array( __( 'Plan', 'chatbotistic' ), __( 'Portal', 'chatbotistic' ), __( 'Widget', 'chatbotistic' ), __( 'License', 'chatbotistic' ), __( 'WordPress Addon', 'chatbotistic' ), __( 'Live Chat', 'chatbotistic' ) );
 ?>
 
-<section class="cb-section cb-hero">
-	<div class="cb-container">
-		<div class="cb-hero__grid">
-			<div class="cb-reveal">
-				<span class="cb-eyebrow"><?php esc_html_e( 'AI WhatsApp Agent Platform', 'chatbotistic' ); ?></span>
-				<h1 class="cb-display" style="margin-top:20px;">
-					<span class="cb-grad"><?php esc_html_e( 'Turn website visitors into ', 'chatbotistic' ); ?></span>
-					<span class="cb-grad cb-grad--brand"><?php esc_html_e( 'real conversations.', 'chatbotistic' ); ?></span>
-				</h1>
-				<p class="cb-lead" style="margin-top:20px;max-width:540px;">
-					<?php esc_html_e( 'Chatbotistic puts an AI WhatsApp Agent on your site that answers questions, qualifies leads and books appointments — 24/7. Chat, WhatsApp, booking and a shared inbox in one platform.', 'chatbotistic' ); ?>
-				</p>
-				<div style="display:flex;gap:12px;margin-top:30px;flex-wrap:wrap;">
-					<?php
-					cb_button( __( 'Start free', 'chatbotistic' ), $cb_signup, 'primary', array( 'size' => 'lg', 'icon' => 'arrow-r' ) );
-					cb_button( __( 'See features', 'chatbotistic' ), home_url( '/features/' ), 'ghost', array( 'size' => 'lg' ) );
-					?>
-				</div>
-				<div class="cb-hero__meta">
-					<span><?php cb_icon( 'check', 15 ); ?> <?php esc_html_e( 'No credit card required', 'chatbotistic' ); ?></span>
-					<span><?php cb_icon( 'check', 15 ); ?> <?php esc_html_e( 'Setup in under an hour', 'chatbotistic' ); ?></span>
-				</div>
-				<div class="cb-trust">
-					<span class="cb-stars">
-						<?php for ( $cb_i = 0; $cb_i < 5; $cb_i++ ) : ?>
-							<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 14.5 9H22l-6 4.5 2.3 7.5L12 16.5 5.7 21l2.3-7.5L2 9h7.5z"/></svg>
-						<?php endfor; ?>
-					</span>
-					<span><?php esc_html_e( '4.9 / 5 — loved by growing service businesses', 'chatbotistic' ); ?></span>
-				</div>
-			</div>
+<main class="page-fade">
 
-			<div class="cb-reveal cb-mock" aria-hidden="true">
-				<div class="cb-mock__head">
-					<div class="cb-mock__avatar">C</div>
-					<div>
-						<b><?php esc_html_e( 'Chatbotistic Agent', 'chatbotistic' ); ?></b>
-						<span><?php esc_html_e( 'Online · replies instantly', 'chatbotistic' ); ?></span>
+	<!-- HERO -->
+	<section class="section hero">
+		<div class="container">
+			<div class="hero-grid">
+				<div>
+					<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'WordPress · WhatsApp lead system', 'chatbotistic' ); ?></span>
+					<h1 class="h-display" style="margin-top:22px;">
+						<span class="text-grad"><?php esc_html_e( 'Turn your WordPress website into a ', 'chatbotistic' ); ?></span>
+						<span class="text-grad-accent"><?php esc_html_e( 'WhatsApp lead system.', 'chatbotistic' ); ?></span>
+					</h1>
+					<p class="lead" style="margin-top:22px;">
+						<?php esc_html_e( 'Chatbotistic lets businesses create WhatsApp chatbot widgets, connect them with a licensed WordPress addon, and capture more conversations from every website visit.', 'chatbotistic' ); ?>
+					</p>
+					<div style="display:flex;gap:12px;margin-top:32px;flex-wrap:wrap;">
+						<a class="btn btn-primary btn-lg" href="<?php echo esc_url( home_url( '/pricing/' ) ); ?>"><?php esc_html_e( 'Start with Chatbotistic', 'chatbotistic' ); ?></a>
+						<a class="btn btn-ghost btn-lg" href="#how-it-works"><?php esc_html_e( 'See how it works', 'chatbotistic' ); ?></a>
+					</div>
+
+					<!-- Hero operational flow strip -->
+					<div class="op-flowstrip" style="margin-top:32px;">
+						<div class="scan op-scan"></div>
+						<div class="sysmap">
+							<div class="sysmap-label"><span class="ld"></span><?php esc_html_e( 'Operational flow', 'chatbotistic' ); ?></div>
+							<div class="sysmap-track">
+								<?php
+								$cb_n = count( $cb_public_flow ) - 1;
+								foreach ( $cb_public_flow as $cb_i => $cb_step ) :
+									$cb_live = ( $cb_i === $cb_n );
+									?>
+									<div class="sysmap-node<?php echo $cb_live ? ' live' : ''; ?>"><span class="nd<?php echo $cb_live ? ' op-pulse' : ''; ?>"></span><?php echo esc_html( $cb_step ); ?></div>
+									<?php if ( $cb_i < $cb_n ) : ?>
+										<div class="sysmap-rail"><span class="op-flow op-signal" style="animation-delay:<?php echo esc_attr( $cb_i * 0.5 ); ?>s"></span></div>
+									<?php endif; ?>
+								<?php endforeach; ?>
+							</div>
+						</div>
+					</div>
+
+					<div class="hero-meta">
+						<span><?php esc_html_e( '✓ No credit card required', 'chatbotistic' ); ?></span>
+						<span><?php esc_html_e( '✓ Licensed WordPress addon', 'chatbotistic' ); ?></span>
+						<span><?php esc_html_e( '✓ Live widget in minutes', 'chatbotistic' ); ?></span>
 					</div>
 				</div>
-				<div class="cb-mock__body">
-					<div class="cb-bubble cb-bubble--bot"><?php esc_html_e( 'Hi! I can give you a quote or book a call. What do you need?', 'chatbotistic' ); ?></div>
-					<div class="cb-bubble cb-bubble--user"><?php esc_html_e( 'A quote for a new website', 'chatbotistic' ); ?></div>
-					<div class="cb-bubble cb-bubble--bot"><?php esc_html_e( 'Great — what is your budget range?', 'chatbotistic' ); ?></div>
-					<div class="cb-mock__quick">
-						<span><?php esc_html_e( 'Under $5k', 'chatbotistic' ); ?></span>
-						<span><?php esc_html_e( '$5k–$15k', 'chatbotistic' ); ?></span>
-						<span><?php esc_html_e( '$15k+', 'chatbotistic' ); ?></span>
+
+				<div class="widget-stack">
+					<!-- Hero routing layer (SVG rails behind the chat widget) -->
+					<div class="hero-routing" aria-hidden="true">
+						<svg viewBox="0 0 500 520" preserveAspectRatio="xMidYMid meet">
+							<path class="op-rail-line" d="M56 64 V250 V446 H444 V86 H56 Z" />
+							<path class="op-rail-flow op-flow" d="M56 64 V250 V446 H444 V86 H56 Z" />
+							<g><circle class="hero-rnode" cx="56"  cy="64"  r="6" /><circle cx="56"  cy="64"  r="2.4" fill="#3fdcff" /><text class="hero-rnode-label" x="56"  y="52"  text-anchor="middle">WEBSITE</text></g>
+							<g><circle class="hero-rnode" cx="56"  cy="250" r="6" /><circle cx="56"  cy="250" r="2.4" fill="#3fdcff" /><text class="hero-rnode-label" x="56"  y="238" text-anchor="middle">PORTAL</text></g>
+							<g><circle class="hero-rnode" cx="70"  cy="446" r="6" /><circle cx="70"  cy="446" r="2.4" fill="#3fdcff" /><text class="hero-rnode-label" x="70"  y="434" text-anchor="middle">LICENSE</text></g>
+							<g><circle class="hero-rnode" cx="444" cy="452" r="6" /><circle cx="444" cy="452" r="2.4" fill="#3fdcff" /><text class="hero-rnode-label" x="444" y="440" text-anchor="middle">WP ADDON</text></g>
+							<g><circle class="hero-rnode" cx="452" cy="86"  r="6" /><circle cx="452" cy="86"  r="2.4" fill="#34d399" /><text class="hero-rnode-label" x="452" y="74"  text-anchor="middle">WHATSAPP</text></g>
+						</svg>
+					</div>
+
+					<!-- Chat widget mock (static, V4 styling) -->
+					<div class="chat-widget glass-edge">
+						<div class="cw-head">
+							<div class="cw-avatar">C</div>
+							<div class="cw-head-text">
+								<b><?php esc_html_e( 'Chatbotistic Assistant', 'chatbotistic' ); ?></b>
+								<span><?php esc_html_e( 'Online · replies instantly', 'chatbotistic' ); ?></span>
+							</div>
+						</div>
+						<div class="cw-body">
+							<div class="bubble bot"><?php esc_html_e( '👋 Hey there! I’m here to help. Looking for a service quote or want to book a call?', 'chatbotistic' ); ?></div>
+							<div class="bubble user"><?php esc_html_e( 'I need a quote for a new website', 'chatbotistic' ); ?></div>
+							<div class="bubble bot"><?php esc_html_e( 'Got it — I can connect you with the team in 30 seconds. What’s your project budget?', 'chatbotistic' ); ?></div>
+							<div class="cw-quick">
+								<button type="button"><?php esc_html_e( 'Under $5k', 'chatbotistic' ); ?></button>
+								<button type="button"><?php esc_html_e( '$5k – $15k', 'chatbotistic' ); ?></button>
+								<button type="button"><?php esc_html_e( '$15k+', 'chatbotistic' ); ?></button>
+							</div>
+						</div>
+						<div class="cw-input">
+							<input placeholder="<?php esc_attr_e( 'Type a message…', 'chatbotistic' ); ?>" readonly>
+							<button class="cw-send" type="button" aria-label="<?php esc_attr_e( 'Send', 'chatbotistic' ); ?>">→</button>
+						</div>
 					</div>
 				</div>
-				<div class="cb-mock__input">
-					<?php cb_icon( 'bolt', 15 ); ?>
-					<span><?php esc_html_e( 'Type a message…', 'chatbotistic' ); ?></span>
-					<span class="cb-mock__send"><?php cb_icon( 'arrow-r', 15 ); ?></span>
-				</div>
 			</div>
 		</div>
-	</div>
-</section>
+	</section>
 
-<section class="cb-section cb-section--tight">
-	<div class="cb-container">
-		<div class="cb-statband">
-			<?php
-			$cb_stats = array(
-				array( '24/7', __( 'always-on lead capture', 'chatbotistic' ) ),
-				array( '< 1 min', __( 'average first reply', 'chatbotistic' ) ),
-				array( '6-in-1', __( 'tools replaced by one platform', 'chatbotistic' ) ),
-				array( '$19', __( 'a month to start — no per-seat fee', 'chatbotistic' ) ),
-			);
-			foreach ( $cb_stats as $cb_s ) :
-				?>
-				<div class="cb-reveal">
-					<div class="cb-statband__num cb-grad cb-grad--brand"><?php echo esc_html( $cb_s[0] ); ?></div>
-					<div class="cb-statband__label"><?php echo esc_html( $cb_s[1] ); ?></div>
-				</div>
-			<?php endforeach; ?>
-		</div>
-	</div>
-</section>
-
-<section class="cb-section cb-section--tight">
-	<div class="cb-container">
-		<div class="cb-shead cb-reveal">
-			<span class="cb-eyebrow"><?php esc_html_e( 'The problem', 'chatbotistic' ); ?></span>
-			<h2 class="cb-h1"><span class="cb-grad"><?php esc_html_e( 'Most websites leak leads. Quietly.', 'chatbotistic' ); ?></span></h2>
-			<p class="cb-lead"><?php esc_html_e( 'You spent months on the site and weeks on the ads — and visitors still bounce. Here is where the leak happens.', 'chatbotistic' ); ?></p>
-		</div>
-		<div class="cb-grid cb-grid--3">
-			<?php foreach ( $cb_problems as $cb_i => $cb_p ) : ?>
-				<div class="cb-feature cb-reveal">
-					<div class="cb-mono cb-dim" style="font-size:12px;letter-spacing:0.12em;"><?php echo esc_html( sprintf( '%02d', $cb_i + 1 ) ); ?></div>
-					<h3 style="margin-top:8px;"><?php echo esc_html( $cb_p[0] ); ?></h3>
-					<p><?php echo esc_html( $cb_p[1] ); ?></p>
-				</div>
-			<?php endforeach; ?>
-		</div>
-	</div>
-</section>
-
-<section class="cb-section cb-section--tight">
-	<div class="cb-container cb-center">
-		<div class="cb-shead cb-reveal">
-			<span class="cb-eyebrow"><?php esc_html_e( 'Everything you need', 'chatbotistic' ); ?></span>
-			<h2 class="cb-h1"><span class="cb-grad"><?php esc_html_e( 'One platform that plugs every leak', 'chatbotistic' ); ?></span></h2>
-			<p class="cb-lead"><?php esc_html_e( 'Eight tightly integrated modules. Start with what you need, scale into the rest.', 'chatbotistic' ); ?></p>
-		</div>
-		<div class="cb-grid cb-grid--4" style="text-align:left;">
-			<?php foreach ( $cb_features as $cb_f ) : ?>
-				<a class="cb-feature cb-reveal" href="<?php echo esc_url( home_url( $cb_f[3] ) ); ?>">
-					<div class="cb-feature__ico"><?php cb_icon( $cb_f[0], 20 ); ?></div>
-					<h3><?php echo esc_html( $cb_f[1] ); ?></h3>
-					<p><?php echo esc_html( $cb_f[2] ); ?></p>
-				</a>
-			<?php endforeach; ?>
-		</div>
-	</div>
-</section>
-
-<section class="cb-section cb-section--tight">
-	<div class="cb-container cb-center">
-		<div class="cb-shead cb-reveal">
-			<span class="cb-eyebrow"><?php esc_html_e( 'How it works', 'chatbotistic' ); ?></span>
-			<h2 class="cb-h1"><span class="cb-grad"><?php esc_html_e( 'Live in four steps. Really.', 'chatbotistic' ); ?></span></h2>
-		</div>
-		<div class="cb-steps" style="text-align:left;">
-			<?php foreach ( $cb_steps as $cb_n => $cb_s ) : ?>
-				<div class="cb-step cb-reveal">
-					<div class="cb-step__num"><?php echo esc_html( sprintf( '%02d', $cb_n + 1 ) ); ?></div>
-					<h3><?php echo esc_html( $cb_s[0] ); ?></h3>
-					<p><?php echo esc_html( $cb_s[1] ); ?></p>
-				</div>
-			<?php endforeach; ?>
-		</div>
-	</div>
-</section>
-
-<section class="cb-section cb-section--tight">
-	<div class="cb-container">
-		<div class="cb-shead cb-reveal">
-			<span class="cb-eyebrow"><?php esc_html_e( 'Built for', 'chatbotistic' ); ?></span>
-			<h2 class="cb-h1"><span class="cb-grad"><?php esc_html_e( 'Service brands. Agencies. Storefronts.', 'chatbotistic' ); ?></span></h2>
-			<p class="cb-lead"><?php esc_html_e( 'However you win customers, there is a Chatbotistic playbook for it.', 'chatbotistic' ); ?></p>
-		</div>
-		<div class="cb-grid cb-grid--4">
-			<?php foreach ( $cb_uses as $cb_u ) : ?>
-				<a class="cb-use cb-reveal" href="<?php echo esc_url( home_url( '/' . $cb_u[3] . '/' ) ); ?>">
-					<span class="cb-use__ico"><?php cb_icon( $cb_u[0], 17 ); ?></span>
-					<span><b><?php echo esc_html( $cb_u[1] ); ?></b><span><?php echo esc_html( $cb_u[2] ); ?></span></span>
-				</a>
-			<?php endforeach; ?>
-		</div>
-	</div>
-</section>
-
-<section class="cb-section cb-section--tight">
-	<div class="cb-container">
-		<div class="cb-split">
-			<div class="cb-reveal">
-				<span class="cb-eyebrow"><?php esc_html_e( 'Why teams switch', 'chatbotistic' ); ?></span>
-				<h2 class="cb-h2" style="margin-top:14px;"><span class="cb-grad"><?php esc_html_e( 'Replace six subscriptions with one', 'chatbotistic' ); ?></span></h2>
-				<p class="cb-lead" style="margin-top:14px;"><?php esc_html_e( 'Chat tool, WhatsApp tool, booking tool, form builder, inbox and CRM — each with its own bill and its own login. Chatbotistic is all of it, working as one.', 'chatbotistic' ); ?></p>
-				<ul class="cb-ticklist">
-					<li><?php cb_icon( 'check', 16 ); ?> <span><?php esc_html_e( 'One bill, one login, one contact record', 'chatbotistic' ); ?></span></li>
-					<li><?php cb_icon( 'check', 16 ); ?> <span><?php esc_html_e( 'No per-seat pricing — invite the whole team', 'chatbotistic' ); ?></span></li>
-					<li><?php cb_icon( 'check', 16 ); ?> <span><?php esc_html_e( 'Native WordPress plugin and a clean REST API', 'chatbotistic' ); ?></span></li>
-				</ul>
-				<div style="margin-top:22px;">
-					<?php cb_button( __( 'Compare pricing', 'chatbotistic' ), home_url( '/pricing/' ), 'ghost', array( 'icon' => 'arrow-r' ) ); ?>
-				</div>
+	<!-- PROBLEM -->
+	<section class="section section-tight">
+		<div class="container">
+			<div style="max-width:720px;">
+				<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'The problem', 'chatbotistic' ); ?></span>
+				<h2 class="h-1 text-grad" style="margin-top:18px;"><?php esc_html_e( 'Your website gets traffic. The problem is what happens after the visit.', 'chatbotistic' ); ?></h2>
+				<p class="lead" style="margin-top:18px;"><?php esc_html_e( 'The page loads, the visitor reads, the visitor leaves. Built for WordPress businesses that want more conversations from existing traffic — here’s where it breaks down today.', 'chatbotistic' ); ?></p>
 			</div>
-			<div class="cb-quote cb-glass-edge cb-reveal">
-				<p>“<?php esc_html_e( 'We replaced our live chat, a booking app and a separate WhatsApp tool with Chatbotistic. Leads go up, the stack got simpler, and the bill got smaller.', 'chatbotistic' ); ?>”</p>
-				<footer>
-					<span class="cb-quote__avatar">N</span>
-					<div>
-						<b><?php esc_html_e( 'Naomi R.', 'chatbotistic' ); ?></b>
-						<span><?php esc_html_e( 'Founder, a service-business studio', 'chatbotistic' ); ?></span>
+			<div class="problem-grid">
+				<?php foreach ( $cb_problems as $cb_p ) : ?>
+					<div class="problem-card">
+						<div class="strike">✕</div>
+						<div class="ix"><?php echo esc_html( $cb_p[0] ); ?></div>
+						<h3><?php echo esc_html( $cb_p[1] ); ?></h3>
+						<p><?php echo esc_html( $cb_p[2] ); ?></p>
 					</div>
-				</footer>
+				<?php endforeach; ?>
 			</div>
 		</div>
-	</div>
-</section>
+	</section>
 
-<section class="cb-section cb-section--tight">
-	<div class="cb-container cb-center">
-		<div class="cb-shead cb-reveal">
-			<span class="cb-eyebrow"><?php esc_html_e( 'Integrations', 'chatbotistic' ); ?></span>
-			<h2 class="cb-h2"><span class="cb-grad"><?php esc_html_e( 'Connects with the tools you already use', 'chatbotistic' ); ?></span></h2>
-		</div>
-		<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:34px;">
-			<?php foreach ( $cb_integrations as $cb_int ) : ?>
-				<span class="cb-reveal" style="padding:10px 18px;border-radius:999px;background:var(--cb-glass);border:1px solid var(--cb-line);font-size:14px;color:var(--cb-soft);"><?php echo esc_html( $cb_int ); ?></span>
-			<?php endforeach; ?>
-		</div>
-	</div>
-</section>
-
-<section class="cb-section cb-section--tight">
-	<div class="cb-container cb-center">
-		<div class="cb-shead cb-reveal">
-			<span class="cb-eyebrow"><?php esc_html_e( 'FAQ', 'chatbotistic' ); ?></span>
-			<h2 class="cb-h2"><span class="cb-grad"><?php esc_html_e( 'Questions, answered', 'chatbotistic' ); ?></span></h2>
-		</div>
-		<div class="cb-faq" style="text-align:left;">
-			<?php foreach ( $cb_faqs as $cb_faq ) : ?>
-				<div class="cb-faq__item">
-					<button type="button" class="cb-faq__q">
-						<span><?php echo esc_html( $cb_faq['q'] ); ?></span>
-						<?php cb_icon( 'plus', 16 ); ?>
-					</button>
-					<div class="cb-faq__a"><p><?php echo esc_html( $cb_faq['a'] ); ?></p></div>
+	<!-- SOLUTION -->
+	<section class="section">
+		<div class="container">
+			<div class="split-2">
+				<div>
+					<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'The solution', 'chatbotistic' ); ?></span>
+					<h2 class="h-1 text-grad" style="margin-top:18px;"><?php esc_html_e( 'One licensed chatbot system for WordPress websites.', 'chatbotistic' ); ?></h2>
+					<p class="lead" style="margin-top:18px;"><?php esc_html_e( 'Not just a chat button — a managed conversation layer for WordPress. Create once, connect with the addon, and deploy across approved domains from a single branded portal.', 'chatbotistic' ); ?></p>
+					<div class="solution-list">
+						<?php foreach ( $cb_solutions as $cb_s ) : ?>
+							<div class="solution-item">
+								<div class="si-ico"></div>
+								<div><b><?php echo esc_html( $cb_s[1] ); ?></b><span><?php echo esc_html( $cb_s[2] ); ?></span></div>
+							</div>
+						<?php endforeach; ?>
+					</div>
 				</div>
-			<?php endforeach; ?>
-		</div>
-	</div>
-</section>
-
-<section class="cb-section">
-	<div class="cb-container">
-		<div class="cb-cta cb-reveal">
-			<span class="cb-eyebrow"><?php esc_html_e( 'Ready when you are', 'chatbotistic' ); ?></span>
-			<h2 class="cb-h2"><span class="cb-grad"><?php esc_html_e( 'Launch your AI WhatsApp Agent today', 'chatbotistic' ); ?></span></h2>
-			<p class="cb-lead" style="max-width:520px;margin:0 auto;"><?php esc_html_e( 'Start free, upgrade when it pays for itself. No contracts, no per-seat tax.', 'chatbotistic' ); ?></p>
-			<div class="cb-cta__actions">
-				<?php
-				cb_button( __( 'Start free', 'chatbotistic' ), $cb_signup, 'primary', array( 'size' => 'lg', 'icon' => 'arrow-r' ) );
-				cb_button( __( 'View pricing', 'chatbotistic' ), home_url( '/pricing/' ), 'ghost', array( 'size' => 'lg' ) );
-				?>
+				<div class="dash-mock glass-edge">
+					<div class="dash-head">
+						<div class="dh-dots"><span></span><span></span><span></span></div>
+						<div class="dh-tabs">
+							<button class="dh-tab active"><?php esc_html_e( 'Inbox', 'chatbotistic' ); ?></button>
+							<button class="dh-tab"><?php esc_html_e( 'Leads', 'chatbotistic' ); ?></button>
+							<button class="dh-tab"><?php esc_html_e( 'Bookings', 'chatbotistic' ); ?></button>
+						</div>
+						<div class="dh-search"><?php esc_html_e( 'Search conversations…', 'chatbotistic' ); ?></div>
+					</div>
+					<div class="dash-body">
+						<div class="dash-main">
+							<div class="dm-stats">
+								<div class="dm-stat"><div class="label"><?php esc_html_e( 'Conversations', 'chatbotistic' ); ?></div><div class="val">2,418</div><div class="delta"><?php esc_html_e( '▲ 18% week', 'chatbotistic' ); ?></div></div>
+								<div class="dm-stat"><div class="label"><?php esc_html_e( 'Leads captured', 'chatbotistic' ); ?></div><div class="val">487</div><div class="delta"><?php esc_html_e( '▲ 24% week', 'chatbotistic' ); ?></div></div>
+								<div class="dm-stat"><div class="label"><?php esc_html_e( 'Bookings', 'chatbotistic' ); ?></div><div class="val">96</div><div class="delta"><?php esc_html_e( '▲ 11% week', 'chatbotistic' ); ?></div></div>
+							</div>
+							<div class="dm-chart">
+								<div class="dm-chart-head">
+									<b><?php esc_html_e( 'Lead flow · last 14 days', 'chatbotistic' ); ?></b>
+									<span class="mono" style="color:var(--text-dim);"><?php esc_html_e( '+38.2% MoM', 'chatbotistic' ); ?></span>
+								</div>
+								<div class="dm-spark">
+									<?php foreach ( array( 18, 22, 15, 30, 28, 35, 42, 38, 45, 52, 49, 58, 64, 72 ) as $cb_h ) : ?>
+										<span style="height:<?php echo esc_attr( $cb_h ); ?>%;"></span>
+									<?php endforeach; ?>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
-	</div>
-</section>
+	</section>
+
+	<!-- FEATURE GRID -->
+	<section class="section">
+		<div class="container">
+			<div style="text-align:center;max-width:680px;margin:0 auto;">
+				<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'Everything you need', 'chatbotistic' ); ?></span>
+				<h2 class="h-1 text-grad" style="margin-top:18px;"><?php esc_html_e( 'A complete conversation platform — not a chat widget.', 'chatbotistic' ); ?></h2>
+				<p class="lead" style="margin:18px auto 0;"><?php esc_html_e( 'Twelve tightly integrated modules. Pick what you need, scale to the rest.', 'chatbotistic' ); ?></p>
+			</div>
+			<div class="features-grid">
+				<?php foreach ( $cb_features as $cb_i => $cb_f ) : ?>
+					<div class="f-card">
+						<div class="f-ico"></div>
+						<?php if ( 0 === $cb_i ) : ?><div class="ribbon"><?php esc_html_e( 'CORE', 'chatbotistic' ); ?></div><?php endif; ?>
+						<h3><?php echo esc_html( $cb_f[1] ); ?></h3>
+						<p><?php echo esc_html( $cb_f[2] ); ?></p>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</section>
+
+	<!-- HOW IT WORKS -->
+	<section id="how-it-works" class="section">
+		<div class="container">
+			<div style="max-width:760px;">
+				<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'How it works', 'chatbotistic' ); ?></span>
+				<h2 class="h-1 text-grad" style="margin-top:18px;"><?php esc_html_e( 'How Chatbotistic connects your website to WhatsApp automation.', 'chatbotistic' ); ?></h2>
+				<p class="lead" style="margin-top:18px;"><?php esc_html_e( 'From plan to live widget in six operational steps — each one a node in the same connected system.', 'chatbotistic' ); ?></p>
+			</div>
+			<div class="op-pipeline">
+				<div class="op-pipeline-track">
+					<?php foreach ( $cb_how as $cb_s ) :
+						$cb_live = isset( $cb_s[4] ) && $cb_s[4]; ?>
+						<div class="op-stepcard<?php echo $cb_live ? ' live' : ''; ?>">
+							<?php if ( $cb_live ) : ?>
+								<div class="op-livechip"><span class="d op-pulse"></span><?php esc_html_e( 'Live', 'chatbotistic' ); ?></div>
+							<?php endif; ?>
+							<div class="op-node"></div>
+							<div class="op-step-ix"><?php echo esc_html( $cb_s[0] ); ?></div>
+							<h3><?php echo esc_html( $cb_s[2] ); ?></h3>
+							<p><?php echo esc_html( $cb_s[3] ); ?></p>
+						</div>
+					<?php endforeach; ?>
+				</div>
+			</div>
+			<div style="display:flex;justify-content:center;margin-top:44px;">
+				<a class="btn btn-primary btn-lg" href="<?php echo esc_url( home_url( '/pricing/' ) ); ?>"><?php esc_html_e( 'Create your widget', 'chatbotistic' ); ?></a>
+			</div>
+		</div>
+	</section>
+
+	<!-- USE CASES -->
+	<section class="section">
+		<div class="container">
+			<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap;">
+				<div style="max-width:580px;">
+					<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'Built for', 'chatbotistic' ); ?></span>
+					<h2 class="h-1 text-grad" style="margin-top:18px;"><?php esc_html_e( 'Service brands. Agencies. Storefronts.', 'chatbotistic' ); ?></h2>
+				</div>
+				<a class="btn btn-ghost" href="<?php echo esc_url( home_url( '/use-cases/' ) ); ?>"><?php esc_html_e( 'See all use cases', 'chatbotistic' ); ?></a>
+			</div>
+			<div class="use-grid">
+				<?php foreach ( $cb_usecases as $cb_u ) : ?>
+					<a class="use-card" href="<?php echo esc_url( home_url( '/' . $cb_u[0] . '/' ) ); ?>">
+						<div class="use-emoji"></div>
+						<div><b><?php echo esc_html( $cb_u[1] ); ?></b><span><?php echo esc_html( $cb_u[2] ); ?></span></div>
+					</a>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</section>
+
+	<!-- INTEGRATIONS -->
+	<section class="section">
+		<div class="container">
+			<div style="text-align:center;max-width:680px;margin:0 auto;">
+				<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'Integrations', 'chatbotistic' ); ?></span>
+				<h2 class="h-1 text-grad" style="margin-top:18px;"><?php esc_html_e( 'Connects with the tools you already pay for.', 'chatbotistic' ); ?></h2>
+				<p class="lead" style="margin:18px auto 0;"><?php esc_html_e( 'Native integrations for WordPress, WooCommerce, HubSpot, Zoho, Stripe, PayPal, Google Sheets, Email, WhatsApp, and Webhooks.', 'chatbotistic' ); ?></p>
+			</div>
+			<div class="int-grid">
+				<?php foreach ( $cb_integrations as $cb_int ) : ?>
+					<div class="int-tile">
+						<div class="int-logo"></div>
+						<span><?php echo esc_html( $cb_int ); ?></span>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</section>
+
+	<!-- PRICING PREVIEW -->
+	<section class="section">
+		<div class="container">
+			<div style="text-align:center;max-width:680px;margin:0 auto;">
+				<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'Pricing preview', 'chatbotistic' ); ?></span>
+				<h2 class="h-1 text-grad" style="margin-top:18px;"><?php esc_html_e( 'Start free. Scale when you grow.', 'chatbotistic' ); ?></h2>
+				<p class="lead" style="margin:18px auto 0;"><?php esc_html_e( 'Four plans. Honest pricing. No per-seat surprises.', 'chatbotistic' ); ?></p>
+			</div>
+			<div style="display:flex;justify-content:center;margin-top:32px;flex-wrap:wrap;gap:12px;">
+				<a class="btn btn-primary btn-lg" href="<?php echo esc_url( home_url( '/pricing/' ) ); ?>"><?php esc_html_e( 'See all plans', 'chatbotistic' ); ?></a>
+				<a class="btn btn-ghost btn-lg" href="<?php echo esc_url( home_url( '/book-demo/' ) ); ?>"><?php esc_html_e( 'Book a demo', 'chatbotistic' ); ?></a>
+			</div>
+		</div>
+	</section>
+
+	<!-- ECOSYSTEM PHASES (Standalone now / WPistic next) -->
+	<section class="section section-tight">
+		<div class="container">
+			<div style="text-align:center;max-width:720px;margin:0 auto;">
+				<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'Ecosystem', 'chatbotistic' ); ?></span>
+				<h2 class="h-1 text-grad" style="margin-top:18px;"><?php esc_html_e( 'Standalone today. Ecosystem-ready for tomorrow.', 'chatbotistic' ); ?></h2>
+				<p class="lead" style="margin:18px auto 0;"><?php esc_html_e( 'Chatbotistic runs as its own member portal today, so it launches fast and serves customers immediately — then connects into the centralized WPistic dashboard as the WordPressistic ecosystem grows.', 'chatbotistic' ); ?></p>
+			</div>
+			<div class="phases">
+				<div class="phase phase-1">
+					<div class="scan op-scan"></div>
+					<div class="phase-head">
+						<span class="phase-tag"><?php esc_html_e( 'Phase 1 · Now', 'chatbotistic' ); ?></span>
+						<span class="phase-status now"><span class="d"></span><?php esc_html_e( 'Live', 'chatbotistic' ); ?></span>
+					</div>
+					<h3><?php esc_html_e( 'Standalone Chatbotistic', 'chatbotistic' ); ?></h3>
+					<p><?php esc_html_e( 'A self-contained licensed system you can launch and sell today.', 'chatbotistic' ); ?></p>
+					<div class="phase-chain">
+						<?php
+						$cb_chain = array( __( 'Chatbotistic.com', 'chatbotistic' ), __( 'Member Portal', 'chatbotistic' ), __( 'License', 'chatbotistic' ), __( 'WordPress Addon', 'chatbotistic' ) );
+						$cb_chain_n = count( $cb_chain ) - 1;
+						foreach ( $cb_chain as $cb_ci => $cb_node ) :
+							?>
+							<div class="chain-node"><span class="ci"></span><?php echo esc_html( $cb_node ); ?></div>
+							<?php if ( $cb_ci < $cb_chain_n ) : ?>
+								<div class="chain-link op-flow"></div>
+							<?php endif; ?>
+						<?php endforeach; ?>
+					</div>
+				</div>
+				<div class="phase phase-2">
+					<div class="scan op-scan"></div>
+					<div class="phase-head">
+						<span class="phase-tag"><?php esc_html_e( 'Phase 2 · Next', 'chatbotistic' ); ?></span>
+						<span class="phase-status next"><span class="d"></span><?php esc_html_e( 'Planned', 'chatbotistic' ); ?></span>
+					</div>
+					<h3><?php esc_html_e( 'WPistic ecosystem', 'chatbotistic' ); ?></h3>
+					<p><?php esc_html_e( 'One centralized dashboard orchestrating every WordPressistic product.', 'chatbotistic' ); ?></p>
+					<div class="phase-hub">
+						<div class="hub-core"><span class="hc-dot op-pulse"></span><?php esc_html_e( 'WPistic Dashboard', 'chatbotistic' ); ?></div>
+						<div class="hub-rail"></div>
+						<div class="hub-spokes">
+							<?php
+							$cb_spokes = array( array( __( 'Chatbotistic', 'chatbotistic' ), true ), array( __( 'Memberistic', 'chatbotistic' ), false ), array( __( 'Licenseistic', 'chatbotistic' ), false ), array( __( 'Bookingistic', 'chatbotistic' ), false ), array( __( 'Insightistic', 'chatbotistic' ), false ) );
+							foreach ( $cb_spokes as $cb_sp ) : ?>
+								<div class="hub-spoke<?php echo $cb_sp[1] ? ' self' : ''; ?>"><span class="hs-dot"></span><?php echo esc_html( $cb_sp[0] ); ?></div>
+							<?php endforeach; ?>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- FINAL CTA -->
+	<section class="section">
+		<div class="container">
+			<div class="big-cta">
+				<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'Ready when you are', 'chatbotistic' ); ?></span>
+				<h2 class="text-grad" style="margin-top:18px;"><?php esc_html_e( 'Launch your WhatsApp chatbot system today.', 'chatbotistic' ); ?></h2>
+				<p><?php esc_html_e( 'A licensed WhatsApp chatbot system for websites, agencies, and service brands. Create your widget, connect WordPress, and start capturing conversations.', 'chatbotistic' ); ?></p>
+				<div class="cta-actions">
+					<a class="btn btn-primary btn-lg" href="<?php echo esc_url( home_url( '/pricing/' ) ); ?>"><?php esc_html_e( 'Start with Chatbotistic', 'chatbotistic' ); ?></a>
+					<a class="btn btn-ghost btn-lg" href="<?php echo esc_url( home_url( '/book-demo/' ) ); ?>"><?php esc_html_e( 'Book a demo', 'chatbotistic' ); ?></a>
+				</div>
+			</div>
+		</div>
+	</section>
+
+</main>
 
 <?php
 get_footer();

@@ -97,15 +97,31 @@ class Caps {
 	 * @return array
 	 */
 	public static function for_plan_id( int $plan_id ): array {
-		// Precedence: explicit admin override (mlb_plan_caps) wins, then the
-		// plan's own settings.limits from Memberistic, then the slug defaults,
-		// then the hard Free fallback.
+		// Precedence:
+		//   1. mlb_plan_caps keyed by plan ID         (admin UI override)
+		//   2. mlb_plan_caps keyed by plan slug       (env-driven override —
+		//      survives a Plans::wipe_and_replace cycle that changes plan IDs)
+		//   3. plan settings.limits from Memberistic  (single source of truth)
+		//   4. slug defaults from default_by_slug()
+		//   5. FREE hard fallback
 		$all = (array) get_option( 'mlb_plan_caps', [] );
 		if ( isset( $all[ $plan_id ] ) && is_array( $all[ $plan_id ] ) ) {
 			return array_merge( self::FREE, $all[ $plan_id ] );
 		}
 
 		$plan = self::memberistic_plan( $plan_id );
+
+		// Slug-keyed override (precedence 2) — keep the plan rename / replace
+		// resilient. Admins who write `mlb_plan_caps[pro] = [...]` keep their
+		// override applying even after a Plans::wipe_and_replace assigns a
+		// new numeric plan_id.
+		if ( $plan ) {
+			$slug = sanitize_key( (string) ( $plan['slug'] ?? '' ) );
+			if ( $slug && isset( $all[ $slug ] ) && is_array( $all[ $slug ] ) ) {
+				return array_merge( self::FREE, $all[ $slug ] );
+			}
+		}
+
 		if ( $plan ) {
 			$by_slug = self::default_by_slug();
 			$slug    = sanitize_key( (string) ( $plan['slug'] ?? '' ) );

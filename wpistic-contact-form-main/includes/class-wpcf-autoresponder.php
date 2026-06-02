@@ -32,6 +32,14 @@ class WPISTIC_CF_Autoresponder {
 	 * @param array  $fields        Captured fields (label => value).
 	 */
 	public function maybe_send( $submission_id, $form_name, $fields ) {
+		// Global kill-switch. Set WPCF_EMAIL_DISABLED in wp-config.php on
+		// staging/dev to suppress all outbound auto-responders without
+		// touching the per-form admin toggle.
+		if ( ( defined( 'WPCF_EMAIL_DISABLED' ) && WPCF_EMAIL_DISABLED )
+			|| (bool) get_option( 'WPISTIC_CF_emails_disabled', false ) ) {
+			return;
+		}
+
 		if ( '1' !== get_option( 'WPISTIC_CF_ar_enabled', '0' ) ) {
 			return;
 		}
@@ -40,6 +48,14 @@ class WPISTIC_CF_Autoresponder {
 		if ( ! $submission || ! is_email( $submission->sender_email ) ) {
 			return;
 		}
+
+		// Per-target throttle: do not re-send to the same email more than
+		// once per hour, even if a script floods the capture endpoint.
+		$throttle_key = 'wpcf_ar_' . md5( strtolower( trim( $submission->sender_email ) ) );
+		if ( false !== get_transient( $throttle_key ) ) {
+			return;
+		}
+		set_transient( $throttle_key, 1, HOUR_IN_SECONDS );
 
 		$placeholders = [
 			'{name}'      => $submission->sender_name !== '' ? $submission->sender_name : __( 'there', 'wpistic-contact-form' ),
@@ -52,6 +68,22 @@ class WPISTIC_CF_Autoresponder {
 
 		$subject = strtr( (string) get_option( 'WPISTIC_CF_ar_subject', '' ), $placeholders );
 		$body    = strtr( (string) get_option( 'WPISTIC_CF_ar_body', '' ), $placeholders );
+
+		/**
+		 * Per-form override. Filter returns ['subject' => ..., 'body' => ...]
+		 * for a known form name, or null to use the global subject + body.
+		 * Lets host products ship per-form copy without forking this class.
+		 *
+		 * @param array|null $override   null to keep global, or [subject, body]
+		 * @param string     $form_name  Captured form name.
+		 * @param array      $fields     Submission fields.
+		 */
+		$override = apply_filters( 'WPISTIC_CF_ar_for_form', null, $form_name, $fields );
+		if ( is_array( $override ) && ! empty( $override['subject'] ) && ! empty( $override['body'] ) ) {
+			$subject = strtr( (string) $override['subject'], $placeholders );
+			$body    = strtr( (string) $override['body'],    $placeholders );
+		}
+
 		if ( '' === trim( $subject ) || '' === trim( $body ) ) {
 			return;
 		}

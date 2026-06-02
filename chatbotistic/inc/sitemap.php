@@ -22,12 +22,20 @@ add_filter( 'wp_sitemaps_enabled', '__return_false' );
  * Register rewrite endpoints for the sitemap index, sub-sitemaps and llms files.
  */
 function cb_register_endpoints() {
-	add_rewrite_rule( '^sitemap\.xml$', 'index.php?cb_feed=sitemap', 'top' );
-	add_rewrite_rule( '^page-sitemap\.xml$', 'index.php?cb_feed=sitemap-page', 'top' );
-	add_rewrite_rule( '^post-sitemap\.xml$', 'index.php?cb_feed=sitemap-post', 'top' );
-	add_rewrite_rule( '^category-sitemap\.xml$', 'index.php?cb_feed=sitemap-category', 'top' );
-	add_rewrite_rule( '^llms\.txt$', 'index.php?cb_feed=llms', 'top' );
-	add_rewrite_rule( '^llms-full\.txt$', 'index.php?cb_feed=llms-full', 'top' );
+	add_rewrite_rule( '^sitemap\.xml$',                'index.php?cb_feed=sitemap',             'top' );
+	add_rewrite_rule( '^sitemap-pages\.xml$',          'index.php?cb_feed=sitemap-pages',       'top' );
+	add_rewrite_rule( '^sitemap-posts\.xml$',          'index.php?cb_feed=sitemap-posts',       'top' );
+	add_rewrite_rule( '^sitemap-usecases\.xml$',       'index.php?cb_feed=sitemap-usecases',    'top' );
+	add_rewrite_rule( '^sitemap-products\.xml$',       'index.php?cb_feed=sitemap-products',    'top' );
+	add_rewrite_rule( '^sitemap-categories\.xml$',     'index.php?cb_feed=sitemap-categories',  'top' );
+	add_rewrite_rule( '^sitemap-tags\.xml$',           'index.php?cb_feed=sitemap-tags',        'top' );
+	// Legacy aliases — early branded paths used <type>-sitemap.xml. Keep
+	// them resolving so any existing crawler bookmarks survive.
+	add_rewrite_rule( '^page-sitemap\.xml$',           'index.php?cb_feed=sitemap-pages',       'top' );
+	add_rewrite_rule( '^post-sitemap\.xml$',           'index.php?cb_feed=sitemap-posts',       'top' );
+	add_rewrite_rule( '^category-sitemap\.xml$',       'index.php?cb_feed=sitemap-categories',  'top' );
+	add_rewrite_rule( '^llms\.txt$',                   'index.php?cb_feed=llms',                'top' );
+	add_rewrite_rule( '^llms-full\.txt$',              'index.php?cb_feed=llms-full',           'top' );
 }
 add_action( 'init', 'cb_register_endpoints' );
 
@@ -62,10 +70,34 @@ function cb_noindex_slugs() {
  * @return array<string,array{label:string,callback:callable}>
  */
 function cb_sitemap_sections() {
+	return (array) apply_filters( 'cb_sitemap_sections', array(
+		'pages'      => array( 'label' => __( 'Pages',       'chatbotistic' ), 'callback' => 'cb_sitemap_pages' ),
+		'posts'      => array( 'label' => __( 'Blog posts',  'chatbotistic' ), 'callback' => 'cb_sitemap_posts' ),
+		'usecases'   => array( 'label' => __( 'Use cases',   'chatbotistic' ), 'callback' => 'cb_sitemap_usecases' ),
+		'products'   => array( 'label' => __( 'Products',    'chatbotistic' ), 'callback' => 'cb_sitemap_products' ),
+		'categories' => array( 'label' => __( 'Categories',  'chatbotistic' ), 'callback' => 'cb_sitemap_categories' ),
+		'tags'       => array( 'label' => __( 'Tags',        'chatbotistic' ), 'callback' => 'cb_sitemap_tags' ),
+	) );
+}
+
+/**
+ * Pages that belong in the dedicated usecases / products sub-sitemaps —
+ * pulled out of the generic pages sub-sitemap so SEO tools can analyse
+ * landing-page health in isolation.
+ *
+ * @return array{usecases:string[],products:string[]}
+ */
+function cb_special_landing_slugs() {
 	return array(
-		'page'     => array( 'label' => __( 'Pages', 'chatbotistic' ),      'callback' => 'cb_sitemap_pages' ),
-		'post'     => array( 'label' => __( 'Posts', 'chatbotistic' ),      'callback' => 'cb_sitemap_posts' ),
-		'category' => array( 'label' => __( 'Categories', 'chatbotistic' ), 'callback' => 'cb_sitemap_terms' ),
+		'usecases' => array(
+			'use-cases', 'agencies', 'local-business', 'clinics-spas', 'clinics',
+			'real-estate', 'ecommerce', 'wordpress-sites', 'saas-founders',
+			'coaches', 'coaches-consultants', 'travel-agencies',
+		),
+		'products' => array(
+			'features', 'whatsapp-automation', 'ai-chatbot', 'booking-forms',
+			'wordpress-plugin', 'agency-white-label',
+		),
 	);
 }
 
@@ -75,9 +107,12 @@ function cb_sitemap_sections() {
  * @return array<int,array{url:string,modified:string}>
  */
 function cb_sitemap_pages() {
-	$entries = array( array( 'url' => home_url( '/' ), 'modified' => current_time( 'c' ) ) );
-	$skip    = cb_noindex_slugs();
-	$front   = (string) get_option( 'page_on_front' );
+	$front_img = function_exists( 'cb_share_image_for' ) ? cb_share_image_for( null ) : '';
+	$entries   = array( array( 'url' => home_url( '/' ), 'modified' => current_time( 'c' ), 'image' => $front_img ) );
+	$skip      = cb_noindex_slugs();
+	$special   = cb_special_landing_slugs();
+	$reserved  = array_merge( $special['usecases'], $special['products'] );
+	$front     = (string) get_option( 'page_on_front' );
 
 	foreach ( get_posts( array(
 		'post_type'   => 'page',
@@ -86,13 +121,62 @@ function cb_sitemap_pages() {
 		'orderby'     => 'menu_order title',
 		'order'       => 'ASC',
 	) ) as $page ) {
-		if ( in_array( $page->post_name, $skip, true ) || $front === (string) $page->ID ) {
+		if ( in_array( $page->post_name, $skip, true ) || in_array( $page->post_name, $reserved, true ) || $front === (string) $page->ID ) {
 			continue;
 		}
 		$entries[] = array(
 			'url'      => get_permalink( $page ),
 			'modified' => get_post_modified_time( 'c', true, $page ),
+			'image'    => function_exists( 'cb_share_image_for' ) ? cb_share_image_for( $page ) : '',
 		);
+	}
+	return $entries;
+}
+
+/**
+ * Use-case landing pages (split out of the generic pages sub-sitemap).
+ *
+ * @return array<int,array{url:string,modified:string}>
+ */
+function cb_sitemap_usecases() {
+	$entries = array();
+	$skip    = cb_noindex_slugs();
+	foreach ( cb_special_landing_slugs()['usecases'] as $slug ) {
+		if ( in_array( $slug, $skip, true ) ) {
+			continue;
+		}
+		$page = get_page_by_path( $slug );
+		if ( $page && 'publish' === $page->post_status ) {
+			$entries[] = array(
+				'url'      => get_permalink( $page ),
+				'modified' => get_post_modified_time( 'c', true, $page ),
+				'image'    => function_exists( 'cb_share_image_for' ) ? cb_share_image_for( $page ) : '',
+			);
+		}
+	}
+	return $entries;
+}
+
+/**
+ * Product landing pages.
+ *
+ * @return array<int,array{url:string,modified:string}>
+ */
+function cb_sitemap_products() {
+	$entries = array();
+	$skip    = cb_noindex_slugs();
+	foreach ( cb_special_landing_slugs()['products'] as $slug ) {
+		if ( in_array( $slug, $skip, true ) ) {
+			continue;
+		}
+		$page = get_page_by_path( $slug );
+		if ( $page && 'publish' === $page->post_status ) {
+			$entries[] = array(
+				'url'      => get_permalink( $page ),
+				'modified' => get_post_modified_time( 'c', true, $page ),
+				'image'    => function_exists( 'cb_share_image_for' ) ? cb_share_image_for( $page ) : '',
+			);
+		}
 	}
 	return $entries;
 }
@@ -108,6 +192,7 @@ function cb_sitemap_posts() {
 		$entries[] = array(
 			'url'      => get_permalink( $post ),
 			'modified' => get_post_modified_time( 'c', true, $post ),
+			'image'    => function_exists( 'cb_share_image_for' ) ? cb_share_image_for( $post ) : '',
 		);
 	}
 	return $entries;
@@ -118,7 +203,7 @@ function cb_sitemap_posts() {
  *
  * @return array<int,array{url:string,modified:string}>
  */
-function cb_sitemap_terms() {
+function cb_sitemap_categories() {
 	$entries = array();
 	foreach ( get_categories( array( 'hide_empty' => true ) ) as $term ) {
 		$link = get_term_link( $term );
@@ -127,6 +212,31 @@ function cb_sitemap_terms() {
 		}
 	}
 	return $entries;
+}
+
+/**
+ * Tag archive entries (non-empty only).
+ *
+ * @return array<int,array{url:string,modified:string}>
+ */
+function cb_sitemap_tags() {
+	$entries = array();
+	foreach ( get_tags( array( 'hide_empty' => true ) ) as $term ) {
+		$link = get_term_link( $term );
+		if ( ! is_wp_error( $link ) ) {
+			$entries[] = array( 'url' => $link, 'modified' => current_time( 'c' ) );
+		}
+	}
+	return $entries;
+}
+
+/**
+ * Back-compat alias — older callers referenced cb_sitemap_terms.
+ *
+ * @deprecated Use cb_sitemap_categories() directly.
+ */
+function cb_sitemap_terms() {
+	return cb_sitemap_categories();
 }
 
 /**
@@ -153,7 +263,13 @@ function cb_render_feed() {
 	} elseif ( 0 === strpos( $feed, 'sitemap-' ) ) {
 		$key      = substr( $feed, 8 );
 		$sections = cb_sitemap_sections();
-		$entries  = isset( $sections[ $key ] ) ? call_user_func( $sections[ $key ]['callback'] ) : array();
+		// Back-compat: the early branded path used 'page'/'post'/'category'
+		// keys instead of 'pages'/'posts'/'categories'. Map them through.
+		$compat = array( 'page' => 'pages', 'post' => 'posts', 'category' => 'categories' );
+		if ( isset( $compat[ $key ] ) ) {
+			$key = $compat[ $key ];
+		}
+		$entries = isset( $sections[ $key ] ) ? call_user_func( $sections[ $key ]['callback'] ) : array();
 		cb_render_urlset( $entries );
 	}
 	exit;
@@ -178,7 +294,7 @@ function cb_render_sitemap_index() {
 			}
 		}
 		echo "\t<sitemap>\n";
-		echo "\t\t<loc>" . esc_url( home_url( '/' . $key . '-sitemap.xml' ) ) . "</loc>\n";
+		echo "\t\t<loc>" . esc_url( home_url( '/sitemap-' . $key . '.xml' ) ) . "</loc>\n";
 		echo "\t\t<lastmod>" . esc_html( $modified ?: current_time( 'c' ) ) . "</lastmod>\n";
 		echo "\t</sitemap>\n";
 	}
@@ -191,11 +307,19 @@ function cb_render_sitemap_index() {
  * @param array<int,array{url:string,modified:string}> $entries Entries.
  */
 function cb_render_urlset( $entries ) {
-	echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+	// xmlns:image lets each <url> carry one or more <image:image><image:loc>
+	// blocks — the same OG / share image we serve to social cards, now
+	// visible to Google Images and AI image-search engines.
+	echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
 	foreach ( $entries as $entry ) {
 		echo "\t<url>\n";
 		echo "\t\t<loc>" . esc_url( $entry['url'] ) . "</loc>\n";
 		echo "\t\t<lastmod>" . esc_html( $entry['modified'] ) . "</lastmod>\n";
+		if ( ! empty( $entry['image'] ) ) {
+			echo "\t\t<image:image>\n";
+			echo "\t\t\t<image:loc>" . esc_url( $entry['image'] ) . "</image:loc>\n";
+			echo "\t\t</image:image>\n";
+		}
 		echo "\t\t<changefreq>weekly</changefreq>\n";
 		echo "\t</url>\n";
 	}

@@ -30,10 +30,19 @@ final class Import_Page {
 
 	/**
 	 * Legacy PMPro level name (lowercased) => Memberistic plan slug.
-	 * Mirrors the agreed Guns 2 Ammo migration mapping.
+	 *
+	 * Brand-neutral by default — every host product (Chatbotistic, Guns 2
+	 * Ammo, etc.) supplies its own mapping via the `memberistic_import_level_map`
+	 * filter. The defaults below are the historical Guns 2 Ammo mapping,
+	 * preserved so existing installs upgrading the plugin still resolve
+	 * their PMPro export without touching the filter — but the plugin
+	 * itself no longer claims any specific industry's plan names.
+	 *
+	 * @return array<string, string> Map of lowercased legacy level name
+	 *                               to current Memberistic plan slug.
 	 */
 	private static function level_map() {
-		return apply_filters(
+		return (array) apply_filters(
 			'memberistic_import_level_map',
 			array(
 				'bronze'                                   => 'defender',
@@ -57,6 +66,28 @@ final class Import_Page {
 	}
 
 	/**
+	 * Keyword fallback rules: when a legacy level isn't in the explicit
+	 * map, match by substring. Host products override this list via
+	 * `memberistic_import_level_keyword_rules` so e.g. Chatbotistic Profile
+	 * can ship its own (bronze → pro, gold → agency, etc.).
+	 *
+	 * Each rule is `[ 'keywords' => [...], 'slug' => 'plan-slug' ]`;
+	 * the first rule with any matching keyword wins.
+	 *
+	 * @return array<int,array{keywords:array<int,string>,slug:string}>
+	 */
+	private static function level_keyword_rules() {
+		return (array) apply_filters(
+			'memberistic_import_level_keyword_rules',
+			array(
+				array( 'keywords' => array( 'happy family', 'plus', 'master', 'gold' ), 'slug' => 'guardian' ),
+				array( 'keywords' => array( 'silver', 'trigger pro' ),                  'slug' => 'patriot' ),
+				array( 'keywords' => array( 'bronze', 'defender', 'trigger membership' ), 'slug' => 'defender' ),
+			)
+		);
+	}
+
+	/**
 	 * Resolve a legacy level name to a plan slug, with keyword fallback.
 	 *
 	 * Returns `no-plan` (a sentinel slug that the importer auto-creates) for
@@ -73,17 +104,20 @@ final class Import_Page {
 		}
 		$map = self::level_map();
 		if ( isset( $map[ $level ] ) ) {
-			return $map[ $level ];
+			return (string) $map[ $level ];
 		}
 		// Keyword fallback for unmapped levels.
-		if ( false !== strpos( $level, 'happy family' ) || false !== strpos( $level, 'plus' ) || false !== strpos( $level, 'master' ) || false !== strpos( $level, 'gold' ) ) {
-			return 'guardian';
-		}
-		if ( false !== strpos( $level, 'silver' ) || false !== strpos( $level, 'trigger pro' ) ) {
-			return 'patriot';
-		}
-		if ( false !== strpos( $level, 'bronze' ) || false !== strpos( $level, 'defender' ) || false !== strpos( $level, 'trigger membership' ) ) {
-			return 'defender';
+		foreach ( self::level_keyword_rules() as $rule ) {
+			$keywords = isset( $rule['keywords'] ) ? (array) $rule['keywords'] : array();
+			$slug     = isset( $rule['slug'] )     ? (string) $rule['slug']     : '';
+			if ( '' === $slug ) {
+				continue;
+			}
+			foreach ( $keywords as $kw ) {
+				if ( '' !== $kw && false !== strpos( $level, strtolower( (string) $kw ) ) ) {
+					return $slug;
+				}
+			}
 		}
 		return 'no-plan';
 	}
