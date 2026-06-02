@@ -18,6 +18,9 @@ class Dashboard {
 	/**
 	 * Register the shortcode and assets.
 	 */
+	/** Allowed tab keys the shortcode can preselect. */
+	private const VALID_TABS = array( 'widgets', 'analytics', 'leads' );
+
 	public function __construct() {
 		add_shortcode( 'chatbotistic_dashboard', array( $this, 'render' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_assets' ) );
@@ -44,15 +47,27 @@ class Dashboard {
 	/**
 	 * Render the dashboard shell.
 	 *
+	 * Shortcode attributes:
+	 *   default_tab   widgets | analytics | leads   (default: widgets)
+	 *                 Lets the theme deep-link into the right tab from a
+	 *                 sidebar item, e.g. [chatbotistic_dashboard default_tab="leads"].
+	 *
+	 * @param array $atts Shortcode attributes.
 	 * @return string
 	 */
-	public function render(): string {
+	public function render( $atts = array() ): string {
 		if ( ! is_user_logged_in() ) {
 			return '<div class="cbc-gate"><p>' . esc_html__( 'Please sign in to open your dashboard.', 'chatbotistic-connector' ) . '</p></div>';
 		}
 
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
 			define( 'DONOTCACHEPAGE', true );
+		}
+
+		$atts = shortcode_atts( array( 'default_tab' => 'widgets' ), is_array( $atts ) ? $atts : array(), 'chatbotistic_dashboard' );
+		$default_tab = sanitize_key( (string) $atts['default_tab'] );
+		if ( ! in_array( $default_tab, self::VALID_TABS, true ) ) {
+			$default_tab = 'widgets';
 		}
 
 		// Enqueue here so assets load even when the shortcode is rendered
@@ -62,7 +77,7 @@ class Dashboard {
 
 		ob_start();
 		?>
-		<div class="cbc-app" id="cbc-app">
+		<div class="cbc-app" id="cbc-app" data-default-tab="<?php echo esc_attr( $default_tab ); ?>">
 
 			<header class="cbc-top">
 				<div class="cbc-top__id">
@@ -70,15 +85,15 @@ class Dashboard {
 					<span class="cbc-usage" id="cbc-usage"></span>
 				</div>
 				<nav class="cbc-tabs" role="tablist">
-					<button class="cbc-tab is-active" data-tab="widgets" role="tab"><?php esc_html_e( 'Widgets', 'chatbotistic-connector' ); ?></button>
-					<button class="cbc-tab" data-tab="analytics" role="tab"><?php esc_html_e( 'Analytics', 'chatbotistic-connector' ); ?></button>
-					<button class="cbc-tab" data-tab="leads" role="tab"><?php esc_html_e( 'Leads', 'chatbotistic-connector' ); ?></button>
+					<button class="cbc-tab<?php echo 'widgets'   === $default_tab ? ' is-active' : ''; ?>" data-tab="widgets"   role="tab" aria-selected="<?php echo 'widgets'   === $default_tab ? 'true' : 'false'; ?>"><?php esc_html_e( 'Widgets', 'chatbotistic-connector' ); ?></button>
+					<button class="cbc-tab<?php echo 'analytics' === $default_tab ? ' is-active' : ''; ?>" data-tab="analytics" role="tab" aria-selected="<?php echo 'analytics' === $default_tab ? 'true' : 'false'; ?>"><?php esc_html_e( 'Analytics', 'chatbotistic-connector' ); ?></button>
+					<button class="cbc-tab<?php echo 'leads'     === $default_tab ? ' is-active' : ''; ?>" data-tab="leads"     role="tab" aria-selected="<?php echo 'leads'     === $default_tab ? 'true' : 'false'; ?>"><?php esc_html_e( 'Leads', 'chatbotistic-connector' ); ?></button>
 				</nav>
 			</header>
 
 			<div class="cbc-notice" id="cbc-notice" role="status" hidden></div>
 
-			<section class="cbc-panel is-active" id="cbc-panel-widgets" role="tabpanel">
+			<section class="cbc-panel<?php echo 'widgets'   === $default_tab ? ' is-active' : ''; ?>" id="cbc-panel-widgets"   role="tabpanel"<?php echo 'widgets'   === $default_tab ? '' : ' hidden'; ?>>
 				<div class="cbc-panel__head">
 					<h2><?php esc_html_e( 'Your WhatsApp Widgets', 'chatbotistic-connector' ); ?></h2>
 					<button class="cbc-btn cbc-btn--primary" id="cbc-new-widget"><?php esc_html_e( '+ New Widget', 'chatbotistic-connector' ); ?></button>
@@ -88,12 +103,12 @@ class Dashboard {
 				</div>
 			</section>
 
-			<section class="cbc-panel" id="cbc-panel-analytics" role="tabpanel" hidden>
+			<section class="cbc-panel<?php echo 'analytics' === $default_tab ? ' is-active' : ''; ?>" id="cbc-panel-analytics" role="tabpanel"<?php echo 'analytics' === $default_tab ? '' : ' hidden'; ?>>
 				<div class="cbc-panel__head"><h2><?php esc_html_e( 'Performance — last 30 days', 'chatbotistic-connector' ); ?></h2></div>
 				<div id="cbc-analytics"><div class="cbc-loading"><?php esc_html_e( 'Loading analytics…', 'chatbotistic-connector' ); ?></div></div>
 			</section>
 
-			<section class="cbc-panel" id="cbc-panel-leads" role="tabpanel" hidden>
+			<section class="cbc-panel<?php echo 'leads'     === $default_tab ? ' is-active' : ''; ?>" id="cbc-panel-leads"     role="tabpanel"<?php echo 'leads'     === $default_tab ? '' : ' hidden'; ?>>
 				<div class="cbc-panel__head"><h2><?php esc_html_e( 'Leads', 'chatbotistic-connector' ); ?></h2></div>
 				<div id="cbc-leads"><div class="cbc-loading"><?php esc_html_e( 'Loading leads…', 'chatbotistic-connector' ); ?></div></div>
 			</section>

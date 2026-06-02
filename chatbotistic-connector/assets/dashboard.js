@@ -55,17 +55,42 @@
 	el('cbc-modal').addEventListener('click', function (e) { if (e.target === this) { closeModal(); } });
 
 	/* ---- tabs ---- */
+	var VALID_TABS = ['widgets', 'analytics', 'leads'];
+
+	function activateTab(name) {
+		if (VALID_TABS.indexOf(name) === -1) { return; }
+		app.querySelectorAll('.cbc-tab').forEach(function (t) {
+			var on = (t.getAttribute('data-tab') === name);
+			t.classList.toggle('is-active', on);
+			t.setAttribute('aria-selected', on ? 'true' : 'false');
+		});
+		app.querySelectorAll('.cbc-panel').forEach(function (p) {
+			var on = (p.id === 'cbc-panel-' + name);
+			p.hidden = !on;
+			p.classList.toggle('is-active', on);
+		});
+		if (name === 'analytics') { loadAnalytics(); }
+		if (name === 'leads')     { loadLeads(); }
+	}
+
 	app.querySelectorAll('.cbc-tab').forEach(function (tab) {
 		tab.addEventListener('click', function () {
-			var name = tab.getAttribute('data-tab');
-			app.querySelectorAll('.cbc-tab').forEach(function (t) { t.classList.toggle('is-active', t === tab); });
-			app.querySelectorAll('.cbc-panel').forEach(function (p) {
-				p.hidden = (p.id !== 'cbc-panel-' + name);
-			});
-			if (name === 'analytics') { loadAnalytics(); }
-			if (name === 'leads') { loadLeads(); }
+			activateTab(tab.getAttribute('data-tab'));
 		});
 	});
+
+	// Honour the shortcode's default_tab attribute on first load. PHP has
+	// already set the matching .is-active class and hidden state, but we
+	// still need to fire the loader for analytics/leads (their AJAX
+	// fetchers only run when a tab activates).
+	var initial = app.getAttribute('data-default-tab') || 'widgets';
+	if (initial !== 'widgets' && VALID_TABS.indexOf(initial) !== -1) {
+		// Defer until loadDashboard() has resolved membership/usage so
+		// the loaders have CFG.nonce + auth context in place.
+		document.addEventListener('cbc:ready', function () {
+			activateTab(initial);
+		}, { once: true });
+	}
 
 	/* ============ Dashboard ============ */
 	function loadDashboard() {
@@ -79,8 +104,10 @@
 					+ d.usage.agents + limitLabel(d.membership.agent_limit) + ' agents')
 				: '';
 			renderWidgets();
+			document.dispatchEvent(new CustomEvent('cbc:ready'));
 		}).catch(function (e) {
 			el('cbc-widgets').innerHTML = '<div class="cbc-empty"><strong>Could not load</strong>' + esc(e.message) + '</div>';
+			document.dispatchEvent(new CustomEvent('cbc:ready'));
 		});
 	}
 	function limitLabel(limit) { return limit === -1 ? '' : ('/' + limit); }
