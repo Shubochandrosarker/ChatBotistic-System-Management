@@ -93,7 +93,8 @@ class WPISTIC_CF_Database {
 			PRIMARY KEY  (id),
 			KEY status (status),
 			KEY form_name (form_name),
-			KEY created_at (created_at)
+			KEY created_at (created_at),
+			KEY sender_email (sender_email)
 		) {$charset};";
 
 		$sql_replies = "CREATE TABLE {$replies} (
@@ -158,6 +159,13 @@ class WPISTIC_CF_Database {
 		dbDelta( $sql_notes );
 		dbDelta( $sql_impressions );
 		dbDelta( $sql_ai_meta );
+
+		// Newsletter subscribers table — owned by WPISTIC_CF_Newsletter
+		// but installed in the same dbDelta pass so the schema upgrade
+		// stays atomic from the admin's point of view.
+		if ( class_exists( 'WPISTIC_CF_Newsletter' ) ) {
+			WPISTIC_CF_Newsletter::install();
+		}
 
 		update_option( 'WPISTIC_CF_db_version', WPISTIC_CF_DB_VERSION );
 	}

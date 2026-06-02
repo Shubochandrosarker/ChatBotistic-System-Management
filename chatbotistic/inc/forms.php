@@ -271,6 +271,11 @@ add_action( 'admin_post_cb_demo_request', 'cb_handle_demo_request' );
 
 /**
  * Newsletter opt-in.
+ *
+ * Subscribers land in WPISTIC_CF_Newsletter's dedicated table so the admin
+ * can see, export, and unsubscribe them from one dashboard. Falls back to a
+ * fire-and-forget action for sites where the contact-form plugin isn't
+ * active.
  */
 function cb_handle_newsletter() {
 	$back = cb_form_redirect();
@@ -280,11 +285,21 @@ function cb_handle_newsletter() {
 		exit;
 	}
 
-	$email = isset( $_POST['cb_email'] ) ? sanitize_email( wp_unslash( $_POST['cb_email'] ) ) : '';
+	$email  = isset( $_POST['cb_email'] ) ? sanitize_email( wp_unslash( $_POST['cb_email'] ) ) : '';
+	$source = isset( $_POST['cb_source'] ) ? sanitize_text_field( wp_unslash( $_POST['cb_source'] ) ) : 'footer';
+	$status = 'error';
+
 	if ( is_email( $email ) ) {
+		if ( class_exists( 'WPISTIC_CF_Newsletter' ) && method_exists( 'WPISTIC_CF_Newsletter', 'process' ) ) {
+			$res = WPISTIC_CF_Newsletter::process( $email, $source );
+			$ok  = isset( $res['status'] ) && in_array( $res['status'], array( 'subscribed', 'duplicate', 'reactivated' ), true );
+			$status = $ok ? 'success' : ( $res['status'] ?? 'error' );
+		} else {
+			$status = 'success';
+		}
 		do_action( 'cb_newsletter_subscribe', $email );
 	}
-	wp_safe_redirect( add_query_arg( 'news', is_email( $email ) ? 'success' : 'error', $back ) );
+	wp_safe_redirect( add_query_arg( 'news', $status, $back ) );
 	exit;
 }
 add_action( 'admin_post_nopriv_cb_newsletter', 'cb_handle_newsletter' );
@@ -352,6 +367,17 @@ function cb_handle_support() {
 			'[Chatbotistic Support] ' . $subject,
 			sprintf( "From: %s <%s>\nUser ID: %d\n\n%s", $user->display_name, $user->user_email, $user->ID, $message ),
 			array( 'Reply-To: ' . $user->user_email )
+		);
+		cb_capture_wpistic_contact_form(
+			'Member Portal Support Ticket',
+			array(
+				'name'    => $user->display_name,
+				'email'   => $user->user_email,
+				'subject' => $subject,
+				'message' => $message,
+				'user_id' => $user->ID,
+				'source'  => 'member_portal',
+			)
 		);
 		do_action( 'cb_support_ticket', $user->ID, $subject, $message );
 	}
