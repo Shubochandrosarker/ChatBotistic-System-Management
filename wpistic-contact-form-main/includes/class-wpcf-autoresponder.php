@@ -68,6 +68,22 @@ class WPISTIC_CF_Autoresponder {
 
 		$subject = strtr( (string) get_option( 'WPISTIC_CF_ar_subject', '' ), $placeholders );
 		$body    = strtr( (string) get_option( 'WPISTIC_CF_ar_body', '' ), $placeholders );
+
+		/**
+		 * Per-form override. Filter returns ['subject' => ..., 'body' => ...]
+		 * for a known form name, or null to use the global subject + body.
+		 * Lets host products ship per-form copy without forking this class.
+		 *
+		 * @param array|null $override   null to keep global, or [subject, body]
+		 * @param string     $form_name  Captured form name.
+		 * @param array      $fields     Submission fields.
+		 */
+		$override = apply_filters( 'WPISTIC_CF_ar_for_form', null, $form_name, $fields );
+		if ( is_array( $override ) && ! empty( $override['subject'] ) && ! empty( $override['body'] ) ) {
+			$subject = strtr( (string) $override['subject'], $placeholders );
+			$body    = strtr( (string) $override['body'],    $placeholders );
+		}
+
 		if ( '' === trim( $subject ) || '' === trim( $body ) ) {
 			return;
 		}

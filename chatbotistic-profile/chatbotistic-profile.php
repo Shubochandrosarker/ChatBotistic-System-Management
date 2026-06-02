@@ -49,9 +49,10 @@ spl_autoload_register( function ( string $class ): void {
 		'Emails'        => 'includes/class-emails.php',
 		'Auto_Approve'  => 'includes/class-auto-approve.php',
 		'Stripper'      => 'includes/class-stripper.php',
-		'System_Health' => 'includes/class-system-health.php',
-		'WPCF_Preset'   => 'includes/class-wpcf-preset.php',
-		'Admin'         => 'admin/class-admin.php',
+		'System_Health'      => 'includes/class-system-health.php',
+		'WPCF_Preset'        => 'includes/class-wpcf-preset.php',
+		'Emails_Automation'  => 'includes/class-emails-automation.php',
+		'Admin'              => 'admin/class-admin.php',
 	];
 	if ( isset( $map[ $short ] ) && is_readable( CBP_DIR . $map[ $short ] ) ) {
 		require_once CBP_DIR . $map[ $short ];

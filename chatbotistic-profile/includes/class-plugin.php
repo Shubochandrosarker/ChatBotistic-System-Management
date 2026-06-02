@@ -71,6 +71,10 @@ class Plugin {
 		// endpoints + first-run notice).
 		( new System_Health() )->register();
 
+		// Account-verification, welcome, license-activation and per-form
+		// auto-responder copy — every customer-facing automated email.
+		( new Emails_Automation() )->register();
+
 		// Dismiss-welcome handler.
 		add_action( 'admin_post_cbp_dismiss_welcome', static function () {
 			if ( current_user_can( 'manage_options' ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ?? '' ) ), 'cbp_dismiss_welcome' ) ) {
