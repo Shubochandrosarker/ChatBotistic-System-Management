@@ -66,5 +66,23 @@ class Plugin {
 		if ( is_admin() ) {
 			( new Admin() )->register();
 		}
+
+		// System health (Site Health tests + dashboard widget + REST
+		// endpoints + first-run notice).
+		( new System_Health() )->register();
+
+		// Dismiss-welcome handler.
+		add_action( 'admin_post_cbp_dismiss_welcome', static function () {
+			if ( current_user_can( 'manage_options' ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ?? '' ) ), 'cbp_dismiss_welcome' ) ) {
+				update_option( System_Health::FIRST_RUN_FLAG, '1', false );
+			}
+			wp_safe_redirect( wp_get_referer() ?: admin_url() );
+			exit;
+		} );
+
+		// WP-CLI integration (loaded only in CLI context).
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			require_once CBP_DIR . 'includes/class-wp-cli.php';
+		}
 	}
 }

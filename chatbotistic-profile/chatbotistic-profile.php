@@ -42,14 +42,15 @@ spl_autoload_register( function ( string $class ): void {
 	}
 	$short = substr( $class, 21 );
 	$map   = [
-		'Plugin'       => 'includes/class-plugin.php',
-		'Installer'    => 'includes/class-installer.php',
-		'Plans'        => 'includes/class-plans.php',
-		'Pages'        => 'includes/class-pages.php',
-		'Emails'       => 'includes/class-emails.php',
-		'Auto_Approve' => 'includes/class-auto-approve.php',
-		'Stripper'     => 'includes/class-stripper.php',
-		'Admin'        => 'admin/class-admin.php',
+		'Plugin'        => 'includes/class-plugin.php',
+		'Installer'     => 'includes/class-installer.php',
+		'Plans'         => 'includes/class-plans.php',
+		'Pages'         => 'includes/class-pages.php',
+		'Emails'        => 'includes/class-emails.php',
+		'Auto_Approve'  => 'includes/class-auto-approve.php',
+		'Stripper'      => 'includes/class-stripper.php',
+		'System_Health' => 'includes/class-system-health.php',
+		'Admin'         => 'admin/class-admin.php',
 	];
 	if ( isset( $map[ $short ] ) && is_readable( CBP_DIR . $map[ $short ] ) ) {
 		require_once CBP_DIR . $map[ $short ];

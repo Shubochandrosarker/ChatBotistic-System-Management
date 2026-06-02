@@ -16,13 +16,60 @@ class Store {
 	/**
 	 * Read one plugin setting.
 	 *
+	 * For api_email / api_password / lead_api_key the lookup precedence is:
+	 *   1. PHP constant defined in wp-config.php  (preferred for production
+	 *      deployments — secrets stay out of the database)
+	 *   2. WordPress option (admin-entered via the settings UI)
+	 *   3. The $default argument
+	 *
+	 * Constants take precedence so a deploy can override per environment
+	 * without touching the option table.
+	 *
 	 * @param string $key     Setting key.
 	 * @param mixed  $default Fallback.
 	 * @return mixed
 	 */
 	public static function setting( string $key, $default = '' ) {
+		// Environment-driven overrides. Recognised constants:
+		//   CBC_API_EMAIL       — Tochat master account email
+		//   CBC_API_PASSWORD    — Tochat master account password (plain text,
+		//                         NOT base64; the encrypt/decrypt pair is
+		//                         skipped on the constant path).
+		//   CBC_LEAD_API_KEY    — lead webhook signing key
+		$env_map = array(
+			'api_email'    => 'CBC_API_EMAIL',
+			'api_password' => 'CBC_API_PASSWORD',
+			'lead_api_key' => 'CBC_LEAD_API_KEY',
+		);
+		if ( isset( $env_map[ $key ] ) && defined( $env_map[ $key ] ) ) {
+			$val = (string) constant( $env_map[ $key ] );
+			// api_password gets stored encrypted, but the constant ships
+			// plaintext — return it pre-encrypted so callers using
+			// Store::decrypt() get back the right thing without changes.
+			if ( 'api_password' === $key && '' !== $val ) {
+				return self::encrypt( $val );
+			}
+			return $val;
+		}
 		$all = get_option( self::SETTINGS, array() );
 		return is_array( $all ) && array_key_exists( $key, $all ) ? $all[ $key ] : $default;
+	}
+
+	/**
+	 * Whether a particular setting is being supplied by a wp-config.php
+	 * constant rather than the database. The admin UI uses this to render
+	 * a "managed in wp-config.php" label instead of an editable field.
+	 *
+	 * @param string $key Setting key.
+	 * @return bool
+	 */
+	public static function setting_is_locked( string $key ): bool {
+		$env_map = array(
+			'api_email'    => 'CBC_API_EMAIL',
+			'api_password' => 'CBC_API_PASSWORD',
+			'lead_api_key' => 'CBC_LEAD_API_KEY',
+		);
+		return isset( $env_map[ $key ] ) && defined( $env_map[ $key ] );
 	}
 
 	/**

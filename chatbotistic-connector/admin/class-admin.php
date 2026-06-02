@@ -179,6 +179,11 @@ class Admin {
 		$has_lead_key  = '' !== (string) Store::setting( 'lead_api_key' );
 		$limits        = Membership::plan_limits();
 		$plans         = Membership::memberistic_plans();
+		// When the credentials are pinned in wp-config.php, lock the input
+		// so admins don't accidentally overwrite them via the form.
+		$email_locked  = Store::setting_is_locked( 'api_email' );
+		$pass_locked   = Store::setting_is_locked( 'api_password' );
+		$lead_locked   = Store::setting_is_locked( 'lead_api_key' );
 		?>
 		<div class="wrap cbc-admin">
 			<h1><?php esc_html_e( 'Chatbotistic Connector', 'chatbotistic-connector' ); ?></h1>
@@ -189,23 +194,41 @@ class Admin {
 				<table class="form-table" role="presentation">
 					<tr>
 						<th scope="row"><label for="cbc-email"><?php esc_html_e( 'API Email', 'chatbotistic-connector' ); ?></label></th>
-						<td><input type="email" id="cbc-email" name="api_email" class="regular-text" value="<?php echo esc_attr( $email ); ?>" required></td>
+						<td>
+							<input type="email" id="cbc-email" name="api_email" class="regular-text" value="<?php echo esc_attr( $email ); ?>" <?php disabled( $email_locked ); ?> <?php echo $email_locked ? '' : 'required'; ?>>
+							<?php if ( $email_locked ) : ?>
+								<p class="description"><?php esc_html_e( '🔒 Managed by the CBC_API_EMAIL constant in wp-config.php.', 'chatbotistic-connector' ); ?></p>
+							<?php endif; ?>
+						</td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="cbc-pass"><?php esc_html_e( 'API Password', 'chatbotistic-connector' ); ?></label></th>
 						<td>
-							<input type="password" id="cbc-pass" name="api_password" class="regular-text" autocomplete="new-password" placeholder="<?php echo $has_pass ? esc_attr__( '•••••• (leave blank to keep)', 'chatbotistic-connector' ) : ''; ?>">
-							<p class="description"><?php esc_html_e( 'Stored encrypted. Leave blank to keep the saved password.', 'chatbotistic-connector' ); ?></p>
+							<input type="password" id="cbc-pass" name="api_password" class="regular-text" autocomplete="new-password" placeholder="<?php echo $has_pass ? esc_attr__( '•••••• (leave blank to keep)', 'chatbotistic-connector' ) : ''; ?>" <?php disabled( $pass_locked ); ?>>
+							<?php if ( $pass_locked ) : ?>
+								<p class="description"><?php esc_html_e( '🔒 Managed by the CBC_API_PASSWORD constant in wp-config.php.', 'chatbotistic-connector' ); ?></p>
+							<?php else : ?>
+								<p class="description"><?php esc_html_e( 'Stored encrypted. Leave blank to keep the saved password.', 'chatbotistic-connector' ); ?></p>
+							<?php endif; ?>
 						</td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="cbc-lead-key"><?php esc_html_e( 'Lead Export API Key', 'chatbotistic-connector' ); ?></label></th>
 						<td>
-							<input type="password" id="cbc-lead-key" name="lead_api_key" class="regular-text" autocomplete="new-password" placeholder="<?php echo $has_lead_key ? esc_attr__( '•••••• (leave blank to keep)', 'chatbotistic-connector' ) : ''; ?>">
-							<p class="description"><?php esc_html_e( 'Long-lived API key for GET /api/get-json-lead (lead export). Optional — leave blank if you don\'t need bulk lead JSON exports.', 'chatbotistic-connector' ); ?></p>
+							<input type="password" id="cbc-lead-key" name="lead_api_key" class="regular-text" autocomplete="new-password" placeholder="<?php echo $has_lead_key ? esc_attr__( '•••••• (leave blank to keep)', 'chatbotistic-connector' ) : ''; ?>" <?php disabled( $lead_locked ); ?>>
+							<?php if ( $lead_locked ) : ?>
+								<p class="description"><?php esc_html_e( '🔒 Managed by the CBC_LEAD_API_KEY constant in wp-config.php.', 'chatbotistic-connector' ); ?></p>
+							<?php else : ?>
+								<p class="description"><?php esc_html_e( 'Long-lived API key for GET /api/get-json-lead (lead export). Optional — leave blank if you don\'t need bulk lead JSON exports.', 'chatbotistic-connector' ); ?></p>
+							<?php endif; ?>
 						</td>
 					</tr>
 				</table>
+
+				<p class="description" style="background:#f0f6fc;border-left:4px solid #2271b1;padding:10px 12px;margin:12px 0;">
+					<?php esc_html_e( 'For production deployments, define the constants below in wp-config.php so secrets stay out of the database:', 'chatbotistic-connector' ); ?>
+					<code style="display:block;margin-top:6px;">define( 'CBC_API_EMAIL',    'master@your-account.com' );<br>define( 'CBC_API_PASSWORD', 'your-password' );<br>define( 'CBC_LEAD_API_KEY', 'optional-lead-key' );</code>
+				</p>
 
 				<h2><?php esc_html_e( 'Plan limits', 'chatbotistic-connector' ); ?></h2>
 				<p class="description"><?php esc_html_e( 'Widgets and WhatsApp agents allowed per Memberistic plan. Use -1 or “unlimited” for no limit.', 'chatbotistic-connector' ); ?></p>
