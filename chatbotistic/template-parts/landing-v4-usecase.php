@@ -27,6 +27,12 @@ if ( ! empty( $cb_case['faqs'] ) && is_array( $cb_case['faqs'] ) && function_exi
 		$cb_case['faqs']
 	) );
 }
+
+// SpeakableSpecification — hero headline + sub-headline are clean
+// voice-answer snippets for "tell me about Chatbotistic for <industry>".
+if ( function_exists( 'cb_add_speakable' ) ) {
+	cb_add_speakable( array( '.page-hero h1', '.page-hero p' ) );
+}
 ?>
 
 <main class="page-fade">

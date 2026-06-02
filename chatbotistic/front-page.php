@@ -16,6 +16,13 @@ defined( 'ABSPATH' ) || exit;
 
 get_header();
 
+// SpeakableSpecification — flags the hero headline + lead paragraph as
+// good candidates for AI voice-assistant playback (Google Assistant,
+// etc.). The selectors target V4's hero heading + lead text classes.
+if ( function_exists( 'cb_add_speakable' ) ) {
+	cb_add_speakable( array( '.hero .h-display', '.hero .lead' ) );
+}
+
 $cb_features = array(
 	array( 'ai',    __( 'AI Chatbot Widgets', 'chatbotistic' ),    __( 'Trained on your site, FAQs, and services. Answers in your tone, 24/7.', 'chatbotistic' ) ),
 	array( 'wa',    __( 'WhatsApp Chat Widgets', 'chatbotistic' ), __( 'Click-to-chat with department routing and pre-chat lead capture.', 'chatbotistic' ) ),

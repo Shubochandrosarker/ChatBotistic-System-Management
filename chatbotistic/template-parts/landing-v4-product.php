@@ -16,6 +16,11 @@ $cb_p = $args['product'] ?? null;
 if ( ! is_array( $cb_p ) ) {
 	return;
 }
+
+// SpeakableSpecification for the product hero — short H1 + sub for AI voice.
+if ( function_exists( 'cb_add_speakable' ) ) {
+	cb_add_speakable( array( '.page-hero h1', '.page-hero p' ) );
+}
 $cb_feats = $cb_p['feats'] ?? array();
 $cb_top5  = array_slice( $cb_feats, 0, 5 );
 ?>

@@ -107,11 +107,12 @@ function cb_special_landing_slugs() {
  * @return array<int,array{url:string,modified:string}>
  */
 function cb_sitemap_pages() {
-	$entries = array( array( 'url' => home_url( '/' ), 'modified' => current_time( 'c' ) ) );
-	$skip    = cb_noindex_slugs();
-	$special = cb_special_landing_slugs();
-	$reserved = array_merge( $special['usecases'], $special['products'] );
-	$front   = (string) get_option( 'page_on_front' );
+	$front_img = function_exists( 'cb_share_image_for' ) ? cb_share_image_for( null ) : '';
+	$entries   = array( array( 'url' => home_url( '/' ), 'modified' => current_time( 'c' ), 'image' => $front_img ) );
+	$skip      = cb_noindex_slugs();
+	$special   = cb_special_landing_slugs();
+	$reserved  = array_merge( $special['usecases'], $special['products'] );
+	$front     = (string) get_option( 'page_on_front' );
 
 	foreach ( get_posts( array(
 		'post_type'   => 'page',
@@ -126,6 +127,7 @@ function cb_sitemap_pages() {
 		$entries[] = array(
 			'url'      => get_permalink( $page ),
 			'modified' => get_post_modified_time( 'c', true, $page ),
+			'image'    => function_exists( 'cb_share_image_for' ) ? cb_share_image_for( $page ) : '',
 		);
 	}
 	return $entries;
@@ -148,6 +150,7 @@ function cb_sitemap_usecases() {
 			$entries[] = array(
 				'url'      => get_permalink( $page ),
 				'modified' => get_post_modified_time( 'c', true, $page ),
+				'image'    => function_exists( 'cb_share_image_for' ) ? cb_share_image_for( $page ) : '',
 			);
 		}
 	}
@@ -171,6 +174,7 @@ function cb_sitemap_products() {
 			$entries[] = array(
 				'url'      => get_permalink( $page ),
 				'modified' => get_post_modified_time( 'c', true, $page ),
+				'image'    => function_exists( 'cb_share_image_for' ) ? cb_share_image_for( $page ) : '',
 			);
 		}
 	}
@@ -188,6 +192,7 @@ function cb_sitemap_posts() {
 		$entries[] = array(
 			'url'      => get_permalink( $post ),
 			'modified' => get_post_modified_time( 'c', true, $post ),
+			'image'    => function_exists( 'cb_share_image_for' ) ? cb_share_image_for( $post ) : '',
 		);
 	}
 	return $entries;
@@ -302,11 +307,19 @@ function cb_render_sitemap_index() {
  * @param array<int,array{url:string,modified:string}> $entries Entries.
  */
 function cb_render_urlset( $entries ) {
-	echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+	// xmlns:image lets each <url> carry one or more <image:image><image:loc>
+	// blocks — the same OG / share image we serve to social cards, now
+	// visible to Google Images and AI image-search engines.
+	echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
 	foreach ( $entries as $entry ) {
 		echo "\t<url>\n";
 		echo "\t\t<loc>" . esc_url( $entry['url'] ) . "</loc>\n";
 		echo "\t\t<lastmod>" . esc_html( $entry['modified'] ) . "</lastmod>\n";
+		if ( ! empty( $entry['image'] ) ) {
+			echo "\t\t<image:image>\n";
+			echo "\t\t\t<image:loc>" . esc_url( $entry['image'] ) . "</image:loc>\n";
+			echo "\t\t</image:image>\n";
+		}
 		echo "\t\t<changefreq>weekly</changefreq>\n";
 		echo "\t</url>\n";
 	}

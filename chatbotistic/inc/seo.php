@@ -70,6 +70,32 @@ function cb_share_image() {
 }
 
 /**
+ * Share image URL for one specific post — used by the sitemap's
+ * <image:image> entries so search engines and image-based AI search
+ * surface the right preview per URL. Mirrors cb_share_image()'s
+ * precedence ladder (featured image -> custom logo -> filter default).
+ *
+ * @param WP_Post|int|null $post Post object or ID.
+ * @return string
+ */
+function cb_share_image_for( $post ) {
+	$post = $post ? get_post( $post ) : null;
+	if ( $post && has_post_thumbnail( $post ) ) {
+		$src = wp_get_attachment_image_src( get_post_thumbnail_id( $post ), 'full' );
+		if ( $src ) {
+			return $src[0];
+		}
+	}
+	if ( has_custom_logo() ) {
+		$src = wp_get_attachment_image_src( (int) get_theme_mod( 'custom_logo' ), 'full' );
+		if ( $src ) {
+			return $src[0];
+		}
+	}
+	return apply_filters( 'cb_default_share_image', '' );
+}
+
+/**
  * Output meta tags, Open Graph, Twitter cards and canonical.
  */
 function cb_head_meta() {
@@ -293,16 +319,59 @@ function cb_extra_schema( $add = null ) {
 function cb_add_faq_schema( array $faqs ) {
 	$entities = array();
 	foreach ( $faqs as $faq ) {
-		if ( empty( $faq['q'] ) || empty( $faq['a'] ) ) {
+		// Accept both ['q'/'a'] (legacy) and ['question'/'answer'] (V4)
+		// payload shapes so every template style works without rewrites.
+		$q = (string) ( $faq['q']        ?? $faq['question'] ?? '' );
+		$a = (string) ( $faq['a']        ?? $faq['answer']   ?? '' );
+		if ( '' === $q || '' === $a ) {
 			continue;
 		}
 		$entities[] = array(
 			'@type'          => 'Question',
-			'name'           => wp_strip_all_tags( $faq['q'] ),
-			'acceptedAnswer' => array( '@type' => 'Answer', 'text' => wp_strip_all_tags( $faq['a'] ) ),
+			'name'           => wp_strip_all_tags( $q ),
+			'acceptedAnswer' => array( '@type' => 'Answer', 'text' => wp_strip_all_tags( $a ) ),
 		);
 	}
 	if ( $entities ) {
-		cb_extra_schema( array( '@type' => 'FAQPage', 'mainEntity' => $entities ) );
+		// FAQPage with SpeakableSpecification — schema.org SpeakableSpecification
+		// hints AI voice assistants (Google Assistant, Bixby, etc.) that the
+		// FAQ block is suited for spoken answer playback. CSS selectors point
+		// at the V4 .faq-list / .faq-item summary + p markup used across the
+		// theme + use-case templates.
+		cb_extra_schema( array(
+			'@type'      => 'FAQPage',
+			'mainEntity' => $entities,
+			'speakable'  => array(
+				'@type'    => 'SpeakableSpecification',
+				'cssSelector' => array( '.faq-list', '.faq-item summary', '.faq-item p' ),
+			),
+		) );
 	}
+}
+
+/**
+ * Register a Speakable block for any non-FAQ page that wants AI voice
+ * assistants to read a specific element out loud. Templates call:
+ *
+ *   cb_add_speakable( array( '.cb-h1', '.cb-lead' ) );
+ *
+ * Adds a SpeakableSpecification node anchored to the current page URL,
+ * scoped by the CSS selectors provided. Multiple calls per page merge.
+ *
+ * @param array<int,string> $selectors CSS selectors for speakable content.
+ */
+function cb_add_speakable( array $selectors ) {
+	$selectors = array_values( array_filter( array_map( 'strval', $selectors ) ) );
+	if ( ! $selectors ) {
+		return;
+	}
+	cb_extra_schema( array(
+		'@type'        => 'WebPage',
+		'@id'          => cb_current_url() . '#speakable',
+		'url'          => cb_current_url(),
+		'speakable'    => array(
+			'@type'       => 'SpeakableSpecification',
+			'cssSelector' => $selectors,
+		),
+	) );
 }
