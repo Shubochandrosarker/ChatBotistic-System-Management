@@ -76,9 +76,9 @@ $cb_meta = $cb_plan_meta[ $cb_plan_slug ] ?? $cb_plan_meta['pro'];
 			</div>
 
 			<aside class="glass glass-edge demo-aside-card">
-				<div class="toggle-wrap" style="margin-top:0;margin-bottom:20px;display:flex;width:100%;">
-					<button type="button" class="<?php echo $cb_annual_get ? '' : 'active'; ?>" style="flex:1;" data-checkout-mode="monthly"><?php esc_html_e( 'Monthly', 'chatbotistic' ); ?></button>
-					<button type="button" class="<?php echo $cb_annual_get ? 'active' : ''; ?>" style="flex:1;" data-checkout-mode="annual"><?php esc_html_e( 'Annual', 'chatbotistic' ); ?></button>
+				<div class="toggle-wrap" style="margin-top:0;margin-bottom:20px;display:flex;width:100%;" role="group" aria-label="<?php esc_attr_e( 'Billing cycle', 'chatbotistic' ); ?>">
+					<button type="button" class="<?php echo $cb_annual_get ? '' : 'active'; ?>" style="flex:1;" data-checkout-mode="monthly" aria-pressed="<?php echo $cb_annual_get ? 'false' : 'true'; ?>"><?php esc_html_e( 'Monthly', 'chatbotistic' ); ?></button>
+					<button type="button" class="<?php echo $cb_annual_get ? 'active' : ''; ?>" style="flex:1;" data-checkout-mode="annual" aria-pressed="<?php echo $cb_annual_get ? 'true' : 'false'; ?>"><?php esc_html_e( 'Annual', 'chatbotistic' ); ?></button>
 				</div>
 				<div style="display:flex;align-items:baseline;gap:6px;">
 					<span class="price-amount" style="font-size:38px;font-family:var(--font-display);font-weight:600;">
@@ -122,7 +122,9 @@ $cb_meta = $cb_plan_meta[ $cb_plan_slug ] ?? $cb_plan_meta['pro'];
 	var annualTotal = '<?php echo esc_js( $cb_meta['annual'] ); ?>';
 	function set(mode) {
 		page.querySelectorAll('[data-checkout-mode]').forEach(function (b) {
-			b.classList.toggle('active', b.getAttribute('data-checkout-mode') === mode);
+			var on = (b.getAttribute('data-checkout-mode') === mode);
+			b.classList.toggle('active', on);
+			b.setAttribute('aria-pressed', on ? 'true' : 'false');
 		});
 		page.querySelector('#cb-checkout-cycle').value = mode;
 		var price = (mode === 'annual') ? (parseFloat(annualTotal)/12).toFixed(2) : prices.monthly;

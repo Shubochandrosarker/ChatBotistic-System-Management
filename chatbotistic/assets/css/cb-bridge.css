@@ -419,8 +419,83 @@
 .auth-card           { max-width: 460px; width: 100%; padding: 36px 32px; border-radius: 22px; background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015)); border: 1px solid var(--line-strong); }
 .auth-card h1        { font-size: 28px; letter-spacing: -0.02em; margin: 0; }
 
+/* =========================================================================
+   Accessibility — focus-visible rings + screen-reader helpers.
+   Applies a consistent 2px focus ring across every interactive class V4
+   ships, plus the legacy .cb-* prefixed equivalents. Uses :focus-visible
+   so it only shows on keyboard navigation, not on mouse clicks.
+   ========================================================================= */
+:where(
+	a,
+	button,
+	[role="button"],
+	[role="tab"],
+	[role="menuitem"],
+	input,
+	select,
+	textarea,
+	summary,
+	details > summary,
+	.btn, .cb-btn,
+	.cbc-btn, .cbc-tab,
+	.toggle-wrap button,
+	.faq-item summary,
+	.sso-btn,
+	.cb-nav__link,
+	.cb-portal__nav a,
+	.memberistic-acct-nav a,
+	.cbw-btn
+):focus { outline: none; }
+
+:where(
+	a,
+	button,
+	[role="button"],
+	[role="tab"],
+	[role="menuitem"],
+	summary,
+	.btn, .cb-btn,
+	.cbc-btn, .cbc-tab,
+	.toggle-wrap button,
+	.faq-item summary,
+	.sso-btn,
+	.cb-nav__link,
+	.cb-portal__nav a,
+	.memberistic-acct-nav a,
+	.cbw-btn
+):focus-visible {
+	outline: 2px solid var(--blue-bright, #6aa3ff);
+	outline-offset: 3px;
+	border-radius: 8px;
+}
+
+:where(input, select, textarea):focus-visible {
+	outline: 2px solid var(--blue-bright, #6aa3ff);
+	outline-offset: 0;
+	border-color: var(--blue-bright, #6aa3ff) !important;
+}
+
+/* Screen-reader-only helper (Bootstrap pattern). */
+.sr-only,
+.screen-reader-text {
+	position: absolute !important;
+	width: 1px; height: 1px;
+	padding: 0; margin: -1px; overflow: hidden;
+	clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* aria-current="page" boost — adds an underline on top of the existing
+   .is-active class so screen-magnifier users get an extra visual cue. */
+[aria-current="page"] { font-weight: 600; }
+
 /* ---------- Reduced motion (V4 motion primitives must be neutralised) ---------- */
 @media (prefers-reduced-motion: reduce) {
-	.op-pulse, .op-ring, .op-flow, .op-scan, .op-queue { animation: none !important; }
+	.op-pulse, .op-ring, .op-flow, .op-scan, .op-queue,
+	.op-rail-flow, .op-signal { animation: none !important; }
+	/* V4 ambient site-fade-in on every page. */
+	.page-fade, #cb-main { animation: none !important; }
+	/* Hover lift transforms that count as motion. */
+	.cb-feature:hover, .cb-btn:hover, .btn:hover,
+	.use-card:hover, .cbc-btn:hover { transform: none !important; }
 	html { scroll-behavior: auto; }
 }

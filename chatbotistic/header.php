@@ -15,7 +15,9 @@ $cb_signin    = home_url( '/login/' );
 $cb_member    = $cb_logged_in ? cb_membership() : array( 'active' => false, 'plan_name' => '' );
 
 /**
- * Active-state helper for the primary nav.
+ * Active-state helper for the primary nav. Returns a space-prefixed class
+ * fragment when the page matches. Use cb_nav_active_attrs() in new code —
+ * it also emits aria-current="page" for screen readers.
  *
  * @param string $template Page template filename.
  * @param string $slug     Page slug.
@@ -24,6 +26,17 @@ $cb_member    = $cb_logged_in ? cb_membership() : array( 'active' => false, 'pla
 function cb_nav_active( $template = '', $slug = '' ) {
 	$is = ( $template && is_page_template( $template ) ) || ( $slug && is_page( $slug ) );
 	return $is ? ' is-active' : '';
+}
+
+/**
+ * Same match logic as cb_nav_active() but returns the full attribute
+ * pair to drop into an <a> tag: the class fragment AND aria-current
+ * when active. Use as: <a class="cb-nav__link<?php echo cb_nav_active_attrs(...); ?>"
+ * (note: aria-current is appended after the closing class quote).
+ */
+function cb_nav_active_attrs( $template = '', $slug = '' ) {
+	$is = ( $template && is_page_template( $template ) ) || ( $slug && is_page( $slug ) );
+	return $is ? ' is-active" aria-current="page' : '';
 }
 
 $cb_products = array(
@@ -63,10 +76,10 @@ $cb_products = array(
 		</a>
 
 		<nav class="cb-nav" aria-label="<?php esc_attr_e( 'Primary', 'chatbotistic' ); ?>">
-			<a class="cb-nav__link<?php echo is_front_page() ? ' is-active' : ''; ?>" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'chatbotistic' ); ?></a>
-			<a class="cb-nav__link<?php echo esc_attr( cb_nav_active( 'page-features.php', 'features' ) ); ?>" href="<?php echo esc_url( home_url( '/features/' ) ); ?>"><?php esc_html_e( 'Features', 'chatbotistic' ); ?></a>
-			<a class="cb-nav__link<?php echo esc_attr( cb_nav_active( 'page-pricing.php', 'pricing' ) ); ?>" href="<?php echo esc_url( home_url( '/pricing/' ) ); ?>"><?php esc_html_e( 'Pricing', 'chatbotistic' ); ?></a>
-			<a class="cb-nav__link<?php echo esc_attr( cb_nav_active( 'page-use-cases.php', 'use-cases' ) ); ?>" href="<?php echo esc_url( home_url( '/use-cases/' ) ); ?>"><?php esc_html_e( 'Use cases', 'chatbotistic' ); ?></a>
+			<a class="cb-nav__link<?php echo is_front_page() ? ' is-active" aria-current="page' : ''; ?>" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'chatbotistic' ); ?></a>
+			<a class="cb-nav__link<?php echo cb_nav_active_attrs( 'page-features.php', 'features' ); ?>" href="<?php echo esc_url( home_url( '/features/' ) ); ?>"><?php esc_html_e( 'Features', 'chatbotistic' ); ?></a>
+			<a class="cb-nav__link<?php echo cb_nav_active_attrs( 'page-pricing.php', 'pricing' ); ?>" href="<?php echo esc_url( home_url( '/pricing/' ) ); ?>"><?php esc_html_e( 'Pricing', 'chatbotistic' ); ?></a>
+			<a class="cb-nav__link<?php echo cb_nav_active_attrs( 'page-use-cases.php', 'use-cases' ); ?>" href="<?php echo esc_url( home_url( '/use-cases/' ) ); ?>"><?php esc_html_e( 'Use cases', 'chatbotistic' ); ?></a>
 
 			<div class="cb-has-menu" data-menu aria-expanded="false">
 				<button type="button" class="cb-nav__link" data-menu-trigger aria-haspopup="true">
@@ -83,7 +96,7 @@ $cb_products = array(
 				</div>
 			</div>
 
-			<a class="cb-nav__link<?php echo esc_attr( cb_nav_active( 'page-docs.php', 'docs' ) ); ?>" href="<?php echo esc_url( home_url( '/docs/' ) ); ?>"><?php esc_html_e( 'Docs', 'chatbotistic' ); ?></a>
+			<a class="cb-nav__link<?php echo cb_nav_active_attrs( 'page-docs.php', 'docs' ); ?>" href="<?php echo esc_url( home_url( '/docs/' ) ); ?>"><?php esc_html_e( 'Docs', 'chatbotistic' ); ?></a>
 		</nav>
 
 		<div class="cb-header__cta">

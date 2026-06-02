@@ -96,9 +96,9 @@ $cb_faqs = array(
 			<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'Pricing', 'chatbotistic' ); ?></span>
 			<h1 class="h-1 text-grad" style="margin:18px auto 0;max-width:760px;"><?php esc_html_e( 'Honest pricing. Outrageous value.', 'chatbotistic' ); ?></h1>
 			<p class="lead" style="margin:18px auto 0;"><?php esc_html_e( 'Start free forever. Upgrade when you’re ready. Lifetime deals for the first 50 founders.', 'chatbotistic' ); ?></p>
-			<div class="toggle-wrap" style="margin-top:36px;">
-				<button class="active" type="button" data-pricing-mode="monthly"><?php esc_html_e( 'Monthly', 'chatbotistic' ); ?></button>
-				<button type="button" data-pricing-mode="annual"><?php esc_html_e( 'Annual', 'chatbotistic' ); ?> <span class="save-pill" style="margin-left:6px;"><?php esc_html_e( 'Save 20%', 'chatbotistic' ); ?></span></button>
+			<div class="toggle-wrap" style="margin-top:36px;" role="group" aria-label="<?php esc_attr_e( 'Billing cycle', 'chatbotistic' ); ?>">
+				<button class="active" type="button" data-pricing-mode="monthly" aria-pressed="true"><?php esc_html_e( 'Monthly', 'chatbotistic' ); ?></button>
+				<button type="button" data-pricing-mode="annual" aria-pressed="false"><?php esc_html_e( 'Annual', 'chatbotistic' ); ?> <span class="save-pill" style="margin-left:6px;"><?php esc_html_e( 'Save 20%', 'chatbotistic' ); ?></span></button>
 			</div>
 		</div>
 	</section>
@@ -220,7 +220,11 @@ $cb_faqs = array(
 	if ( ! page ) return;
 	var btns = page.querySelectorAll('[data-pricing-mode]');
 	function setMode(mode) {
-		btns.forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-pricing-mode') === mode); });
+		btns.forEach(function (b) {
+			var on = b.getAttribute('data-pricing-mode') === mode;
+			b.classList.toggle('active', on);
+			b.setAttribute('aria-pressed', on ? 'true' : 'false');
+		});
 		page.querySelectorAll('.price-amount').forEach(function (el) {
 			var v  = el.getAttribute('data-' + mode);
 			var pv = el.querySelector('.price-value');
