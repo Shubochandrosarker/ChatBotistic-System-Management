@@ -215,18 +215,34 @@ class System_Health {
 			return;
 		}
 		?>
-		<div class="notice notice-info is-dismissible" id="cbp-welcome">
+		$dismiss_url = admin_url( 'admin-post.php?action=cbp_dismiss_welcome&_wpnonce=' . wp_create_nonce( 'cbp_dismiss_welcome' ) );
+		?>
+		<div class="notice notice-info is-dismissible" id="cbp-welcome" data-cbp-dismiss="<?php echo esc_attr( $dismiss_url ); ?>">
 			<p style="font-size:14px;">
 				<strong>🎉 <?php esc_html_e( 'Welcome to Chatbotistic.', 'chatbotistic-profile' ); ?></strong>
 				<?php esc_html_e( 'Your stack is installed. One last step: open the Profile screen to verify pages, plans, and integrations are configured correctly.', 'chatbotistic-profile' ); ?>
 				<a class="button button-primary" style="margin-left:8px;" href="<?php echo esc_url( admin_url( 'admin.php?page=chatbotistic-profile' ) ); ?>">
 					<?php esc_html_e( 'Open setup', 'chatbotistic-profile' ); ?>
 				</a>
-				<a class="button" href="<?php echo esc_url( admin_url( 'admin-post.php?action=cbp_dismiss_welcome&_wpnonce=' . wp_create_nonce( 'cbp_dismiss_welcome' ) ) ); ?>">
+				<a class="button" href="<?php echo esc_url( $dismiss_url ); ?>">
 					<?php esc_html_e( 'Dismiss', 'chatbotistic-profile' ); ?>
 				</a>
 			</p>
 		</div>
+		<script>
+		(function(){
+			var n = document.getElementById('cbp-welcome');
+			if (!n) return;
+			n.addEventListener('click', function(e){
+				if (e.target && e.target.classList && e.target.classList.contains('notice-dismiss')) {
+					// Fire-and-forget; persists the dismissal so the notice
+					// stays gone after a page reload.
+					var img = new Image();
+					img.src = n.getAttribute('data-cbp-dismiss');
+				}
+			});
+		})();
+		</script>
 		<?php
 	}
 

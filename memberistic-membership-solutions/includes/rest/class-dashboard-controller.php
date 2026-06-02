@@ -17,6 +17,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Dashboard_Controller extends REST_Controller {
 	/**
+	 * Run a controller callback inside an output buffer so any stray
+	 * PHP notice/warning is captured and discarded before the REST
+	 * response is serialised. Without this, a single E_NOTICE produces
+	 * a "The response is not a valid JSON response" error on the
+	 * dashboard (the symptom reported on the Memberistic dashboard
+	 * page on first install).
+	 *
+	 * @param callable $cb     The real controller method.
+	 * @param mixed    $request The WP_REST_Request, or null.
+	 * @return mixed
+	 */
+	private function buffered( callable $cb, $request = null ) {
+		ob_start();
+		try {
+			return $request ? $cb( $request ) : $cb();
+		} finally {
+			if ( ob_get_level() > 0 ) { ob_end_clean(); }
+		}
+	}
+
+	/**
 	 * Register routes.
 	 */
 	public function register_routes() {
@@ -103,6 +124,10 @@ final class Dashboard_Controller extends REST_Controller {
 	 * Get dashboard stats.
 	 */
 	public function get_stats() {
+		return $this->buffered( function () { return $this->compute_stats(); } );
+	}
+
+	private function compute_stats() {
 		$data = array(
 			'active_members'       => Memberships_Repository::count_by_status( 'active' ),
 			'monthly_revenue'      => Payments_Repository::sum_paid_by_cycle( 'monthly' ),
@@ -122,26 +147,29 @@ final class Dashboard_Controller extends REST_Controller {
 	}
 
 	public function get_expiring_soon( $request ) {
-		$days  = (int) $request->get_param( 'days' );
-		$limit = (int) $request->get_param( 'limit' );
-
-		return rest_ensure_response(
-			Memberships_Repository::get_expiring_soon(
-				$days > 0 ? $days : 30,
-				$limit > 0 ? $limit : 50
-			)
-		);
+		return $this->buffered( function ( $req ) {
+			$days  = (int) $req->get_param( 'days' );
+			$limit = (int) $req->get_param( 'limit' );
+			return rest_ensure_response(
+				Memberships_Repository::get_expiring_soon(
+					$days > 0 ? $days : 30,
+					$limit > 0 ? $limit : 50
+				)
+			);
+		}, $request );
 	}
 
 	public function get_revenue_history( $request ) {
-		$months = (int) $request->get_param( 'months' );
-
-		return rest_ensure_response( Payments_Repository::revenue_history( $months > 0 ? $months : 12 ) );
+		return $this->buffered( function ( $req ) {
+			$months = (int) $req->get_param( 'months' );
+			return rest_ensure_response( Payments_Repository::revenue_history( $months > 0 ? $months : 12 ) );
+		}, $request );
 	}
 
 	public function get_recent_activity( $request ) {
-		$limit = (int) $request->get_param( 'limit' );
-
-		return rest_ensure_response( Activity_Repository::get_recent( $limit > 0 ? $limit : 50 ) );
+		return $this->buffered( function ( $req ) {
+			$limit = (int) $req->get_param( 'limit' );
+			return rest_ensure_response( Activity_Repository::get_recent( $limit > 0 ? $limit : 50 ) );
+		}, $request );
 	}
 }

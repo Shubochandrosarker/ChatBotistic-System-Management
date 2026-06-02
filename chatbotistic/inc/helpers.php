@@ -169,7 +169,21 @@ function cb_membership( $user_id = 0 ) {
 		$out['plan_name'] = (string) get_user_meta( $user_id, 'memberistic_active_plan_name', true );
 	}
 	if ( ! $out['plan_name'] && $out['plan_id'] ) {
-		$out['plan_name'] = sprintf( __( 'Plan #%d', 'chatbotistic' ), $out['plan_id'] );
+		// Resolve the plan title from Memberistic's repository so the badge
+		// shows "Pro" / "Agency" / "Lifetime" instead of "Plan #6".
+		$plan_repo = '\\WordPressistic\\Memberistic\\Database\\Plans_Repository';
+		if ( class_exists( $plan_repo ) && method_exists( $plan_repo, 'get' ) ) {
+			$plan = $plan_repo::get( $out['plan_id'] );
+			if ( is_array( $plan ) ) {
+				$out['plan_name'] = (string) ( $plan['name'] ?? $plan['title'] ?? $plan['slug'] ?? '' );
+				if ( ! empty( $plan['slug'] ) ) {
+					$out['plan_slug'] = (string) $plan['slug'];
+				}
+			}
+		}
+		if ( ! $out['plan_name'] ) {
+			$out['plan_name'] = __( 'Member', 'chatbotistic' );
+		}
 	}
 
 	return apply_filters( 'cb_membership', $out, $user_id );

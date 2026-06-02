@@ -40,7 +40,20 @@ class Ajax {
 			'cbc_admin_test'       => 'admin_test',
 		);
 		foreach ( $actions as $action => $method ) {
-			add_action( "wp_ajax_{$action}", array( $this, $method ) );
+			// Wrap every handler so any stray PHP notice/warning is captured
+			// and discarded before wp_send_json_* writes the response body.
+			// Without this, a single E_NOTICE produces an "Unexpected token"
+			// JSON parse error on the front-end (the symptom reported in
+			// the Widgets → Leads / Analytics tabs).
+			add_action( "wp_ajax_{$action}", function () use ( $method ) {
+				ob_start();
+				try {
+					$this->{$method}();
+				} finally {
+					// Drop anything echoed before wp_send_json_* (it short-circuits).
+					if ( ob_get_level() > 0 ) { ob_end_clean(); }
+				}
+			} );
 		}
 	}
 

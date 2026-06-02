@@ -11,14 +11,19 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Resolve a real post-login URL — /account/ may not exist on all installs.
+$cb_after_login = function_exists( 'cb_account_url' )
+	? cb_account_url()
+	: ( get_page_by_path( 'account' ) ? home_url( '/account/' ) : admin_url( 'profile.php' ) );
+
 if ( is_user_logged_in() ) {
-	wp_safe_redirect( home_url( '/account/' ) );
+	wp_safe_redirect( $cb_after_login );
 	exit;
 }
 
 get_template_part( 'template-parts/auth-head' );
 
-$redirect = isset( $_GET['redirect_to'] ) ? esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ) : home_url( '/account/' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$redirect = isset( $_GET['redirect_to'] ) ? esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ) : $cb_after_login; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $err      = isset( $_GET['login'] ) && 'failed' === $_GET['login']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 ob_start(); ?>

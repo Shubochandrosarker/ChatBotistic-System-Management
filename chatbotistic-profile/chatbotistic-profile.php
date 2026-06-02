@@ -3,7 +3,7 @@
  * Plugin Name:       Chatbotistic Profile for Memberistic
  * Plugin URI:        https://chatbotistic.com
  * Description:       One-install configuration profile for chatbotistic.com — replaces Memberistic's default plans with the 4 Chatbotistic plans (Free / Pro / Agency / Lifetime), creates branded member-facing pages, auto-approves memberships on payment, auto-activates free signups, hides waiver UI, overrides every transactional email with chatbotistic.com URLs, and seeds the Memberistic → Licenseistic Bridge caps.
- * Version:           1.1.0
+ * Version: 1.1.1
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            WordPressistic
@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'CBP_VERSION',  '1.1.0' );
+define( 'CBP_VERSION',  '1.1.1' );
 define( 'CBP_FILE',     __FILE__ );
 define( 'CBP_DIR',      plugin_dir_path( __FILE__ ) );
 define( 'CBP_URL',      plugin_dir_url( __FILE__ ) );

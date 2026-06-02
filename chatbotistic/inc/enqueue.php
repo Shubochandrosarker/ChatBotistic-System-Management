@@ -45,7 +45,8 @@ function cb_enqueue_assets() {
 	// .result-* / .receipt) + form (.cb-form / .field-err / .field-hint)
 	// styles, so it loads globally now — not just on the account template.
 	wp_enqueue_style( 'cb-v4',        CB_URI . '/assets/css/v4-styles.css', array( 'cb-fonts' ), cb_asset_ver( '/assets/css/v4-styles.css' ) );
-	wp_enqueue_style( 'cb-v4-portal', CB_URI . '/assets/css/v4-portal.css', array( 'cb-v4' ),    cb_asset_ver( '/assets/css/v4-portal.css' ) );
+	wp_enqueue_style( 'cb-v4-icons',  CB_URI . '/assets/css/v4-icons.css',  array( 'cb-v4' ),    cb_asset_ver( '/assets/css/v4-icons.css' ) );
+	wp_enqueue_style( 'cb-v4-portal', CB_URI . '/assets/css/v4-portal.css', array( 'cb-v4-icons' ), cb_asset_ver( '/assets/css/v4-portal.css' ) );
 	wp_enqueue_style( 'cb-bridge',    CB_URI . '/assets/css/cb-bridge.css', array( 'cb-v4-portal' ), cb_asset_ver( '/assets/css/cb-bridge.css' ) );
 	wp_enqueue_style( 'cb-theme',     CB_URI . '/assets/css/theme.css',     array( 'cb-bridge' ), cb_asset_ver( '/assets/css/theme.css' ) );
 
