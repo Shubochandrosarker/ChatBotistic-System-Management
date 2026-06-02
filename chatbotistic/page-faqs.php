@@ -31,6 +31,20 @@ $cb_groups = array(
 		array( __( 'Can I get a refund?', 'chatbotistic' ), __( 'Yes — see /refund-policy/ for the full terms.', 'chatbotistic' ) ),
 	) ),
 );
+
+// Emit one FAQPage JSON-LD covering every grouped FAQ so search + AI
+// engines can render the full set in rich-result cards.
+if ( function_exists( 'cb_add_faq_schema' ) ) {
+	$cb_faq_schema = array();
+	foreach ( $cb_groups as $g ) {
+		foreach ( $g[1] as $q ) {
+			$cb_faq_schema[] = array( 'question' => $q[0], 'answer' => $q[1] );
+		}
+	}
+	if ( $cb_faq_schema ) {
+		cb_add_faq_schema( $cb_faq_schema );
+	}
+}
 ?>
 
 <main class="page-fade">

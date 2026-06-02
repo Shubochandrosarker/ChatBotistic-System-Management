@@ -87,6 +87,15 @@ $cb_faqs = array(
 	array( __( 'Can I use it for multiple websites?', 'chatbotistic' ), __( 'Free covers 1 domain, Pro covers 10, Agency covers 50, and Lifetime is unlimited.', 'chatbotistic' ) ),
 	array( __( 'How does the Lifetime deal work?', 'chatbotistic' ), __( 'Pay once, own it forever — limited to the first 50 founders. Includes everything in Agency plus lifetime updates and founder-direct support. Email hello@chatbotistic.com to claim a seat.', 'chatbotistic' ) ),
 );
+
+// Emit FAQPage JSON-LD so Google + AI engines render this page's FAQs as
+// rich answers in the SERP / answer cards.
+if ( function_exists( 'cb_add_faq_schema' ) ) {
+	cb_add_faq_schema( array_map(
+		static fn ( $q ) => array( 'question' => $q[0], 'answer' => $q[1] ),
+		$cb_faqs
+	) );
+}
 ?>
 
 <main class="page-fade" id="cb-pricing-page">

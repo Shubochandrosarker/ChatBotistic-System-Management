@@ -19,6 +19,14 @@ $cb_next  = $args['next']  ?? null;
 if ( ! is_array( $cb_case ) ) {
 	return;
 }
+
+// FAQPage JSON-LD for this use-case's FAQs.
+if ( ! empty( $cb_case['faqs'] ) && is_array( $cb_case['faqs'] ) && function_exists( 'cb_add_faq_schema' ) ) {
+	cb_add_faq_schema( array_map(
+		static fn ( $q ) => array( 'question' => $q[0], 'answer' => $q[1] ),
+		$cb_case['faqs']
+	) );
+}
 ?>
 
 <main class="page-fade">

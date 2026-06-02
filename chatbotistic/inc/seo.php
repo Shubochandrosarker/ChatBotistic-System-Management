@@ -90,6 +90,12 @@ function cb_head_meta() {
 	}
 	printf( '<link rel="canonical" href="%s">' . "\n", esc_url( $url ) );
 
+	// AI-assistant discovery — llmstxt.org standard. Crawlers look for
+	// these <link> hints to find the curated AI-readable map of the site.
+	printf( '<link rel="alternate" type="text/markdown" title="llms.txt" href="%s">' . "\n",      esc_url( home_url( '/llms.txt' ) ) );
+	printf( '<link rel="alternate" type="text/markdown" title="llms-full.txt" href="%s">' . "\n", esc_url( home_url( '/llms-full.txt' ) ) );
+	printf( '<link rel="sitemap" type="application/xml" title="Sitemap" href="%s">' . "\n",      esc_url( home_url( '/sitemap.xml' ) ) );
+
 	// Open Graph.
 	printf( '<meta property="og:site_name" content="%s">' . "\n", esc_attr( get_bloginfo( 'name' ) ) );
 	printf( '<meta property="og:type" content="%s">' . "\n", esc_attr( $type ) );
