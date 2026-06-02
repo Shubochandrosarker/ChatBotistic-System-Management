@@ -18,8 +18,16 @@ class Membership {
 	/**
 	 * Resolve a user's current membership and connector limits.
 	 *
+	 * Cap precedence (high → low):
+	 *   1. Bridge caps via MLB\Caps::for_plan_id() — the single source of
+	 *      truth across the whole stack. Already resolves admin overrides,
+	 *      plan settings, slug defaults.
+	 *   2. Connector's own cbc_settings.plan_limits override (legacy).
+	 *   3. Memberistic plan's own settings.limits block.
+	 *   4. Conservative 1/1/1 fallback.
+	 *
 	 * @param int $user_id WordPress user ID.
-	 * @return array{active:bool,status:string,plan_id:int,plan_name:string,widget_limit:int,agent_limit:int}
+	 * @return array{active:bool,status:string,plan_id:int,plan_name:string,widget_limit:int,agent_limit:int,domain_limit:int,white_label:bool}
 	 */
 	public static function for_user( int $user_id ): array {
 		$out = array(
@@ -29,6 +37,8 @@ class Membership {
 			'plan_name'    => '',
 			'widget_limit' => 0,
 			'agent_limit'  => 0,
+			'domain_limit' => 0,
+			'white_label'  => false,
 		);
 		if ( ! $user_id ) {
 			return $out;
@@ -46,18 +56,27 @@ class Membership {
 		$out['plan_name'] = (string) get_user_meta( $user_id, 'memberistic_active_plan_name', true );
 
 		if ( $out['active'] ) {
-			// Precedence: admin overrides in Store, then the Memberistic plan's
-			// own settings.limits (single source of truth across the stack),
-			// then a conservative 1/1 fallback.
-			$limits = self::plan_limits();
-			$plan   = $limits[ $out['plan_id'] ] ?? null;
-			if ( $plan ) {
-				$out['widget_limit'] = (int) $plan['widgets'];
-				$out['agent_limit']  = (int) $plan['agents'];
+			// 1. Bridge caps — single source of truth.
+			if ( class_exists( '\WordPressistic\MLB\Caps' ) && $out['plan_id'] ) {
+				$caps                = \WordPressistic\MLB\Caps::for_plan_id( $out['plan_id'] );
+				$out['plan_name']    = $caps['plan_name']    ?? $out['plan_name'];
+				$out['widget_limit'] = (int) ( $caps['max_widgets'] ?? 1 );
+				$out['agent_limit']  = (int) ( $caps['max_agents']  ?? 1 );
+				$out['domain_limit'] = (int) ( $caps['max_domains'] ?? 1 );
+				$out['white_label']  = (bool) ( $caps['white_label'] ?? false );
 			} else {
-				$from_plan = self::limits_from_plan_settings( $out['plan_id'] );
-				$out['widget_limit'] = $from_plan['widgets'] ?? 1;
-				$out['agent_limit']  = $from_plan['agents'] ?? 1;
+				// 2-3. Legacy fallback chain.
+				$limits = self::plan_limits();
+				$plan   = $limits[ $out['plan_id'] ] ?? null;
+				if ( $plan ) {
+					$out['widget_limit'] = (int) $plan['widgets'];
+					$out['agent_limit']  = (int) $plan['agents'];
+				} else {
+					$from_plan = self::limits_from_plan_settings( $out['plan_id'] );
+					$out['widget_limit'] = $from_plan['widgets'] ?? 1;
+					$out['agent_limit']  = $from_plan['agents']  ?? 1;
+					$out['domain_limit'] = $from_plan['domains'] ?? 1;
+				}
 			}
 		}
 
@@ -93,6 +112,9 @@ class Membership {
 		}
 		if ( array_key_exists( 'agents', $settings['limits'] ) ) {
 			$out['agents'] = (int) $settings['limits']['agents'];
+		}
+		if ( array_key_exists( 'domains', $settings['limits'] ) ) {
+			$out['domains'] = (int) $settings['limits']['domains'];
 		}
 		return $out;
 	}
