@@ -24,6 +24,8 @@ final class Admin {
 		add_action( 'admin_post_cbw_disconnect_api',       [ Settings_Page::class, 'handle_disconnect_api' ] );
 		add_action( 'admin_post_cbw_activate_license',     [ License_Page::class,  'handle_activate' ] );
 		add_action( 'admin_post_cbw_deactivate_license',   [ License_Page::class,  'handle_deactivate' ] );
+		add_action( 'admin_post_cbw_refresh_widgets',      [ License_Page::class,  'handle_refresh_widgets' ] );
+		add_action( 'admin_post_cbw_test_license',         [ License_Page::class,  'handle_test_connection' ] );
 		add_filter( 'plugin_action_links_' . CBW_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
 	}
 

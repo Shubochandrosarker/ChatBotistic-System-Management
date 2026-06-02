@@ -95,6 +95,11 @@ final class Settings_Page {
 								'<a href="' . esc_url( CBW_APP_BASE_URL ) . '" target="_blank" rel="noopener">app.chatbotistic.com</a>'
 							);
 							?>
+							<?php
+							/* Inline refresh button — posts to admin-post.php?action=cbw_refresh_widgets
+							   and bounces back to the License screen with a notice. */
+							?>
+							· <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=cbw_refresh_widgets' ), 'cbw_refresh_widgets' ) ); ?>"><?php esc_html_e( 'Refresh now', 'chatbotistic-widget' ); ?></a>
 						</small>
 						<script>
 						(function () {
