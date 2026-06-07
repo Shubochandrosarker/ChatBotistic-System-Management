@@ -70,6 +70,10 @@ class Pages {
 	 * create_required_pages() logic but only for our 7 keys.
 	 */
 	public static function ensure_all(): int {
+		// Rename legacy "memberistic-*" pages to their clean slugs first, so
+		// the existence checks below find them and don't create duplicates.
+		self::migrate_legacy_slugs();
+
 		$settings = get_option( 'memberistic_settings', [] );
 		$settings = is_array( $settings ) ? $settings : [];
 		$created  = 0;
@@ -98,5 +102,45 @@ class Pages {
 		}
 		update_option( 'memberistic_settings', $settings, false );
 		return $created;
+	}
+
+	/**
+	 * Rename pages still using the legacy "memberistic-*" slug to their
+	 * clean Chatbotistic slug ("checkout", "renew", "payment-failed",
+	 * "payment-success"). Also strips the leading "Memberistic " from the
+	 * title so the URL bar and the page title never expose the underlying
+	 * plugin name to end users.
+	 *
+	 * Idempotent — safe to run on every install / repair / activation.
+	 */
+	private static function migrate_legacy_slugs(): void {
+		$rename_map = [
+			'memberistic-checkout'        => [ 'slug' => CBP_SLUG_CHECKOUT,  'title' => 'Checkout' ],
+			'memberistic-renewal'         => [ 'slug' => CBP_SLUG_RENEWAL,   'title' => 'Renew Membership' ],
+			'memberistic-payment-failed'  => [ 'slug' => CBP_SLUG_FAILED,    'title' => 'Payment Failed' ],
+			'memberistic-thank-you'       => [ 'slug' => CBP_SLUG_THANK_YOU, 'title' => 'Thank You' ],
+			'memberistic-memberships'     => [ 'slug' => CBP_SLUG_PLANS,     'title' => 'Memberships' ],
+			'memberistic-account'         => [ 'slug' => CBP_SLUG_ACCOUNT,   'title' => 'My Account' ],
+			'memberistic-login'           => [ 'slug' => CBP_SLUG_LOGIN,     'title' => 'Login' ],
+		];
+
+		foreach ( $rename_map as $legacy_slug => $target ) {
+			$page = get_page_by_path( $legacy_slug );
+			if ( ! $page || 'trash' === get_post_status( $page ) ) {
+				continue;
+			}
+			// Don't clobber a real page that already lives at the clean slug.
+			if ( get_page_by_path( $target['slug'] ) ) {
+				continue;
+			}
+			$update = [
+				'ID'        => (int) $page->ID,
+				'post_name' => $target['slug'],
+			];
+			if ( 0 === strpos( (string) $page->post_title, 'Memberistic ' ) ) {
+				$update['post_title'] = $target['title'];
+			}
+			wp_update_post( $update );
+		}
 	}
 }

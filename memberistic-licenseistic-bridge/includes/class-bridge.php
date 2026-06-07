@@ -260,13 +260,11 @@ class Bridge {
 		$plans   = home_url( '/pricing/' );
 
 		if ( 'expired' === $new_status ) {
-			/* translators: %s: site name. */
-			$subject = sprintf( __( '[%s] Your license has expired', 'memberistic-licenseistic-bridge' ), $site );
-			$lead    = __( 'Your membership has ended, so your Chatbotistic license is now expired. Premium widget features are paused, but your account and data are safe.', 'memberistic-licenseistic-bridge' );
+			$subject = __( 'Your membership has ended', 'memberistic-licenseistic-bridge' );
+			$lead    = __( 'Your membership has ended, so premium widget features are paused. Your account and data are safe — renew any time to switch them back on.', 'memberistic-licenseistic-bridge' );
 		} else {
-			/* translators: %s: site name. */
-			$subject = sprintf( __( '[%s] Your license is suspended', 'memberistic-licenseistic-bridge' ), $site );
-			$lead    = __( 'We could not confirm your latest payment, so your Chatbotistic license is suspended. Update your billing to restore premium widget features. Your account and data are safe.', 'memberistic-licenseistic-bridge' );
+			$subject = __( 'Your membership is paused', 'memberistic-licenseistic-bridge' );
+			$lead    = __( 'We could not confirm your latest payment, so premium widget features are paused. Update your billing to switch them back on — your account and data are safe.', 'memberistic-licenseistic-bridge' );
 		}
 
 		/* translators: %s: user display name. */
@@ -321,13 +319,17 @@ class Bridge {
 			return;
 		}
 		$site    = get_bloginfo( 'name' );
-		$subject = sprintf( __( '[%s] Your %s license key is ready', 'memberistic-licenseistic-bridge' ), $site, $caps['plan_name'] );
+		$subject = sprintf(
+			/* translators: %s: plan name (e.g. "Pro") */
+			__( 'Your %s membership is active', 'memberistic-licenseistic-bridge' ),
+			$caps['plan_name']
+		);
 
 		// Branded URLs. Filterable so the central profile can point them at the
 		// canonical www.chatbotistic.com paths.
 		$account_url  = (string) apply_filters( 'mlb_account_url',  home_url( '/account/' ) );
 		$login_url    = (string) apply_filters( 'mlb_login_url',    home_url( '/login/' ) );
-		$reset_url    = (string) apply_filters( 'mlb_reset_url',    home_url( '/login?action=resetpassword' ) );
+		$reset_url    = (string) apply_filters( 'mlb_reset_url',    home_url( '/forgot-password/' ) );
 		$download_url = (string) apply_filters( 'mlb_widget_download_url', $account_url );
 
 		$fmt = static function ( $n ) {
@@ -335,22 +337,26 @@ class Bridge {
 		};
 
 		$body  = sprintf( __( 'Hi %s,', 'memberistic-licenseistic-bridge' ), $user->display_name ) . "\n\n"
-			. sprintf( __( 'Your %s plan is active and your Chatbotistic license is ready. Here is everything you need to go live.', 'memberistic-licenseistic-bridge' ), $caps['plan_name'] ) . "\n\n"
+			. sprintf(
+				/* translators: %s: plan name */
+				__( 'Your %s membership is now active. Here is everything you need to go live.', 'memberistic-licenseistic-bridge' ),
+				$caps['plan_name']
+			) . "\n\n"
 			. "──────────────────────────────────────\n"
-			. __( 'License key: ', 'memberistic-licenseistic-bridge' ) . $key . "\n"
+			. __( 'Your key:    ', 'memberistic-licenseistic-bridge' ) . $key . "\n"
 			. sprintf( __( 'Widgets:     %s', 'memberistic-licenseistic-bridge' ), $fmt( $caps['max_widgets'] ) ) . "\n"
 			. sprintf( __( 'Agents:      %s', 'memberistic-licenseistic-bridge' ), $fmt( $caps['max_agents'] ) ) . "\n"
 			. sprintf( __( 'Domains:     %s', 'memberistic-licenseistic-bridge' ), $fmt( $caps['max_domains'] ) ) . "\n"
 			. "──────────────────────────────────────\n\n"
-			. __( 'Activation steps:', 'memberistic-licenseistic-bridge' ) . "\n"
-			. __( '  1. Download & install the Chatbotistic Widget plugin on your WordPress site.', 'memberistic-licenseistic-bridge' ) . "\n"
-			. __( '  2. Open Chatbotistic → License in wp-admin.', 'memberistic-licenseistic-bridge' ) . "\n"
-			. __( '  3. Paste the license key above and click Activate.', 'memberistic-licenseistic-bridge' ) . "\n"
-			. __( '  4. Your plan limits unlock automatically — start adding widgets and agents.', 'memberistic-licenseistic-bridge' ) . "\n\n"
-			. __( 'Download the widget plugin: ', 'memberistic-licenseistic-bridge' ) . $download_url . "\n"
-			. __( 'Your account & license:     ', 'memberistic-licenseistic-bridge' ) . $account_url . "\n"
-			. __( 'Portal login:               ', 'memberistic-licenseistic-bridge' ) . $login_url . "\n"
-			. __( 'Set / reset password:       ', 'memberistic-licenseistic-bridge' ) . $reset_url . "\n\n"
+			. __( 'Get started:', 'memberistic-licenseistic-bridge' ) . "\n"
+			. __( '  1. Download the WordPress plugin from your account.', 'memberistic-licenseistic-bridge' ) . "\n"
+			. __( '  2. Install it on your site and open the WhatsApp Widget menu.', 'memberistic-licenseistic-bridge' ) . "\n"
+			. __( '  3. Paste your key on the License tab and click Activate.', 'memberistic-licenseistic-bridge' ) . "\n"
+			. __( '  4. Your plan limits unlock automatically.', 'memberistic-licenseistic-bridge' ) . "\n\n"
+			. __( 'Download the plugin:  ', 'memberistic-licenseistic-bridge' ) . $download_url . "\n"
+			. __( 'Your account:         ', 'memberistic-licenseistic-bridge' ) . $account_url . "\n"
+			. __( 'Sign in:              ', 'memberistic-licenseistic-bridge' ) . $login_url . "\n"
+			. __( 'Create / reset password: ', 'memberistic-licenseistic-bridge' ) . $reset_url . "\n\n"
 			. sprintf( __( '— The %s team', 'memberistic-licenseistic-bridge' ), $site );
 
 		wp_mail( $user->user_email, $subject, $body );

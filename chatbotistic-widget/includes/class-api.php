@@ -16,11 +16,27 @@ final class API {
 	const TOKEN_TTL       = 600; // 10 minutes — matches the API's effective lifetime.
 
 	public static function get_email(): string    { return (string) get_option( 'cbw_tochat_email', '' ); }
-	public static function get_password(): string { return (string) get_option( 'cbw_tochat_password', '' ); }
+
+	public static function get_password(): string {
+		$stored = (string) get_option( 'cbw_tochat_password', '' );
+		if ( '' === $stored ) {
+			return '';
+		}
+		// Legacy plaintext rows (no v1: prefix) — read once, then re-write
+		// encrypted on the next set_credentials. We return the raw value so the
+		// Tochat API call still works during the migration window.
+		if ( 0 !== strpos( $stored, 'v1:' ) ) {
+			return $stored;
+		}
+		return self::decrypt_secret( $stored );
+	}
 
 	public static function set_credentials( string $email, string $password ): void {
 		update_option( 'cbw_tochat_email', sanitize_email( $email ) );
-		update_option( 'cbw_tochat_password', $password );
+		// Don't store the Tochat password as plaintext in wp_options. Encrypt
+		// at rest with AUTH_KEY (or sodium if available) so an attacker with
+		// read-only DB access can't lift the customer's Tochat credentials.
+		update_option( 'cbw_tochat_password', self::encrypt_secret( $password ) );
 		self::clear_token();
 	}
 
@@ -28,6 +44,44 @@ final class API {
 		delete_option( 'cbw_tochat_email' );
 		delete_option( 'cbw_tochat_password' );
 		self::clear_token();
+	}
+
+	/**
+	 * Derive a stable 32-byte key from WordPress's AUTH_KEY+AUTH_SALT for use
+	 * with openssl_encrypt. Survives plugin upgrades; rotating AUTH_KEY would
+	 * invalidate stored credentials, which is the correct security posture.
+	 */
+	private static function secret_key(): string {
+		$material = ( defined( 'AUTH_KEY' )  ? AUTH_KEY  : '' )
+			. '|cbw_tochat|'
+			. ( defined( 'AUTH_SALT' ) ? AUTH_SALT : '' );
+		return hash( 'sha256', $material, true );
+	}
+
+	private static function encrypt_secret( string $plain ): string {
+		if ( '' === $plain ) {
+			return '';
+		}
+		$iv     = random_bytes( 16 );
+		$cipher = openssl_encrypt( $plain, 'aes-256-cbc', self::secret_key(), OPENSSL_RAW_DATA, $iv );
+		if ( false === $cipher ) {
+			return $plain; // openssl unavailable — fall back to plain rather than lose creds.
+		}
+		return 'v1:' . base64_encode( $iv . $cipher );
+	}
+
+	private static function decrypt_secret( string $stored ): string {
+		if ( 0 !== strpos( $stored, 'v1:' ) ) {
+			return $stored;
+		}
+		$blob = base64_decode( substr( $stored, 3 ), true );
+		if ( false === $blob || strlen( $blob ) < 17 ) {
+			return '';
+		}
+		$iv     = substr( $blob, 0, 16 );
+		$cipher = substr( $blob, 16 );
+		$plain  = openssl_decrypt( $cipher, 'aes-256-cbc', self::secret_key(), OPENSSL_RAW_DATA, $iv );
+		return false === $plain ? '' : $plain;
 	}
 
 	public static function is_connected(): bool {
