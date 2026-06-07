@@ -28,8 +28,50 @@ class Emails {
 		// canonical chatbotistic.com URLs.
 		add_filter( 'mlb_account_url',         fn () => CBP_BASE_URL . '/account/' );
 		add_filter( 'mlb_login_url',           fn () => CBP_BASE_URL . '/login/' );
-		add_filter( 'mlb_reset_url',           fn () => CBP_BASE_URL . '/login?action=resetpassword' );
+		add_filter( 'mlb_reset_url',           fn () => CBP_BASE_URL . '/forgot-password/' );
 		add_filter( 'mlb_widget_download_url', fn () => CBP_BASE_URL . '/account/?download=widget' );
+
+		// Rewrite WordPress's built-in password-reset email so the link points
+		// at /reset-password/ on chatbotistic.com instead of wp-login.php —
+		// the customer never sees a WordPress URL.
+		add_filter( 'retrieve_password_message', [ __CLASS__, 'rewrite_password_reset_email' ], 10, 4 );
+		add_filter( 'retrieve_password_title',   [ __CLASS__, 'rewrite_password_reset_subject' ], 10, 3 );
+	}
+
+	/**
+	 * Replace WordPress's default password reset email body. The original
+	 * `$message` contains a wp-login.php link; we throw it out and build a
+	 * branded one using the theme's /reset-password/ page.
+	 *
+	 * @param string  $message    Built-in reset message (discarded).
+	 * @param string  $key        Reset key.
+	 * @param string  $user_login Username.
+	 * @param \WP_User|false $user User object.
+	 * @return string
+	 */
+	public static function rewrite_password_reset_email( $message, $key, $user_login, $user ): string {
+		$display_name = $user instanceof \WP_User && $user->display_name ? $user->display_name : $user_login;
+		$reset_url    = add_query_arg(
+			[ 'key' => $key, 'login' => rawurlencode( (string) $user_login ) ],
+			CBP_BASE_URL . '/reset-password/'
+		);
+
+		return sprintf(
+			"Hi %s,\n\n"
+				. "We got a request to reset the password on your Chatbotistic account. "
+				. "Create your new password here — this link is valid for the next 24 hours:\n\n"
+				. "%s\n\n"
+				. "If you didn't ask for this, you can safely ignore this email — your password stays the same.\n\n"
+				. "— The Chatbotistic team\n"
+				. "%s",
+			$display_name,
+			$reset_url,
+			CBP_BASE_URL
+		);
+	}
+
+	public static function rewrite_password_reset_subject( $title, $user_login = '', $user = null ): string {
+		return 'Set a new password for your Chatbotistic account';
 	}
 
 	/** @param string $body */
@@ -49,14 +91,14 @@ class Emails {
 	 * tags work without us having to re-define their values inside each body.
 	 */
 	public static function merge_tags( array $context ): array {
-		$context['{login_url}']         = Pages::url( 'login_page_id',          '/memberistic-login/' );
-		$context['{plans_url}']         = Pages::url( 'plans_page_id',          '/memberistic-memberships/' );
-		$context['{checkout_url}']      = Pages::url( 'checkout_page_id',       '/memberistic-checkout/' );
+		$context['{login_url}']         = Pages::url( 'login_page_id',          '/login/' );
+		$context['{plans_url}']         = Pages::url( 'plans_page_id',          '/memberships/' );
+		$context['{checkout_url}']      = Pages::url( 'checkout_page_id',       '/checkout/' );
 		$context['{account_url}']       = Pages::url( 'account_page_id',        '/account/' );
-		$context['{renewal_url}']       = Pages::url( 'renewal_page_id',        '/memberistic-renewal/' );
-		$context['{payment_failed_url}']= Pages::url( 'failed_payment_page_id', '/memberistic-payment-failed/' );
-		$context['{thank_you_url}']     = Pages::url( 'thank_you_page_id',      '/memberistic-thank-you/' );
-		$context['{password_reset_url}']= CBP_BASE_URL . '/login?action=resetpassword';
+		$context['{renewal_url}']       = Pages::url( 'renewal_page_id',        '/renew/' );
+		$context['{payment_failed_url}']= Pages::url( 'failed_payment_page_id', '/payment-failed/' );
+		$context['{thank_you_url}']     = Pages::url( 'thank_you_page_id',      '/payment-success/' );
+		$context['{password_reset_url}']= CBP_BASE_URL . '/forgot-password/';
 		$context['{brand_label}']       = 'Chatbotistic';
 		$context['{site_url}']          = CBP_BASE_URL;
 		return $context;

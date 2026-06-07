@@ -134,3 +134,24 @@ function cb_login_url( $url ) {
 	return $login ? get_permalink( $login ) : $url;
 }
 add_filter( 'login_url', 'cb_login_url', 20 );
+
+/**
+ * Route the WordPress lost-password URL (used in nav, emails, redirects) at
+ * the branded /forgot-password/ page so the customer never lands on
+ * wp-login.php. Same pattern as cb_login_url.
+ */
+function cb_lostpassword_url( $url ) {
+	$page = get_page_by_path( 'forgot-password' );
+	return $page ? get_permalink( $page ) : $url;
+}
+add_filter( 'lostpassword_url', 'cb_lostpassword_url', 20 );
+
+/**
+ * After WordPress processes a "lost password" form POST, send the user back
+ * to /forgot-password/?sent=1 instead of wp-login.php?checkemail=confirm.
+ */
+function cb_lostpassword_redirect( $url ) {
+	$page = get_page_by_path( 'forgot-password' );
+	return $page ? add_query_arg( 'sent', '1', get_permalink( $page ) ) : $url;
+}
+add_filter( 'lostpassword_redirect', 'cb_lostpassword_redirect', 20 );

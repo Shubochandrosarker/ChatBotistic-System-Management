@@ -3,7 +3,7 @@
  * Plugin Name:       Chatbotistic Profile for Memberistic
  * Plugin URI:        https://chatbotistic.com
  * Description:       One-install configuration profile for chatbotistic.com — replaces Memberistic's default plans with the 4 Chatbotistic plans (Free / Pro / Agency / Lifetime), creates branded member-facing pages, auto-approves memberships on payment, auto-activates free signups, hides waiver UI, overrides every transactional email with chatbotistic.com URLs, and seeds the Memberistic → Licenseistic Bridge caps.
- * Version:           1.1.1
+ * Version:           1.1.2
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            WordPressistic
@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'CBP_VERSION',  '1.1.1' );
+define( 'CBP_VERSION',  '1.1.2' );
 define( 'CBP_FILE',     __FILE__ );
 define( 'CBP_DIR',      plugin_dir_path( __FILE__ ) );
 define( 'CBP_URL',      plugin_dir_url( __FILE__ ) );
@@ -27,13 +27,14 @@ define( 'CBP_FROM_EMAIL',         'hello@chatbotistic.com' );
 define( 'CBP_FROM_NAME',          'Chatbotistic' );
 
 // Profile-managed page slugs (must match what's written into memberistic_settings).
+// Clean, branded URLs — never expose the underlying plugin name to end users.
 define( 'CBP_SLUG_LOGIN',         'login' );
 define( 'CBP_SLUG_PLANS',         'memberships' );
-define( 'CBP_SLUG_CHECKOUT',      'memberistic-checkout' );
+define( 'CBP_SLUG_CHECKOUT',      'checkout' );
 define( 'CBP_SLUG_ACCOUNT',       'account' );
-define( 'CBP_SLUG_RENEWAL',       'memberistic-renewal' );
-define( 'CBP_SLUG_FAILED',        'memberistic-payment-failed' );
-define( 'CBP_SLUG_THANK_YOU',     'memberistic-thank-you' );
+define( 'CBP_SLUG_RENEWAL',       'renew' );
+define( 'CBP_SLUG_FAILED',        'payment-failed' );
+define( 'CBP_SLUG_THANK_YOU',     'payment-success' );
 
 // Autoload.
 spl_autoload_register( function ( string $class ): void {

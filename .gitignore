@@ -1,0 +1,12 @@
+# Build artifacts — never commit zipped plugin/theme bundles. The source
+# folders are the canonical truth; zips are produced on-demand for install.
+*.zip
+
+# Editor / OS noise
+.DS_Store
+.vscode/
+.idea/
+
+# Composer / Node — only relevant if a plugin ever adds them
+vendor/
+node_modules/

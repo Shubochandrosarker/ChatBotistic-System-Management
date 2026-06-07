@@ -37,7 +37,8 @@ ob_start(); ?>
 			<?php else : ?>
 				<h1 style="font-size:24px;"><?php esc_html_e( 'Reset your password', 'chatbotistic' ); ?></h1>
 				<p class="auth-sub"><?php esc_html_e( 'Enter your account email and we’ll send a secure reset link.', 'chatbotistic' ); ?></p>
-				<form class="cb-form" method="post" action="<?php echo esc_url( wp_lostpassword_url( add_query_arg( 'sent', '1', home_url( '/forgot-password/' ) ) ) ); ?>">
+				<form class="cb-form" method="post" action="<?php echo esc_url( site_url( 'wp-login.php?action=lostpassword', 'login_post' ) ); ?>">
+					<input type="hidden" name="redirect_to" value="<?php echo esc_url( add_query_arg( 'sent', '1', home_url( '/forgot-password/' ) ) ); ?>">
 					<div class="field"><label><?php esc_html_e( 'Work email', 'chatbotistic' ); ?></label><input type="email" name="user_login" placeholder="you@company.com" required></div>
 					<button class="btn btn-primary" type="submit" style="justify-content:center;"><?php esc_html_e( 'Send reset link →', 'chatbotistic' ); ?></button>
 				</form>
