@@ -120,6 +120,35 @@ final class Plugin {
 		( new REST\Records_Controller() )->register_routes();
 		( new REST\Saved_Views_Controller() )->register_routes();
 		( new REST\Settings_Controller() )->register_routes();
+
+		// Guarantee clean JSON for every Memberistic endpoint. If another plugin,
+		// the active theme, or a PHP notice emits stray bytes into an output
+		// buffer during the request, the REST body fails to parse and the admin
+		// React app shows "The response is not a valid JSON response." Draining
+		// any open buffers here — once, centrally, for our namespace only — runs
+		// after the route callback but before WordPress serialises the response.
+		add_filter( 'rest_post_dispatch', array( $this, 'flush_stray_output_for_namespace' ), 10, 3 );
+	}
+
+	/**
+	 * Discard stray output buffers for Memberistic REST requests so the JSON
+	 * body is never corrupted by upstream notices or echoes.
+	 *
+	 * @param \WP_HTTP_Response $result  Response object.
+	 * @param \WP_REST_Server   $server  Server instance.
+	 * @param \WP_REST_Request  $request Request used to generate the response.
+	 * @return \WP_HTTP_Response
+	 */
+	public function flush_stray_output_for_namespace( $result, $server, $request ) {
+		$route = is_object( $request ) ? (string) $request->get_route() : '';
+		if ( 0 === strpos( ltrim( $route, '/' ), 'memberistic/v1' ) ) {
+			while ( ob_get_level() > 0 ) {
+				if ( false === ob_get_clean() ) {
+					break;
+				}
+			}
+		}
+		return $result;
 	}
 
 	/**

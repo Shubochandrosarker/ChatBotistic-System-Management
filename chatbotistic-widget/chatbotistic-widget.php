@@ -3,7 +3,7 @@
  * Plugin Name:       Chatbotistic Widget
  * Plugin URI:        https://chatbotistic.com/wordpress-plugin
  * Description:       WhatsApp + AI chat widget for WordPress, by Chatbotistic. A WordPressistic product.
- * Version:           1.1.0
+ * Version:           1.1.1
  * Requires at least: 5.6
  * Requires PHP:      7.4
  * Author:            Chatbotistic (a WordPressistic product)
@@ -23,17 +23,18 @@ define( 'CBW_PLUGIN_FILE',     __FILE__ );
 define( 'CBW_PLUGIN_PATH',     plugin_dir_path( __FILE__ ) );
 define( 'CBW_PLUGIN_URL',      plugin_dir_url( __FILE__ ) );
 define( 'CBW_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
-define( 'CBW_VERSION',         '1.1.0' );
+define( 'CBW_VERSION',         '1.1.1' );
 
-// ── Branding (neutral fallbacks — Brand class resolves per-license at runtime
-//    so all four plans are white-label per spec) ────────────────────────────────
+// ── Branding (real defaults so promo/app links resolve; a white-label site
+//    can override any of these via wp-config.php, and the Brand class still
+//    resolves per-license brand strings at runtime) ─────────────────────────────
 if ( ! defined( 'CBW_PRODUCT_NAME'  ) ) { define( 'CBW_PRODUCT_NAME',   'WhatsApp Widget' ); }
 if ( ! defined( 'CBW_BRAND_TAGLINE' ) ) { define( 'CBW_BRAND_TAGLINE',  '' ); }
-if ( ! defined( 'CBW_BRAND_HOMEPAGE') ) { define( 'CBW_BRAND_HOMEPAGE', '' ); }
-if ( ! defined( 'CBW_REGISTER_URL'  ) ) { define( 'CBW_REGISTER_URL',   '' ); }
-if ( ! defined( 'CBW_PRICING_URL'   ) ) { define( 'CBW_PRICING_URL',    '' ); }
-if ( ! defined( 'CBW_DOCS_URL'      ) ) { define( 'CBW_DOCS_URL',       '' ); }
-if ( ! defined( 'CBW_APP_BASE_URL'  ) ) { define( 'CBW_APP_BASE_URL',   '' ); }
+if ( ! defined( 'CBW_BRAND_HOMEPAGE') ) { define( 'CBW_BRAND_HOMEPAGE', 'https://chatbotistic.com' ); }
+if ( ! defined( 'CBW_REGISTER_URL'  ) ) { define( 'CBW_REGISTER_URL',   'https://chatbotistic.com/register/' ); }
+if ( ! defined( 'CBW_PRICING_URL'   ) ) { define( 'CBW_PRICING_URL',    'https://chatbotistic.com/pricing/' ); }
+if ( ! defined( 'CBW_DOCS_URL'      ) ) { define( 'CBW_DOCS_URL',       'https://chatbotistic.com/docs/' ); }
+if ( ! defined( 'CBW_APP_BASE_URL'  ) ) { define( 'CBW_APP_BASE_URL',   'https://app.chatbotistic.com' ); }
 
 // ── License server (default to chatbotistic.com; Lifetime tier with a
 //    custom_domain in its license overrides at runtime via Brand) ──────────────

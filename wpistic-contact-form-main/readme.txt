@@ -4,7 +4,7 @@ Tags: contact form, form builder, wordpress, submissions, inbox, ai, spam protec
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.5.1
 License: GPL-2.0+
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,6 +108,9 @@ This plugin can connect to third-party services when enabled by the site adminis
 * Terms/Privacy: Depends on selected provider.
 
 == Changelog ==
+
+= 1.5.1 =
+* Wires every Chatbotistic theme email surface (verify, welcome, license-activated, per-form auto-responders) into WPistic Contact Form, with a WPCF preset that auto-configures reply branding, auto-responder, and AI rules.
 
 = 1.0.0 =
 * Initial WP.org publish build.

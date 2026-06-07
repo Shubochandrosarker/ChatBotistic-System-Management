@@ -3,7 +3,7 @@
  * Plugin Name: Memberistic Membership Solutions
  * Plugin URI: https://www.wordpressistic.com
  * Description: A modern membership operations engine for service and SaaS businesses — plans, signups, payments, renewals, linked members, check-ins, staff dashboards, REST API, and Stripe + WooCommerce integration. Brand-neutral by default; host products configure the brand label, login copy, member-ID prefix, QR header, and account-template features through memberistic_settings or filters.
- * Version: 1.12.0
+ * Version: 1.12.2
  * Author: WordPressistic
  * Author URI: https://www.wordpressistic.com
  * Text Domain: memberistic
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MEMBERISTIC_VERSION', '1.12.0' );
+define( 'MEMBERISTIC_VERSION', '1.12.2' );
 define( 'MEMBERISTIC_DB_VERSION', '1.2.0' );
 define( 'MEMBERISTIC_FILE', __FILE__ );
 define( 'MEMBERISTIC_PATH', plugin_dir_path( __FILE__ ) );
