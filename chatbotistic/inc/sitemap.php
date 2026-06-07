@@ -22,22 +22,45 @@ add_filter( 'wp_sitemaps_enabled', '__return_false' );
  * Register rewrite endpoints for the sitemap index, sub-sitemaps and llms files.
  */
 function cb_register_endpoints() {
-	add_rewrite_rule( '^sitemap\.xml$',                'index.php?cb_feed=sitemap',             'top' );
-	add_rewrite_rule( '^sitemap-pages\.xml$',          'index.php?cb_feed=sitemap-pages',       'top' );
-	add_rewrite_rule( '^sitemap-posts\.xml$',          'index.php?cb_feed=sitemap-posts',       'top' );
-	add_rewrite_rule( '^sitemap-usecases\.xml$',       'index.php?cb_feed=sitemap-usecases',    'top' );
-	add_rewrite_rule( '^sitemap-products\.xml$',       'index.php?cb_feed=sitemap-products',    'top' );
-	add_rewrite_rule( '^sitemap-categories\.xml$',     'index.php?cb_feed=sitemap-categories',  'top' );
-	add_rewrite_rule( '^sitemap-tags\.xml$',           'index.php?cb_feed=sitemap-tags',        'top' );
+	// A trailing "/?" makes every rule tolerate an optional trailing slash, so
+	// /sitemap.xml AND /sitemap.xml/ both resolve. Without it, a crawler (or a
+	// human) hitting /sitemap.xml/ misses the rule entirely and WordPress
+	// serves a non-XML body under an XML content type — the "Start tag
+	// expected, '<' not found" parser error.
+	add_rewrite_rule( '^sitemap\.xml/?$',              'index.php?cb_feed=sitemap',             'top' );
+	add_rewrite_rule( '^sitemap-pages\.xml/?$',        'index.php?cb_feed=sitemap-pages',       'top' );
+	add_rewrite_rule( '^sitemap-posts\.xml/?$',        'index.php?cb_feed=sitemap-posts',       'top' );
+	add_rewrite_rule( '^sitemap-usecases\.xml/?$',     'index.php?cb_feed=sitemap-usecases',    'top' );
+	add_rewrite_rule( '^sitemap-products\.xml/?$',     'index.php?cb_feed=sitemap-products',    'top' );
+	add_rewrite_rule( '^sitemap-categories\.xml/?$',   'index.php?cb_feed=sitemap-categories',  'top' );
+	add_rewrite_rule( '^sitemap-tags\.xml/?$',         'index.php?cb_feed=sitemap-tags',        'top' );
 	// Legacy aliases — early branded paths used <type>-sitemap.xml. Keep
 	// them resolving so any existing crawler bookmarks survive.
-	add_rewrite_rule( '^page-sitemap\.xml$',           'index.php?cb_feed=sitemap-pages',       'top' );
-	add_rewrite_rule( '^post-sitemap\.xml$',           'index.php?cb_feed=sitemap-posts',       'top' );
-	add_rewrite_rule( '^category-sitemap\.xml$',       'index.php?cb_feed=sitemap-categories',  'top' );
-	add_rewrite_rule( '^llms\.txt$',                   'index.php?cb_feed=llms',                'top' );
-	add_rewrite_rule( '^llms-full\.txt$',              'index.php?cb_feed=llms-full',           'top' );
+	add_rewrite_rule( '^page-sitemap\.xml/?$',         'index.php?cb_feed=sitemap-pages',       'top' );
+	add_rewrite_rule( '^post-sitemap\.xml/?$',         'index.php?cb_feed=sitemap-posts',       'top' );
+	add_rewrite_rule( '^category-sitemap\.xml/?$',     'index.php?cb_feed=sitemap-categories',  'top' );
+	add_rewrite_rule( '^llms\.txt/?$',                 'index.php?cb_feed=llms',                'top' );
+	add_rewrite_rule( '^llms-full\.txt/?$',            'index.php?cb_feed=llms-full',           'top' );
 }
 add_action( 'init', 'cb_register_endpoints' );
+
+/**
+ * Flush rewrite rules once whenever this theme's endpoint set changes. The
+ * after_switch_theme hook only fires on activation, so a code update that
+ * adds or edits a rule (like the trailing-slash fix) would otherwise need a
+ * manual Settings → Permalinks re-save to take effect. We version the rule
+ * set and re-flush automatically when the stored version drifts.
+ */
+function cb_maybe_flush_rewrites() {
+	$rules_version = '2'; // bump whenever cb_register_endpoints() changes.
+	if ( (string) get_option( 'cb_sitemap_rules_version' ) === $rules_version ) {
+		return;
+	}
+	cb_register_endpoints();
+	flush_rewrite_rules( false );
+	update_option( 'cb_sitemap_rules_version', $rules_version );
+}
+add_action( 'init', 'cb_maybe_flush_rewrites', 99 );
 
 /**
  * Whitelist the custom query var.
@@ -58,9 +81,14 @@ add_filter( 'query_vars', 'cb_query_vars' );
  */
 function cb_noindex_slugs() {
 	return (array) apply_filters( 'cb_noindex_slugs', array(
-		'account', 'login', 'register', 'memberistic-account', 'memberistic-checkout',
-		'memberistic-login', 'memberistic-renewal', 'memberistic-thank-you',
-		'memberistic-payment-failed', 'memberistic-staff-dashboard', 'memberistic-memberships',
+		// Current clean transactional / private slugs.
+		'account', 'login', 'register', 'checkout', 'renew',
+		'payment-failed', 'payment-success', 'reset-password', 'forgot-password',
+		'verify-email', 'account-required', 'cancel-plan',
+		// Legacy memberistic-* slugs — kept so older installs stay excluded.
+		'memberistic-account', 'memberistic-checkout', 'memberistic-login',
+		'memberistic-renewal', 'memberistic-thank-you', 'memberistic-payment-failed',
+		'memberistic-staff-dashboard', 'memberistic-memberships',
 	) );
 }
 
@@ -248,6 +276,14 @@ function cb_render_feed() {
 		return;
 	}
 
+	// Discard anything a plugin or a stray PHP whitespace/BOM may have already
+	// echoed into an output buffer. An XML document must begin at byte 0 with
+	// "<?xml"; a single leading space or BOM triggers the browser's
+	// "Start tag expected, '<' not found" parser error.
+	while ( ob_get_level() > 0 ) {
+		ob_end_clean();
+	}
+
 	if ( 'llms' === $feed || 'llms-full' === $feed ) {
 		cb_render_llms( 'llms-full' === $feed );
 		exit;
@@ -274,7 +310,22 @@ function cb_render_feed() {
 	}
 	exit;
 }
-add_action( 'template_redirect', 'cb_render_feed' );
+// Run before redirect_canonical (also on template_redirect, priority 10) so
+// we emit the feed instead of letting WordPress 301 the URL elsewhere.
+add_action( 'template_redirect', 'cb_render_feed', 9 );
+
+/**
+ * Never let WordPress's canonical redirect touch a sitemap / llms request.
+ * Without this, /sitemap.xml/ can be 301'd to a page URL (or into a redirect
+ * loop) instead of resolving to the feed.
+ *
+ * @param string|false $redirect_url  Proposed canonical URL.
+ * @return string|false
+ */
+function cb_block_feed_canonical( $redirect_url ) {
+	return get_query_var( 'cb_feed' ) ? false : $redirect_url;
+}
+add_filter( 'redirect_canonical', 'cb_block_feed_canonical' );
 
 /**
  * Output the <sitemapindex> linking each non-empty sub-sitemap.
