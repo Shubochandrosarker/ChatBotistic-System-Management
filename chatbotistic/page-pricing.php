@@ -71,9 +71,9 @@ $cb_compare_rows = array(
 );
 
 $cb_recs = array(
-	array( __( 'Just getting started', 'chatbotistic' ), __( 'Free Forever', 'chatbotistic' ), __( 'Solo founders and small sites testing conversational lead capture on one domain.', 'chatbotistic' ), __( 'Get started free', 'chatbotistic' ), $cb_free_url, false ),
-	array( __( 'Growing business', 'chatbotistic' ), __( 'Pro', 'chatbotistic' ), __( 'Teams that need multiple widgets, WhatsApp agents, CRM sync, and the WordPress plugin.', 'chatbotistic' ), __( 'Choose Pro', 'chatbotistic' ), $cb_pro_url, true ),
-	array( __( 'Agencies & resellers', 'chatbotistic' ), __( 'Agency / Lifetime', 'chatbotistic' ), __( 'White-label the dashboard and widgets, manage clients, and resell under your own brand.', 'chatbotistic' ), __( 'Talk to us', 'chatbotistic' ), home_url( '/book-demo/' ), false ),
+	array( __( 'Just getting started', 'chatbotistic' ), __( 'Free Forever', 'chatbotistic' ), __( 'Solo founders and small sites testing conversational lead capture on one domain.', 'chatbotistic' ), __( 'Get started free', 'chatbotistic' ), $cb_free_url, false, 'rocket' ),
+	array( __( 'Growing business', 'chatbotistic' ), __( 'Pro', 'chatbotistic' ), __( 'Teams that need multiple widgets, WhatsApp agents, CRM sync, and the WordPress plugin.', 'chatbotistic' ), __( 'Choose Pro', 'chatbotistic' ), $cb_pro_url, true, 'bolt' ),
+	array( __( 'Agencies & resellers', 'chatbotistic' ), __( 'Agency / Lifetime', 'chatbotistic' ), __( 'White-label the dashboard and widgets, manage clients, and resell under your own brand.', 'chatbotistic' ), __( 'Talk to us', 'chatbotistic' ), home_url( '/book-demo/' ), false, 'users' ),
 );
 
 $cb_faqs = array(
@@ -180,7 +180,7 @@ if ( function_exists( 'cb_add_faq_schema' ) ) {
 			<div class="rec-grid">
 				<?php foreach ( $cb_recs as $cb_r ) : ?>
 					<div class="rec-card"<?php echo $cb_r[5] ? ' style="border-color:rgba(160,112,255,0.35);background:linear-gradient(180deg,rgba(160,112,255,0.08),rgba(79,139,255,0.03));"' : ''; ?>>
-						<div class="ico"></div>
+						<div class="ico"><?php cb_icon( isset( $cb_r[6] ) ? $cb_r[6] : 'bolt', 20 ); ?></div>
 						<div class="pick"><?php esc_html_e( 'Recommended ·', 'chatbotistic' ); ?> <b><?php echo esc_html( $cb_r[1] ); ?></b></div>
 						<h3><?php echo esc_html( $cb_r[0] ); ?></h3>
 						<p><?php echo esc_html( $cb_r[2] ); ?></p>

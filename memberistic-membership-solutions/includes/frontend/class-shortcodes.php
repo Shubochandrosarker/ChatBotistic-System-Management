@@ -230,7 +230,7 @@ final class Shortcodes {
 					<p class="memberistic-auth-sub"><?php echo esc_html( $tagline ); ?></p>
 				<?php endif; ?>
 
-				<form class="memberistic-auth-form" method="post" action="<?php echo esc_url( wp_login_url() ); ?>">
+				<form class="memberistic-auth-form" method="post" action="<?php echo esc_url( site_url( 'wp-login.php', 'login_post' ) ); ?>">
 					<input type="hidden" name="redirect_to" value="<?php echo esc_attr( $redirect ); ?>">
 
 					<label class="memberistic-auth-label" for="memberistic_user_login"><?php esc_html_e( 'Email Address', 'memberistic' ); ?></label>

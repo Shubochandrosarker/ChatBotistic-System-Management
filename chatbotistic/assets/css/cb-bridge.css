@@ -318,7 +318,7 @@
 .rec-card .pick b { color: var(--blue-bright); }
 .rec-card h3 { font-size: 17px; }
 .rec-card p { color: var(--text-soft); font-size: 13.5px; }
-.rec-card .ico { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, rgba(99,128,255,0.25), rgba(160,112,255,0.16)); }
+.rec-card .ico { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, rgba(99,128,255,0.25), rgba(160,112,255,0.16)); display: grid; place-items: center; color: #cfdcff; border: 1px solid rgba(99,128,255,0.28); }
 @media (max-width: 900px) { .rec-grid { grid-template-columns: 1fr; } }
 
 /* FAQ list (details/summary native) */

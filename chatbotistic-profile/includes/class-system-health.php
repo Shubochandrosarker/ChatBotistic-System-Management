@@ -214,15 +214,21 @@ class System_Health {
 			update_option( self::FIRST_RUN_FLAG, '1', false );
 			return;
 		}
+
+		$setup_url   = admin_url( 'admin.php?page=chatbotistic-profile' );
+		$dismiss_url = wp_nonce_url(
+			admin_url( 'admin-post.php?action=cbp_dismiss_welcome' ),
+			'cbp_dismiss_welcome'
+		);
 		?>
 		<div class="notice notice-info is-dismissible" id="cbp-welcome">
 			<p style="font-size:14px;">
 				<strong>🎉 <?php esc_html_e( 'Welcome to Chatbotistic.', 'chatbotistic-profile' ); ?></strong>
 				<?php esc_html_e( 'Your stack is installed. One last step: open the Profile screen to verify pages, plans, and integrations are configured correctly.', 'chatbotistic-profile' ); ?>
-				<a class="button button-primary" style="margin-left:8px;" href="<?php echo esc_url( admin_url( 'admin.php?page=chatbotistic-profile' ) ); ?>">
+				<a class="button button-primary" style="margin-left:8px;" href="<?php echo esc_url( $setup_url ); ?>">
 					<?php esc_html_e( 'Open setup', 'chatbotistic-profile' ); ?>
 				</a>
-				<a class="button" href="<?php echo esc_url( admin_url( 'admin-post.php?action=cbp_dismiss_welcome&_wpnonce=' . wp_create_nonce( 'cbp_dismiss_welcome' ) ) ); ?>">
+				<a class="button" href="<?php echo esc_url( $dismiss_url ); ?>">
 					<?php esc_html_e( 'Dismiss', 'chatbotistic-profile' ); ?>
 				</a>
 			</p>
