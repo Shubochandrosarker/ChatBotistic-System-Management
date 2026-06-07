@@ -45,7 +45,7 @@ ob_start(); ?>
 ob_start(); ?>
 	<h1><?php esc_html_e( 'Sign in', 'chatbotistic' ); ?></h1>
 	<p class="auth-sub"><?php esc_html_e( 'Access your Chatbotistic member portal.', 'chatbotistic' ); ?></p>
-	<form class="cb-form" method="post" action="<?php echo esc_url( wp_login_url() ); ?>">
+	<form class="cb-form" method="post" action="<?php echo esc_url( site_url( 'wp-login.php', 'login_post' ) ); ?>">
 		<input type="hidden" name="redirect_to" value="<?php echo esc_attr( $redirect ); ?>">
 		<?php if ( $err ) : ?>
 			<div class="field-err" style="margin-top:-4px;">✕ <?php esc_html_e( 'Incorrect email or password.', 'chatbotistic' ); ?></div>
