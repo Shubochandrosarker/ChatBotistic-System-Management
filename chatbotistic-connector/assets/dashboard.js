@@ -25,9 +25,32 @@
 		body.append('nonce', CFG.nonce);
 		Object.keys(data || {}).forEach(function (k) { body.append(k, data[k]); });
 		return fetch(CFG.ajax, { method: 'POST', body: body, credentials: 'same-origin' })
-			.then(function (r) { return r.json(); })
+			.then(function (r) {
+				// Read as text first — PHP notices/warnings get prepended
+				// to the JSON body by some plugins, breaking r.json().
+				// Strip leading garbage up to the first { or [.
+				return r.text().then(function (txt) {
+					var s = String(txt || '').trim();
+					var i = s.search(/[\{\[]/);
+					if (i > 0) { s = s.slice(i); }
+					if (!s) {
+						throw new Error('Empty response from server (HTTP ' + r.status + ').');
+					}
+					try {
+						return JSON.parse(s);
+					} catch (e) {
+						var snippet = s.slice(0, 140).replace(/\s+/g, ' ');
+						throw new Error('Server returned an invalid response. ' + snippet);
+					}
+				});
+			})
 			.then(function (res) {
-				if (!res || !res.success) {
+				if (!res || res.success === undefined) {
+					// Upstream returned a bare value (e.g. admin-ajax "0" for
+					// an unregistered action, or a raw array).
+					throw new Error('Unexpected response shape. Please reload and try again.');
+				}
+				if (!res.success) {
 					var msg = (res && res.data && res.data.message) || 'Something went wrong.';
 					throw new Error(msg);
 				}

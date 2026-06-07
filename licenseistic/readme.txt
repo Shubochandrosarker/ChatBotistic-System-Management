@@ -4,7 +4,7 @@ Tags: license, license manager, software license, license key, serial key, activ
 Requires at least: 5.8
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,10 @@ No. Licenseistic Core works independently. WooCommerce support is available via 
 Yes. Plain license keys are never stored. Each key is hashed with HMAC-SHA256 for lookup and AES encrypted for secure display.
 
 == Changelog ==
+
+= 1.1.0 =
+* Adds the `/entitlements` endpoint and per-plan caps (tier, plan_name, max_widgets/agents/domains, white_label) sourced from the Memberistic→Licenseistic bridge envelope, so client plugins can unlock features by plan.
+* Short alias routes (`/activate`, `/deactivate`, `/heartbeat`, `/validate`) alongside the canonical `/license/*` routes.
 
 = 1.0.0 =
 * Initial release.

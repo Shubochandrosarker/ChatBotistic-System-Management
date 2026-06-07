@@ -14,6 +14,8 @@ $opts = [
 	'cbw_license_payload',
 	'cbw_license_last_check',
 	'cbw_license_instance_id',
+	'cbw_license_grace_since',
+	'cbw_license_widget_list',
 	'cbw_tochat_email',
 	'cbw_tochat_password',
 	'cbw_default_widget_key',

@@ -4,7 +4,7 @@ Tags: membership, operations, staff dashboard, stripe, woocommerce, rest api
 Requires at least: 6.0
 Requires PHP: 8.0
 Tested up to: 6.6
-Stable tag: 1.10.0
+Stable tag: 1.12.2
 License: GPLv2 or later
 
 A modern membership operations engine for service and SaaS businesses.
@@ -66,6 +66,9 @@ Set Settings > Advanced > "Delete data on uninstall" to Yes before removing the 
 == Changelog ==
 
 See CHANGELOG.md for the full history.
+
+= 1.12.2 =
+Dashboard reliability: every Memberistic REST endpoint now drains stray output buffers centrally before the response is serialised, so upstream plugin/theme notices can no longer corrupt the JSON body ("The response is not a valid JSON response."). Member login form posts directly to wp-login.php to avoid a redirect loop when a custom login page filters login_url.
 
 = 1.10.0 =
 Admin operations release. Members page gains server-side pagination, eight KPI cards (Total / Active / Pending / Past Due / Expired / Cancelled / New This Month with MoM growth % / Waiver Missing), and a bulk-action option to change waiver status for many memberships at once. Plans page is rebuilt as an animated card grid with per-plan member counts (total / active / other). Payments page gets pagination, six KPI cards (lifetime revenue, this-month revenue + MoM growth, new-member vs renewal payments, failed payments, visible-on-page), and a richer CSV export. Import flow now keeps every row: expired members import as expired, members with no matching plan import under a new "No Plan" sentinel plan with status = needs_review, members with no email still import. Order/payment imports never drop a row — orphan emails create a stub Instore member and emailless rows attach to a shared Instore Walk-in membership. Emails page becomes a React console with KPI cards (sent today/week/month, delivery rate, contact coverage) and a filterable, paginated directory; CSV export now includes 13 properly labelled columns including waiver dates and renewal info.

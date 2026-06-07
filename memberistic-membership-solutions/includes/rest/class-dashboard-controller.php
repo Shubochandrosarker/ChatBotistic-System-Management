@@ -118,7 +118,6 @@ final class Dashboard_Controller extends REST_Controller {
 			'recent_activity'      => Activity_Repository::get_recent( 5 ),
 		);
 
-		$this->discard_stray_output();
 		return rest_ensure_response( $data );
 	}
 
@@ -126,30 +125,23 @@ final class Dashboard_Controller extends REST_Controller {
 		$days  = (int) $request->get_param( 'days' );
 		$limit = (int) $request->get_param( 'limit' );
 
-		$rows = Memberships_Repository::get_expiring_soon(
-			$days > 0 ? $days : 30,
-			$limit > 0 ? $limit : 50
+		return rest_ensure_response(
+			Memberships_Repository::get_expiring_soon(
+				$days > 0 ? $days : 30,
+				$limit > 0 ? $limit : 50
+			)
 		);
-
-		$this->discard_stray_output();
-		return rest_ensure_response( $rows );
 	}
 
 	public function get_revenue_history( $request ) {
 		$months = (int) $request->get_param( 'months' );
 
-		$series = Payments_Repository::revenue_history( $months > 0 ? $months : 12 );
-
-		$this->discard_stray_output();
-		return rest_ensure_response( $series );
+		return rest_ensure_response( Payments_Repository::revenue_history( $months > 0 ? $months : 12 ) );
 	}
 
 	public function get_recent_activity( $request ) {
 		$limit = (int) $request->get_param( 'limit' );
 
-		$rows = Activity_Repository::get_recent( $limit > 0 ? $limit : 50 );
-
-		$this->discard_stray_output();
-		return rest_ensure_response( $rows );
+		return rest_ensure_response( Activity_Repository::get_recent( $limit > 0 ? $limit : 50 ) );
 	}
 }

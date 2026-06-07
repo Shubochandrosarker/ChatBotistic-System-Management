@@ -39,22 +39,4 @@ abstract class REST_Controller extends \WP_REST_Controller {
 	public function public_permissions_check() {
 		return true;
 	}
-
-	/**
-	 * Discard any stray output that may have been emitted by other plugins,
-	 * themes, or PHP notices before this controller responds.
-	 *
-	 * If something earlier in the request printed even a single byte, the
-	 * REST response will fail to parse as JSON and the React dashboard will
-	 * surface "The response is not a valid JSON response." This drains every
-	 * active output buffer so the response leaves the server clean.
-	 */
-	protected function discard_stray_output(): void {
-		while ( ob_get_level() > 0 ) {
-			$contents = ob_get_clean();
-			if ( false === $contents ) {
-				break;
-			}
-		}
-	}
 }
