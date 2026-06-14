@@ -473,3 +473,66 @@ function cb_login_redirect( $redirect, $request, $user ) {
 	return $redirect;
 }
 add_filter( 'login_redirect', 'cb_login_redirect', 10, 3 );
+
+/**
+ * Send failed logins back to the branded /login/ page with an error flag
+ * instead of leaving the visitor on the stock wp-login.php form. The admin
+ * back-door (cb_admin_login / login-w-hub) keeps the default behaviour so
+ * administrators still see WordPress's own login screen.
+ *
+ * @param string $username Submitted username (unused).
+ */
+function cb_login_failed( $username ) {
+	// Only intervene for an actual browser login on wp-login.php. REST,
+	// XML-RPC and Application Password auth failures also fire this hook and
+	// must be left alone — redirecting them would break API authentication.
+	if ( 'wp-login.php' !== ( $GLOBALS['pagenow'] ?? '' ) || wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) ) {
+		return;
+	}
+
+	$request_uri   = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
+	$is_admin_gate = ( isset( $_REQUEST['cb_admin_login'] ) && '1' === (string) $_REQUEST['cb_admin_login'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		|| false !== strpos( $request_uri, '/login-w-hub' );
+	if ( $is_admin_gate ) {
+		return;
+	}
+
+	$args = array( 'login' => 'failed' );
+	if ( ! empty( $_REQUEST['redirect_to'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$args['redirect_to'] = rawurlencode( esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) ) );
+	}
+	wp_safe_redirect( add_query_arg( $args, home_url( '/login/' ) ) );
+	exit;
+}
+add_action( 'wp_login_failed', 'cb_login_failed', 20 );
+
+/**
+ * Guard against an empty-submission edge case: if the login form is POSTed
+ * with no username or password, wp-login.php would normally re-render itself.
+ * Route that back to the branded page too so the experience stays consistent.
+ */
+function cb_login_empty_guard() {
+	if ( 'wp-login.php' !== ( $GLOBALS['pagenow'] ?? '' ) ) {
+		return;
+	}
+	if ( 'POST' !== strtoupper( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) ) {
+		return;
+	}
+	$action = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : 'login'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	if ( 'login' !== $action ) {
+		return;
+	}
+	$has_user = ! empty( $_POST['log'] );
+	$has_pass = ! empty( $_POST['pwd'] );
+	if ( $has_user && $has_pass ) {
+		return;
+	}
+	$is_admin_gate = ( isset( $_REQUEST['cb_admin_login'] ) && '1' === (string) $_REQUEST['cb_admin_login'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		|| false !== strpos( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), '/login-w-hub' );
+	if ( $is_admin_gate ) {
+		return;
+	}
+	wp_safe_redirect( add_query_arg( 'login', 'failed', home_url( '/login/' ) ) );
+	exit;
+}
+add_action( 'login_init', 'cb_login_empty_guard' );
