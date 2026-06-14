@@ -500,7 +500,7 @@ class WPistic_LSI_License_Service {
 		}
 		$status = isset( $license['status'] ) ? $license['status'] : 'inactive';
 
-		if ( in_array( $status, array( 'revoked', 'suspended', 'disabled', 'pending', 'inactive' ), true ) ) {
+		if ( in_array( $status, array( 'revoked', 'suspended', 'disabled', 'pending', 'inactive', 'expired' ), true ) ) {
 			return $status;
 		}
 
