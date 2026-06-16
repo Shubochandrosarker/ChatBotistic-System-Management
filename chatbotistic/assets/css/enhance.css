@@ -61,3 +61,115 @@ img, svg, video, canvas, table { max-width: 100%; }
 	from { opacity: 0; transform: translateY(12px); }
 	to   { opacity: 1; transform: none; }
 }
+
+/* ============================================================================
+   RESPONSIVE OVERRIDES (layout-only) — appended audit pass.
+
+   The base V4 sheet (v4-styles.css) already collapses most landmark grids
+   (hero-grid, split-2, features-grid, use-grid, int-grid, problem-grid,
+   pricing-grid, compare-table, footer-op-grid, op-pipeline-track, phases,
+   use-row) and portal.css stacks the member portal shell. This block fills
+   the remaining gaps: inline grids that have NO matching V4 rule (so they
+   never collapse), inline grids that V4 only relaxes WITHOUT !important (so
+   the inline value still wins on tablet), the unwrapped portal data tables,
+   and a few oversized-heading / flex-row safeties.
+
+   Every rule lives inside a max-width media query so desktop is untouched.
+   !important is used only where an inline style="grid-template-columns:…"
+   on the element would otherwise win. No motion is introduced here.
+   ========================================================================== */
+
+/* ---------- ~960px: tablet ---------- */
+@media (max-width: 960px) {
+	/* Inline `features-grid` 3-up on About / Tutorials / Support pages. V4 only
+	   relaxes .features-grid to 2-up WITHOUT !important at this width, so the
+	   page-level inline repeat(3,1fr) keeps winning and crowds the cards. */
+	.features-grid[style*="repeat(3"] { grid-template-columns: 1fr 1fr !important; }
+
+	/* page-upgrade.php pricing-grid is inline repeat(2,1fr) on a max-width:760
+	   wrapper — already 2-up, leave as-is until phone width below. */
+
+	/* landing-v4-usecase.php "Typical results" metrics: bare inline
+	   repeat(3,1fr) div inside the stacked .split-2 — three big numbers stay
+	   3-up all the way down. Scope tightly via the inline-style attribute. */
+	.split-2 [style*="grid-template-columns:repeat(3,1fr)"] {
+		grid-template-columns: 1fr 1fr 1fr !important; /* still fits at tablet */
+	}
+}
+
+/* ---------- ~760px: large phone / small tablet ---------- */
+@media (max-width: 760px) {
+	/* Collapse the remaining inline 3-up feature grids to a single column. */
+	.features-grid[style*="repeat(3"] { grid-template-columns: 1fr !important; }
+
+	/* Use-cases row: V4 already collapses .use-row to `56px 1fr` via !important,
+	   but make sure the inline 220px CTA column / meta wrap cleanly and don't
+	   force a min track width. */
+	.use-row { grid-template-columns: 56px 1fr !important; }
+	.use-row .use-row-meta,
+	.use-row .use-row-cta { justify-self: start !important; }
+
+	/* page-upgrade.php two-up pricing preview → single column on phones. */
+	.pricing-grid[style*="repeat(2"] { grid-template-columns: 1fr !important; max-width: 100% !important; }
+
+	/* landing-v4-usecase metrics → 1fr at this width (numbers are large). */
+	.split-2 [style*="grid-template-columns:repeat(3,1fr)"] {
+		grid-template-columns: 1fr 1fr !important;
+	}
+
+	/* Portal data tables (license.php, invoices.php) are unwrapped <table
+	   class="cb-table" style="width:100%"> elements with 4–5 columns and no
+	   styling at all. With no parent wrapper to scroll, let the table itself
+	   scroll horizontally inside the panel instead of blowing out the page. */
+	.cb-table {
+		display: block;
+		width: 100% !important;
+		max-width: 100%;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		white-space: nowrap;
+	}
+	.cb-table thead,
+	.cb-table tbody,
+	.cb-table tr { display: table; width: 100%; table-layout: auto; }
+
+	/* Any decorative inline flex row that could overflow → allow wrapping. */
+	.hero-meta,
+	.cta-actions,
+	.footer-cta-actions { flex-wrap: wrap; }
+}
+
+/* ---------- ~640px: phone ---------- */
+@media (max-width: 640px) {
+	/* Tame oversized hero/section headings that overflow narrow viewports.
+	   These clamp() values only ever shrink text on small screens. */
+	.hero .h-display,
+	.page-hero h1,
+	.big-cta h2 { font-size: clamp(28px, 8vw, 44px); line-height: 1.08; word-break: break-word; }
+
+	/* landing metrics: single column on phones. */
+	.split-2 [style*="grid-template-columns:repeat(3,1fr)"] {
+		grid-template-columns: 1fr !important;
+	}
+
+	/* About-page inline two-up stat grid (bare div, no class) — collapse via a
+	   scoped inline-style match so the two large numbers each get full width
+	   only if they would otherwise crowd. */
+	[style*="grid-template-columns:1fr 1fr"] > .glass-edge { min-width: 0; }
+}
+
+/* ---------- ~430px: small phone ---------- */
+@media (max-width: 430px) {
+	/* Final safety: any element carrying an inline multi-column grid collapses
+	   to one column. Scoped to inline-styled grids only (won't touch class-led
+	   grids already handled by the base sheets). */
+	[style*="grid-template-columns:repeat(2"],
+	[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+
+	/* Keep oversized numbers / headings from forcing horizontal scroll. */
+	.hero .h-display,
+	.page-hero h1 { font-size: clamp(24px, 9vw, 36px); }
+
+	/* Pricing compare table already scrolls (V4); ensure portal tables do too. */
+	.cb-table { font-size: 12.5px; }
+}
