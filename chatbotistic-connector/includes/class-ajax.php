@@ -85,8 +85,32 @@ class Ajax {
 		$user_id    = $this->guard();
 		$membership = Membership::for_user( $user_id );
 		if ( empty( $membership['active'] ) ) {
+			$status = isset( $membership['status'] ) ? (string) $membership['status'] : '';
+			switch ( $status ) {
+				case '':
+					$message = __( 'You don’t have an active plan yet. Choose a plan to start creating widgets.', 'chatbotistic-connector' );
+					break;
+				case 'pending':
+					$message = __( 'Your plan is awaiting payment. Complete checkout to activate it — if you chose a paid plan, make sure Stripe is connected.', 'chatbotistic-connector' );
+					break;
+				case 'past_due':
+				case 'unpaid':
+					$message = __( 'Your last payment didn’t go through, so your plan is paused. Update your payment method to reactivate.', 'chatbotistic-connector' );
+					break;
+				case 'paused':
+				case 'cancelled':
+				case 'canceled':
+				case 'expired':
+					/* translators: %s: membership status */
+					$message = sprintf( __( 'Your plan is %s. Renew or choose a plan to manage widgets.', 'chatbotistic-connector' ), $status );
+					break;
+				default:
+					/* translators: %s: membership status */
+					$message = sprintf( __( 'Your plan is not active (status: %s). Activate or renew a plan to manage widgets.', 'chatbotistic-connector' ), $status );
+			}
 			wp_send_json_error( array(
-				'message' => __( 'Your plan is not active. Please activate or renew a plan to manage widgets.', 'chatbotistic-connector' ),
+				'message' => $message,
+				'status'  => $status,
 				'upgrade' => true,
 			), 403 );
 		}
