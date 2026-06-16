@@ -17,7 +17,29 @@
 		pricingToggle();
 		reveal();
 		ecoCycle();
+		docsTabs();
 	});
+
+	/* ---- Docs sidebar tabs — switch the visible content panel ---- */
+	function docsTabs() {
+		var side = document.querySelector('.docs-side');
+		if (!side) { return; }
+		var links = Array.prototype.slice.call(side.querySelectorAll('a[data-doc]'));
+		var panels = Array.prototype.slice.call(document.querySelectorAll('.docs-content[data-doc-panel]'));
+		if (!links.length || !panels.length) { return; }
+
+		links.forEach(function (link) {
+			link.addEventListener('click', function (e) {
+				e.preventDefault();
+				var target = link.getAttribute('data-doc');
+				links.forEach(function (l) { l.classList.remove('active'); });
+				link.classList.add('active');
+				panels.forEach(function (p) {
+					p.classList.toggle('is-active', p.getAttribute('data-doc-panel') === target);
+				});
+			});
+		});
+	}
 
 	/* ---- WordPressistic ecosystem — rotate the active brand + cycling word ---- */
 	function ecoCycle() {

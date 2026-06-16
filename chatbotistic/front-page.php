@@ -215,7 +215,7 @@ $cb_public_flow = array( __( 'Plan', 'chatbotistic' ), __( 'Portal', 'chatbotist
 					<div class="solution-list">
 						<?php foreach ( $cb_solutions as $cb_s ) : ?>
 							<div class="solution-item">
-								<div class="si-ico"></div>
+								<div class="si-ico"><?php echo cb_get_icon( $cb_s[0], 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 								<div><b><?php echo esc_html( $cb_s[1] ); ?></b><span><?php echo esc_html( $cb_s[2] ); ?></span></div>
 							</div>
 						<?php endforeach; ?>
@@ -267,7 +267,7 @@ $cb_public_flow = array( __( 'Plan', 'chatbotistic' ), __( 'Portal', 'chatbotist
 			<div class="features-grid">
 				<?php foreach ( $cb_features as $cb_i => $cb_f ) : ?>
 					<div class="f-card">
-						<div class="f-ico"></div>
+						<div class="f-ico"><?php echo cb_get_icon( $cb_f[0], 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 						<?php if ( 0 === $cb_i ) : ?><div class="ribbon"><?php esc_html_e( 'CORE', 'chatbotistic' ); ?></div><?php endif; ?>
 						<h3><?php echo esc_html( $cb_f[1] ); ?></h3>
 						<p><?php echo esc_html( $cb_f[2] ); ?></p>
@@ -293,7 +293,7 @@ $cb_public_flow = array( __( 'Plan', 'chatbotistic' ), __( 'Portal', 'chatbotist
 							<?php if ( $cb_live ) : ?>
 								<div class="op-livechip"><span class="d op-pulse"></span><?php esc_html_e( 'Live', 'chatbotistic' ); ?></div>
 							<?php endif; ?>
-							<div class="op-node"></div>
+							<div class="op-node"><?php echo cb_get_icon( $cb_s[1], 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 							<div class="op-step-ix"><?php echo esc_html( $cb_s[0] ); ?></div>
 							<h3><?php echo esc_html( $cb_s[2] ); ?></h3>
 							<p><?php echo esc_html( $cb_s[3] ); ?></p>
