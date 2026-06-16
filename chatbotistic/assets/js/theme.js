@@ -10,6 +10,11 @@
 		else { document.addEventListener('DOMContentLoaded', fn); }
 	};
 
+	// Mark that JS is running so reveal animations only hide content when we
+	// can guarantee we'll show it again. Without this class the CSS keeps
+	// everything visible, so a JS failure never leaves blank cards.
+	document.documentElement.classList.add('cbjs');
+
 	ready(function () {
 		dropdowns();
 		mobileNav();
@@ -147,12 +152,21 @@
 
 	/* ---- Reveal on scroll ---- */
 	function reveal() {
-		var els = document.querySelectorAll('.cb-reveal');
+		// Auto-tag common cards/sections so they animate in on scroll without
+		// every template needing the class. Skip anything inside a horizontal
+		// scroller so we never hide off-screen carousel items.
+		var autoSel = '.f-card, .op-stepcard, .solution-item, .rec-card, .qa, .uc-card, .price-card, .stat-card';
+		Array.prototype.forEach.call(document.querySelectorAll(autoSel), function (el) {
+			el.classList.add('cb-reveal');
+		});
+
+		var els = Array.prototype.slice.call(document.querySelectorAll('.cb-reveal'));
 		if (!els.length) { return; }
-		if (!('IntersectionObserver' in window)) {
-			els.forEach(function (el) { el.classList.add('is-in'); });
-			return;
-		}
+
+		var showAll = function () { els.forEach(function (el) { el.classList.add('is-in'); }); };
+
+		if (!('IntersectionObserver' in window)) { showAll(); return; }
+
 		var io = new IntersectionObserver(function (entries) {
 			entries.forEach(function (entry) {
 				if (entry.isIntersecting) {
@@ -160,7 +174,11 @@
 					io.unobserve(entry.target);
 				}
 			});
-		}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+		}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 		els.forEach(function (el) { io.observe(el); });
+
+		// Failsafe: reveal everything after a short delay in case the observer
+		// never fires (very tall layouts, background tabs, etc.).
+		setTimeout(showAll, 1800);
 	}
 })();

@@ -517,10 +517,12 @@ p { margin: 0; }
 .cb-footer__bottom nav { display: flex; gap: 18px; flex-wrap: wrap; }
 
 /* ---------- Reveal on scroll ---------- */
-.cb-reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s ease; }
-.cb-reveal.is-in { opacity: 1; transform: none; }
+/* Only hide pre-reveal when JS is confirmed running (html.cbjs); otherwise
+   content stays visible so a script failure never blanks the page. */
+.cbjs .cb-reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s ease; }
+.cbjs .cb-reveal.is-in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
-	.cb-reveal { opacity: 1; transform: none; transition: none; }
+	.cbjs .cb-reveal { opacity: 1; transform: none; transition: none; }
 	html { scroll-behavior: auto; }
 }
 
