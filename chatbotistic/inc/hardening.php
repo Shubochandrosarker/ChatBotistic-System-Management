@@ -91,12 +91,39 @@ add_filter( 'author_link', 'cb_kill_author_link' );
  * - Optional admin backdoor URL: /login-w-hub?cb_admin_login=1
  */
 function cb_protect_wp_login_surfaces() {
-	if ( is_admin() && ! wp_doing_ajax() && ! current_user_can( 'manage_options' ) ) {
+	$pagenow = isset( $GLOBALS['pagenow'] ) ? $GLOBALS['pagenow'] : '';
+
+	// Block the wp-admin dashboard for non-admins, but never interfere with the
+	// AJAX (admin-ajax.php) or form (admin-post.php) endpoints — both define
+	// WP_ADMIN, so is_admin() is true there even for logged-out visitors, and
+	// the theme's public forms (contact, demo, newsletter, support) post to
+	// admin-post.php. Redirecting those would break every front-end form.
+	if (
+		is_admin()
+		&& ! wp_doing_ajax()
+		&& 'admin-post.php' !== $pagenow
+		&& ! current_user_can( 'manage_options' )
+	) {
 		wp_safe_redirect( home_url( '/404/' ) );
 		exit;
 	}
 
-	if ( ! isset( $GLOBALS['pagenow'] ) || 'wp-login.php' !== $GLOBALS['pagenow'] ) {
+	if ( 'wp-login.php' !== $pagenow ) {
+		return;
+	}
+
+	// Authentication itself must always reach wp-login.php. The branded /login/
+	// form POSTs credentials here, and the password-reset / logout / GDPR flows
+	// arrive via email links. Only the bare login *form display* (a plain GET)
+	// is hidden behind the branded /login/ page.
+	$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( (string) $_SERVER['REQUEST_METHOD'] ) : 'GET';
+	if ( 'POST' === $request_method ) {
+		return;
+	}
+
+	$action          = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : 'login'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$allowed_actions = array( 'logout', 'lostpassword', 'retrievepassword', 'resetpass', 'rp', 'postpass', 'confirmaction', 'register' );
+	if ( in_array( $action, $allowed_actions, true ) ) {
 		return;
 	}
 

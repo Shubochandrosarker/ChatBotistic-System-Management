@@ -210,7 +210,7 @@ class System_Health {
 
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 		// Don't compete with the Profile page itself.
-		if ( $screen && 'memberistic_page_chatbotistic-profile' === $screen->id ) {
+		if ( $screen && false !== strpos( (string) $screen->id, 'chatbotistic-profile' ) ) {
 			update_option( self::FIRST_RUN_FLAG, '1', false );
 			return;
 		}

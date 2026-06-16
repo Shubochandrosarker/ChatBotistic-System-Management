@@ -62,7 +62,7 @@ final class Admin {
 	}
 
 	public function enqueue_assets( string $hook ): void {
-		if ( ! str_contains( $hook, self::MENU_SLUG ) ) return;
+		if ( false === strpos( (string) $hook, self::MENU_SLUG ) ) return;
 
 		wp_enqueue_style( 'cbw-admin', CBW_PLUGIN_URL . 'assets/css/admin.css', [], CBW_VERSION );
 		wp_enqueue_script( 'cbw-admin', CBW_PLUGIN_URL . 'assets/js/admin.js', [], CBW_VERSION, true );

@@ -696,7 +696,7 @@ class Ajax {
 			'referer' => (string) ( $s['referer'] ?? '' ),
 			'widget'  => (string) ( $s['business']['name'] ?? '' ),
 			'agent'   => (string) ( $s['whatsapp']['name'] ?? '' ),
-			'is_new'  => empty( $s['isLeadNew'] ),
+			'is_new'  => ! empty( $s['isLeadNew'] ),
 			'fields'  => $fields,
 			'booked'  => ! empty( $s['bookingData'] ),
 		);
