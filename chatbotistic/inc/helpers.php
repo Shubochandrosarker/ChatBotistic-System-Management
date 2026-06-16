@@ -228,7 +228,7 @@ function cb_plans_url() {
  * @return string
  */
 function cb_free_checkout_url() {
-	$checkout = cb_member_url( 'checkout_page_id', 'memberistic-checkout', home_url( '/memberistic-checkout/' ) );
+	$checkout = cb_member_url( 'checkout_page_id', 'checkout', home_url( '/checkout/' ) );
 	return add_query_arg(
 		array(
 			'memberistic_plan'  => 'free',

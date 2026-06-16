@@ -32,7 +32,7 @@ $cb_cases = function_exists( 'cb_v4_use_cases' ) ? cb_v4_use_cases() : array();
 				$cb_i++; ?>
 				<a class="glass glass-edge use-row" href="<?php echo esc_url( home_url( '/' . $cb_slug . '/' ) ); ?>"
 				   style="padding:28px;display:grid;grid-template-columns:60px 1.4fr 1.4fr 220px;gap:28px;align-items:center;text-decoration:none;">
-					<div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,rgba(79,139,255,0.15),rgba(160,112,255,0.15));border:1px solid rgba(255,255,255,0.08);display:grid;place-items:center;color:#cfdcff;"></div>
+					<div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,rgba(79,139,255,0.15),rgba(160,112,255,0.15));border:1px solid rgba(255,255,255,0.08);display:grid;place-items:center;color:#cfdcff;"><?php echo cb_get_icon( isset( $cb_c['icon'] ) ? $cb_c['icon'] : 'spark', 24 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 					<div>
 						<div style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;color:var(--text-dim);text-transform:uppercase;">
 							<?php echo esc_html( str_pad( (string) $cb_i, 2, '0', STR_PAD_LEFT ) ); ?> · <?php esc_html_e( 'Use case', 'chatbotistic' ); ?>

@@ -10,7 +10,8 @@
 html, body { max-width: 100%; overflow-x: hidden; }
 @supports (overflow-x: clip) { html, body { overflow-x: clip; } }
 img, svg, video, canvas, table { max-width: 100%; }
-.f-ico svg, .si-ico svg, .op-node svg { display: block; }
+.f-ico svg, .si-ico svg, .op-node svg,
+.use-emoji svg, .int-logo svg, .chain-node .ci svg { display: block; }
 
 /* ---------- Feature / card grids on phones ---------- */
 @media (max-width: 680px) {

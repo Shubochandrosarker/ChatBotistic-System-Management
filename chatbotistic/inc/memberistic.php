@@ -70,7 +70,15 @@ add_action( 'wp_enqueue_scripts', 'cb_memberistic_assets', 20 );
  * @return string
  */
 function cb_memberistic_checkout_url( $slug = '' ) {
-	$url = cb_member_url( 'checkout_page_id', 'memberistic-checkout', cb_plans_url() );
+	// Resolve the Memberistic checkout page, falling back to the theme's own
+	// /checkout/ page — never to the pricing page, or the plan param would be
+	// appended to /pricing/ and the button would loop back on itself.
+	$fallback = home_url( '/checkout/' );
+	$page     = get_page_by_path( 'checkout' );
+	if ( $page && 'publish' === get_post_status( $page ) ) {
+		$fallback = get_permalink( $page );
+	}
+	$url = cb_member_url( 'checkout_page_id', 'checkout', $fallback );
 	return $slug ? add_query_arg( 'memberistic_plan', rawurlencode( $slug ), $url ) : $url;
 }
 

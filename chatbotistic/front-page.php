@@ -318,9 +318,11 @@ $cb_public_flow = array( __( 'Plan', 'chatbotistic' ), __( 'Portal', 'chatbotist
 				<a class="btn btn-ghost" href="<?php echo esc_url( home_url( '/use-cases/' ) ); ?>"><?php esc_html_e( 'See all use cases', 'chatbotistic' ); ?></a>
 			</div>
 			<div class="use-grid">
-				<?php foreach ( $cb_usecases as $cb_u ) : ?>
+				<?php
+				$cb_uc_icons = array( 'agencies' => 'users', 'local-business' => 'store', 'clinics-spas' => 'spa', 'coaches' => 'chart', 'real-estate' => 'home', 'ecommerce' => 'cart', 'travel-agencies' => 'plane', 'wordpress-sites' => 'wp', 'saas-founders' => 'rocket' );
+				foreach ( $cb_usecases as $cb_u ) : ?>
 					<a class="use-card" href="<?php echo esc_url( home_url( '/' . $cb_u[0] . '/' ) ); ?>">
-						<div class="use-emoji"></div>
+						<div class="use-emoji"><?php echo cb_get_icon( $cb_uc_icons[ $cb_u[0] ] ?? 'spark', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 						<div><b><?php echo esc_html( $cb_u[1] ); ?></b><span><?php echo esc_html( $cb_u[2] ); ?></span></div>
 					</a>
 				<?php endforeach; ?>
@@ -337,9 +339,11 @@ $cb_public_flow = array( __( 'Plan', 'chatbotistic' ), __( 'Portal', 'chatbotist
 				<p class="lead" style="margin:18px auto 0;"><?php esc_html_e( 'Native integrations for WordPress, WooCommerce, HubSpot, Zoho, Stripe, PayPal, Google Sheets, Email, WhatsApp, and Webhooks.', 'chatbotistic' ); ?></p>
 			</div>
 			<div class="int-grid">
-				<?php foreach ( $cb_integrations as $cb_int ) : ?>
+				<?php
+				$cb_int_icons = array( 'WordPress' => 'wp', 'WooCommerce' => 'cart', 'HubSpot' => 'users', 'Zoho' => 'users', 'Stripe' => 'card', 'PayPal' => 'card', 'Google Sheets' => 'chart', 'Email' => 'mail', 'WhatsApp' => 'wa', 'Webhooks' => 'code' );
+				foreach ( $cb_integrations as $cb_int ) : ?>
 					<div class="int-tile">
-						<div class="int-logo"></div>
+						<div class="int-logo"><?php echo cb_get_icon( $cb_int_icons[ $cb_int ] ?? 'plug', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 						<span><?php echo esc_html( $cb_int ); ?></span>
 					</div>
 				<?php endforeach; ?>
@@ -382,10 +386,11 @@ $cb_public_flow = array( __( 'Plan', 'chatbotistic' ), __( 'Portal', 'chatbotist
 					<div class="phase-chain">
 						<?php
 						$cb_chain = array( __( 'Chatbotistic.com', 'chatbotistic' ), __( 'Member Portal', 'chatbotistic' ), __( 'License', 'chatbotistic' ), __( 'WordPress Addon', 'chatbotistic' ) );
+						$cb_chain_icons = array( 'globe', 'users', 'key', 'wp' );
 						$cb_chain_n = count( $cb_chain ) - 1;
 						foreach ( $cb_chain as $cb_ci => $cb_node ) :
 							?>
-							<div class="chain-node"><span class="ci"></span><?php echo esc_html( $cb_node ); ?></div>
+							<div class="chain-node"><span class="ci"><?php echo cb_get_icon( $cb_chain_icons[ $cb_ci ] ?? 'spark', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span><?php echo esc_html( $cb_node ); ?></div>
 							<?php if ( $cb_ci < $cb_chain_n ) : ?>
 								<div class="chain-link op-flow"></div>
 							<?php endif; ?>
