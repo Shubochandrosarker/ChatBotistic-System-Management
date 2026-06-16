@@ -48,7 +48,7 @@ function cb_memberistic_assets() {
 		return;
 	}
 
-	if ( defined( 'MEMBERISTIC_URL' ) && is_page_template( 'page-account.php' ) ) {
+	if ( defined( 'MEMBERISTIC_URL' ) && ( is_page_template( 'page-account.php' ) || is_page_template( 'page-checkout.php' ) ) ) {
 		$ver = defined( 'MEMBERISTIC_VERSION' ) ? MEMBERISTIC_VERSION : null;
 		wp_enqueue_style( 'memberistic-frontend', MEMBERISTIC_URL . 'assets/frontend.css', array(), $ver );
 		wp_enqueue_script( 'memberistic-frontend', MEMBERISTIC_URL . 'assets/frontend.js', array(), $ver, true );

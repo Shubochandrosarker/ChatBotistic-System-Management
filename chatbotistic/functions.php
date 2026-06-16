@@ -28,3 +28,4 @@ require_once CB_DIR . '/inc/memberistic.php';
 require_once CB_DIR . '/inc/login-branding.php';
 require_once CB_DIR . '/inc/hardening.php';
 require_once CB_DIR . '/inc/pages.php';
+require_once CB_DIR . '/inc/autoconfig.php';
