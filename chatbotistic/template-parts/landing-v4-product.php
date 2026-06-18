@@ -64,9 +64,9 @@ $cb_top5  = array_slice( $cb_feats, 0, 5 );
 					<h2 class="h-2 text-grad"><?php echo esc_html( $cb_p['split_title'] ); ?></h2>
 					<p class="lead" style="margin-top:18px;"><?php echo esc_html( $cb_p['split_lead'] ); ?></p>
 					<div class="solution-list">
-						<?php foreach ( $cb_top5 as $cb_f ) : ?>
+						<?php foreach ( $cb_top5 as $cb_i => $cb_f ) : ?>
 							<div class="solution-item">
-								<div class="si-ico"></div>
+								<div class="si-ico"><?php echo cb_get_icon( cb_feature_icon( $cb_i ), 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 								<div><b><?php echo esc_html( $cb_f[0] ); ?></b><span><?php echo esc_html( $cb_f[1] ); ?></span></div>
 							</div>
 						<?php endforeach; ?>
@@ -90,9 +90,9 @@ $cb_top5  = array_slice( $cb_feats, 0, 5 );
 		<div class="container">
 			<h2 class="h-2 text-grad" style="text-align:center;"><?php echo esc_html( $cb_p['grid_title'] ); ?></h2>
 			<div class="features-grid" style="margin-top:48px;">
-				<?php foreach ( $cb_feats as $cb_f ) : ?>
+				<?php foreach ( $cb_feats as $cb_i => $cb_f ) : ?>
 					<div class="f-card">
-						<div class="f-ico"></div>
+						<div class="f-ico"><?php echo cb_get_icon( cb_feature_icon( $cb_i ), 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 						<h3><?php echo esc_html( $cb_f[0] ); ?></h3>
 						<p><?php echo esc_html( $cb_f[1] ); ?></p>
 					</div>

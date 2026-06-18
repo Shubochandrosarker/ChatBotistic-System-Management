@@ -85,9 +85,9 @@ if ( function_exists( 'cb_add_speakable' ) ) {
 				<h2 class="h-2 text-grad" style="margin-top:16px;"><?php esc_html_e( 'A system built around how you actually work.', 'chatbotistic' ); ?></h2>
 			</div>
 			<div class="features-grid" style="margin-top:40px;">
-				<?php foreach ( $cb_case['helps'] as $cb_h ) : ?>
+				<?php foreach ( $cb_case['helps'] as $cb_i => $cb_h ) : ?>
 					<div class="f-card">
-						<div class="f-ico"></div>
+						<div class="f-ico"><?php echo cb_get_icon( cb_feature_icon( $cb_i ), 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 						<h3><?php echo esc_html( $cb_h[0] ); ?></h3>
 						<p><?php echo esc_html( $cb_h[1] ); ?></p>
 					</div>

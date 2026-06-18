@@ -36,7 +36,7 @@ $cb_tutorials = array(
 			<div class="features-grid" style="grid-template-columns:repeat(3,1fr);">
 				<?php foreach ( $cb_tutorials as $cb_t ) : ?>
 					<a class="f-card" href="<?php echo esc_url( $cb_t[3] ); ?>" style="text-decoration:none;">
-						<div class="f-ico"></div>
+						<div class="f-ico"><?php echo cb_get_icon( 'play', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 						<div style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim);">
 							<span><?php echo esc_html( $cb_t[2] ); ?></span><span>·</span><span><?php echo esc_html( $cb_t[1] ); ?></span>
 						</div>

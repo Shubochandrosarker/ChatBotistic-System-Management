@@ -536,3 +536,96 @@ function cb_login_empty_guard() {
 	exit;
 }
 add_action( 'login_init', 'cb_login_empty_guard' );
+
+/**
+ * Source URL of the Chatbotistic Widget plugin zip.
+ *
+ * Stored in the cb_widget_download_url option (set it in wp-admin or via
+ * code) and filterable. The raw URL is never printed in the portal — the
+ * file is streamed through a gated handler below so visitors only ever see
+ * the /account/ download link, not the upload path.
+ *
+ * @return string
+ */
+function cb_widget_download_source() {
+	$default = 'https://www.chatbotistic.com/wp-content/uploads/2026/06/chatbotisticwidget.zip';
+	$url     = (string) get_option( 'cb_widget_download_url', '' );
+	return (string) apply_filters( 'cb_widget_download_src', $url ? $url : $default );
+}
+
+/**
+ * Point the portal "Download Widget plugin" button at the gated, nonce-signed
+ * streaming endpoint instead of the bare upload URL.
+ *
+ * @return string
+ */
+function cb_widget_download_link() {
+	return wp_nonce_url( admin_url( 'admin-post.php?action=cb_widget_download' ), 'cb_widget_download' );
+}
+add_filter( 'cb_widget_download_url', 'cb_widget_download_link', 20 );
+
+/**
+ * Gated widget-plugin download. Requires a logged-in member with an active
+ * license or membership (admins always allowed), verifies a nonce, then
+ * streams the zip so the real upload URL is never exposed in markup or the
+ * address bar.
+ */
+function cb_handle_widget_download() {
+	if ( ! is_user_logged_in() ) {
+		wp_safe_redirect( add_query_arg( 'redirect_to', rawurlencode( home_url( '/account/?view=license' ) ), home_url( '/login/' ) ) );
+		exit;
+	}
+	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'cb_widget_download' ) ) {
+		wp_safe_redirect( add_query_arg( 'view', 'license', home_url( '/account/' ) ) );
+		exit;
+	}
+
+	// Entitlement gate: an active license, an active membership, or an admin.
+	$allowed = current_user_can( 'manage_options' );
+	if ( ! $allowed && function_exists( 'cb_user_licenses' ) && cb_user_licenses() ) {
+		$allowed = true;
+	}
+	if ( ! $allowed && function_exists( 'cb_membership' ) ) {
+		$m       = cb_membership();
+		$allowed = ! empty( $m['active'] );
+	}
+	if ( ! $allowed ) {
+		wp_safe_redirect( add_query_arg( array( 'view' => 'license', 'download' => 'denied' ), home_url( '/account/' ) ) );
+		exit;
+	}
+
+	$src = cb_widget_download_source();
+	nocache_headers();
+
+	// Prefer streaming the local uploads file, so the source URL never leaves
+	// the server.
+	$uploads = wp_get_upload_dir();
+	$path    = '';
+	if ( ! empty( $uploads['baseurl'] ) && 0 === strpos( $src, $uploads['baseurl'] ) ) {
+		$candidate = $uploads['basedir'] . substr( $src, strlen( $uploads['baseurl'] ) );
+		if ( is_readable( $candidate ) ) {
+			$path = $candidate;
+		}
+	}
+
+	header( 'Content-Type: application/zip' );
+	header( 'Content-Disposition: attachment; filename="chatbotistic-widget.zip"' );
+
+	if ( $path ) {
+		header( 'Content-Length: ' . filesize( $path ) );
+		readfile( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile
+		exit;
+	}
+
+	// Remote fallback — fetch server-side and relay the bytes so the origin
+	// URL stays hidden from the browser.
+	$res = wp_remote_get( $src, array( 'timeout' => 30 ) );
+	if ( is_wp_error( $res ) || 200 !== (int) wp_remote_retrieve_response_code( $res ) ) {
+		wp_safe_redirect( add_query_arg( array( 'view' => 'license', 'download' => 'error' ), home_url( '/account/' ) ) );
+		exit;
+	}
+	echo wp_remote_retrieve_body( $res ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	exit;
+}
+add_action( 'admin_post_cb_widget_download', 'cb_handle_widget_download' );
+add_action( 'admin_post_nopriv_cb_widget_download', 'cb_handle_widget_download' );
