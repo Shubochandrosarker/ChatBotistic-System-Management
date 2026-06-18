@@ -37,6 +37,10 @@ body.login {
 	font-family: 'Sora', system-ui, sans-serif;
 	font-size: 23px; font-weight: 600; letter-spacing: -0.02em; color: #fff;
 }
+.cb-login-brand__img,
+.cb-login-brand .custom-logo {
+	height: 52px; width: auto; max-width: 260px; object-fit: contain;
+}
 
 /* Form card */
 .login form {
