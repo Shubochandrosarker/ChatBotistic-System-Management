@@ -49,6 +49,9 @@ function cb_enqueue_assets() {
 	wp_enqueue_style( 'cb-bridge',    CB_URI . '/assets/css/cb-bridge.css', array( 'cb-v4-portal' ), cb_asset_ver( '/assets/css/cb-bridge.css' ) );
 	wp_enqueue_style( 'cb-theme',     CB_URI . '/assets/css/theme.css',     array( 'cb-bridge' ), cb_asset_ver( '/assets/css/theme.css' ) );
 
+	// Design-audit corrections — must win the cascade, so it loads last.
+	wp_enqueue_style( 'cb-fixes',     CB_URI . '/assets/css/cb-fixes.css',  array( 'cb-theme' ),  cb_asset_ver( '/assets/css/cb-fixes.css' ) );
+
 	// Portal-only legacy overrides — still account-template-scoped.
 	if ( is_page_template( 'page-account.php' ) ) {
 		wp_enqueue_style( 'cb-portal', CB_URI . '/assets/css/portal.css', array( 'cb-theme' ), cb_asset_ver( '/assets/css/portal.css' ) );

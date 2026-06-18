@@ -220,3 +220,50 @@ function cb_free_checkout_url() {
 		$checkout
 	);
 }
+
+/**
+ * Brand logo markup.
+ *
+ * Prefers a Customizer custom logo when one is set; otherwise falls back to
+ * the bundled neon wordmark shipped with the theme. Returns a linked logo so
+ * it can be dropped into the header, footer, and auth/checkout top bars with
+ * consistent branding everywhere.
+ *
+ * @param array $args {
+ *     @type string $class Extra class on the <a> wrapper. Default ''.
+ *     @type bool   $link  Wrap in a home link. Default true.
+ * }
+ * @return string
+ */
+function cb_logo( $args = array() ) {
+	$args  = wp_parse_args( $args, array( 'class' => '', 'link' => true ) );
+	$name  = get_bloginfo( 'name' );
+
+	if ( has_custom_logo() ) {
+		$inner = get_custom_logo();
+		// get_custom_logo() already returns a linked <img>; strip its anchor so
+		// we control the wrapper consistently.
+		$inner = preg_replace( '#</?a[^>]*>#i', '', $inner );
+	} else {
+		$src   = CB_URI . '/assets/images/chatbotistic-logo.png';
+		$inner = sprintf(
+			'<img src="%1$s" alt="%2$s" class="cb-logo__img" width="242" height="60" decoding="async" />',
+			esc_url( $src ),
+			esc_attr( $name )
+		);
+	}
+
+	$class = trim( 'cb-logo ' . $args['class'] );
+
+	if ( ! $args['link'] ) {
+		return '<span class="' . esc_attr( $class ) . '">' . $inner . '</span>';
+	}
+
+	return sprintf(
+		'<a class="%1$s" href="%2$s" aria-label="%3$s" rel="home">%4$s</a>',
+		esc_attr( $class ),
+		esc_url( home_url( '/' ) ),
+		esc_attr( $name ),
+		$inner
+	);
+}

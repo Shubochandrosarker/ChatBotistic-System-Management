@@ -141,12 +141,7 @@ if ( ! is_page_template( 'page-account.php' ) && ! is_404() ) {
 		<div class="footer-op-grid">
 
 			<div class="footer-col footer-op-brand">
-				<a class="cb-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-					<span class="cb-logo__mark" aria-hidden="true">
-						<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5C4 5 5 4 6.5 4h11C19 4 20 5 20 6.5v8c0 1.5-1 2.5-2.5 2.5H13l-4 3v-3H6.5C5 17 4 16 4 14.5z"/></svg>
-					</span>
-					<span><?php echo esc_html( get_bloginfo( 'name' ) ); ?></span>
-				</a>
+				<?php echo cb_logo( array( 'class' => 'cb-logo--footer' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside helper. ?>
 				<p><?php esc_html_e( 'A WordPress-first WhatsApp AI chatbot platform. Turn every website visit into a conversation, then into a lead.', 'chatbotistic' ); ?></p>
 			</div>
 

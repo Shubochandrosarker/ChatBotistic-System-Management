@@ -64,16 +64,7 @@ $cb_products = array(
 <header class="cb-header" role="banner">
 	<div class="cb-container cb-header__inner">
 
-		<a class="cb-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
-			<?php if ( has_custom_logo() ) : ?>
-				<?php the_custom_logo(); ?>
-			<?php else : ?>
-				<span class="cb-logo__mark" aria-hidden="true">
-					<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5C4 5 5 4 6.5 4h11C19 4 20 5 20 6.5v8c0 1.5-1 2.5-2.5 2.5H13l-4 3v-3H6.5C5 17 4 16 4 14.5z"/></svg>
-				</span>
-				<span><?php echo esc_html( get_bloginfo( 'name' ) ); ?></span>
-			<?php endif; ?>
-		</a>
+		<?php echo cb_logo(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside helper. ?>
 
 		<nav class="cb-nav" aria-label="<?php esc_attr_e( 'Primary', 'chatbotistic' ); ?>">
 			<a class="cb-nav__link<?php echo is_front_page() ? ' is-active" aria-current="page' : ''; ?>" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'chatbotistic' ); ?></a>
@@ -148,21 +139,46 @@ $cb_products = array(
 		</div>
 	</div>
 
-	<nav class="cb-mobile-nav" data-mobile-nav aria-label="<?php esc_attr_e( 'Mobile', 'chatbotistic' ); ?>">
-		<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'chatbotistic' ); ?></a>
-		<a href="<?php echo esc_url( home_url( '/features/' ) ); ?>"><?php esc_html_e( 'Features', 'chatbotistic' ); ?></a>
-		<a href="<?php echo esc_url( home_url( '/pricing/' ) ); ?>"><?php esc_html_e( 'Pricing', 'chatbotistic' ); ?></a>
-		<a href="<?php echo esc_url( home_url( '/use-cases/' ) ); ?>"><?php esc_html_e( 'Use cases', 'chatbotistic' ); ?></a>
-		<div class="cb-mobile-nav__group"><?php esc_html_e( 'Products', 'chatbotistic' ); ?></div>
-		<?php foreach ( $cb_products as $cb_p ) : ?>
-			<a href="<?php echo esc_url( home_url( '/' . $cb_p[0] . '/' ) ); ?>"><?php echo esc_html( $cb_p[2] ); ?></a>
-		<?php endforeach; ?>
-		<div class="cb-mobile-nav__group"><?php esc_html_e( 'More', 'chatbotistic' ); ?></div>
-		<a href="<?php echo esc_url( home_url( '/docs/' ) ); ?>"><?php esc_html_e( 'Docs', 'chatbotistic' ); ?></a>
-		<a href="<?php echo esc_url( home_url( '/about/' ) ); ?>"><?php esc_html_e( 'About', 'chatbotistic' ); ?></a>
-		<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact', 'chatbotistic' ); ?></a>
-		<a href="<?php echo esc_url( $cb_logged_in ? $cb_account : $cb_signin ); ?>"><?php echo $cb_logged_in ? esc_html__( 'My Dashboard', 'chatbotistic' ) : esc_html__( 'Sign in', 'chatbotistic' ); ?></a>
-	</nav>
 </header>
+
+<?php /*
+ * Mobile drawer lives OUTSIDE <header> on purpose: the header's
+ * backdrop-filter establishes a containing block, which would otherwise trap
+ * this position:fixed drawer inside the 72px bar and collapse it to nothing.
+ */ ?>
+<nav class="cb-mobile-nav" data-mobile-nav aria-label="<?php esc_attr_e( 'Mobile', 'chatbotistic' ); ?>">
+	<?php if ( $cb_logged_in ) : ?>
+		<div class="cb-mobile-nav__user">
+			<?php echo get_avatar( $cb_user->ID, 40 ); ?>
+			<div>
+				<strong><?php echo esc_html( $cb_user->display_name ); ?></strong>
+				<?php if ( ! empty( $cb_member['active'] ) && $cb_member['plan_name'] ) : ?>
+					<span><?php echo esc_html( $cb_member['plan_name'] ); ?></span>
+				<?php endif; ?>
+			</div>
+		</div>
+	<?php endif; ?>
+	<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'chatbotistic' ); ?></a>
+	<a href="<?php echo esc_url( home_url( '/features/' ) ); ?>"><?php esc_html_e( 'Features', 'chatbotistic' ); ?></a>
+	<a href="<?php echo esc_url( home_url( '/pricing/' ) ); ?>"><?php esc_html_e( 'Pricing', 'chatbotistic' ); ?></a>
+	<a href="<?php echo esc_url( home_url( '/use-cases/' ) ); ?>"><?php esc_html_e( 'Use cases', 'chatbotistic' ); ?></a>
+	<div class="cb-mobile-nav__group"><?php esc_html_e( 'Products', 'chatbotistic' ); ?></div>
+	<?php foreach ( $cb_products as $cb_p ) : ?>
+		<a href="<?php echo esc_url( home_url( '/' . $cb_p[0] . '/' ) ); ?>"><?php echo esc_html( $cb_p[2] ); ?></a>
+	<?php endforeach; ?>
+	<div class="cb-mobile-nav__group"><?php esc_html_e( 'More', 'chatbotistic' ); ?></div>
+	<a href="<?php echo esc_url( home_url( '/docs/' ) ); ?>"><?php esc_html_e( 'Docs', 'chatbotistic' ); ?></a>
+	<a href="<?php echo esc_url( home_url( '/about/' ) ); ?>"><?php esc_html_e( 'About', 'chatbotistic' ); ?></a>
+	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact', 'chatbotistic' ); ?></a>
+	<div class="cb-mobile-nav__cta">
+		<?php if ( $cb_logged_in ) : ?>
+			<a class="cb-btn cb-btn--primary" href="<?php echo esc_url( $cb_account ); ?>"><?php esc_html_e( 'My Dashboard', 'chatbotistic' ); ?></a>
+			<a class="cb-btn cb-btn--ghost" href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Log out', 'chatbotistic' ); ?></a>
+		<?php else : ?>
+			<a class="cb-btn cb-btn--primary" href="<?php echo esc_url( $cb_signup ); ?>"><?php esc_html_e( 'Get Started', 'chatbotistic' ); ?></a>
+			<a class="cb-btn cb-btn--ghost" href="<?php echo esc_url( $cb_signin ); ?>"><?php esc_html_e( 'Sign in', 'chatbotistic' ); ?></a>
+		<?php endif; ?>
+	</div>
+</nav>
 
 <main id="cb-main" role="main">
