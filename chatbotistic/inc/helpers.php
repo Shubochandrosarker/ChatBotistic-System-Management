@@ -66,6 +66,10 @@ function cb_get_icon( $name, $size = 18, $class = '' ) {
 		'gear'   => '<circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2.2-1.3L13.8 2h-3.6l-.4 2.4a7 7 0 0 0-2.2 1.3l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .9.1 1.3l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2.2 1.3l.4 2.4h3.6l.4-2.4a7 7 0 0 0 2.2-1.3l2.4 1 2-3.4-2-1.6c.1-.4.1-.9.1-1.3z"/>',
 		'key'    => '<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M16 7l3 3M14 9l3 3"/>',
 		'play'   => '<circle cx="12" cy="12" r="9"/><path d="m10 9 5 3-5 3z"/>',
+		'user'   => '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+		'spa'    => '<path d="M12 2c3 4 3 8 0 12-3-4-3-8 0-12zM6 13c4 0 6 2 6 7M18 13c-4 0-6 2-6 7"/>',
+		'plane'  => '<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>',
+		'book'   => '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM19 3v16"/>',
 	);
 
 	$cls = trim( 'cb-ico ' . $class );
@@ -76,6 +80,19 @@ function cb_get_icon( $name, $size = 18, $class = '' ) {
 		$out .= $multi[ $name ];
 	}
 	return $out . '</svg>';
+}
+
+/**
+ * Pick a sensible, varied icon key for a feature card that has no explicit
+ * icon, cycling through a curated palette by index so a grid gets distinct
+ * icons instead of a repeated one.
+ *
+ * @param int $i Zero-based item index.
+ * @return string Icon key understood by cb_get_icon().
+ */
+function cb_feature_icon( $i ) {
+	$set = array( 'spark', 'bolt', 'chat', 'wa', 'ai', 'form', 'cal', 'inbox', 'mail', 'plug', 'card', 'page', 'tag', 'code', 'chart', 'users', 'globe', 'shield', 'rocket', 'star', 'gear', 'key' );
+	return $set[ (int) $i % count( $set ) ];
 }
 
 /**
@@ -211,7 +228,7 @@ function cb_plans_url() {
  * @return string
  */
 function cb_free_checkout_url() {
-	$checkout = cb_member_url( 'checkout_page_id', 'memberistic-checkout', home_url( '/memberistic-checkout/' ) );
+	$checkout = cb_member_url( 'checkout_page_id', 'checkout', home_url( '/checkout/' ) );
 	return add_query_arg(
 		array(
 			'memberistic_plan'  => 'free',

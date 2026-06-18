@@ -69,9 +69,9 @@ $cb_pillars = array(
 		<div class="container">
 			<h2 class="h-2 text-grad" style="text-align:center;"><?php esc_html_e( 'What we build, why we build it.', 'chatbotistic' ); ?></h2>
 			<div class="features-grid" style="margin-top:48px;grid-template-columns:repeat(3,1fr);">
-				<?php foreach ( $cb_pillars as $cb_p ) : ?>
+				<?php $cb_pillar_icons = array( 'wp', 'users', 'rocket' ); foreach ( $cb_pillars as $cb_i => $cb_p ) : ?>
 					<div class="f-card">
-						<div class="f-ico"></div>
+						<div class="f-ico"><?php echo cb_get_icon( $cb_pillar_icons[ $cb_i ] ?? 'spark', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 						<h3><?php echo esc_html( $cb_p[0] ); ?></h3>
 						<p><?php echo esc_html( $cb_p[1] ); ?></p>
 					</div>

@@ -13,10 +13,23 @@ defined( 'ABSPATH' ) || exit;
 
 get_header();
 
-$cb_free_url  = function_exists( 'cb_free_checkout_url' ) ? cb_free_checkout_url() : home_url( '/register/?plan=free' );
-$cb_pro_url   = home_url( '/register/?plan=pro' );
-$cb_ag_url    = home_url( '/register/?plan=agency' );
-$cb_ltd_email = 'mailto:hello@chatbotistic.com?subject=Chatbotistic%20Lifetime%20enquiry';
+// Build plan CTA links from the Memberistic helpers so every button lands on a
+// real checkout / inquiry URL (no 404). Paid plans go to the mapped checkout
+// page as /checkout/?memberistic_plan=<slug>; the Free plan reuses the
+// dedicated free-onboarding checkout URL; Lifetime is contact-only and routes
+// to the LTD inquiry flow.
+$cb_free_url = function_exists( 'cb_free_checkout_url' )
+	? cb_free_checkout_url()
+	: home_url( '/checkout/?memberistic_plan=free' );
+$cb_pro_url = function_exists( 'cb_memberistic_checkout_url' )
+	? cb_memberistic_checkout_url( 'pro' )
+	: home_url( '/checkout/?memberistic_plan=pro' );
+$cb_ag_url = function_exists( 'cb_memberistic_checkout_url' )
+	? cb_memberistic_checkout_url( 'agency' )
+	: home_url( '/checkout/?memberistic_plan=agency' );
+$cb_ltd_url = function_exists( 'cb_ltd_inquiry_url' )
+	? cb_ltd_inquiry_url( 'lifetime' )
+	: home_url( '/contact/?plan=lifetime' );
 
 $cb_plans = array(
 	array(
@@ -45,7 +58,7 @@ $cb_plans = array(
 		'monthly' => '✳✳✳', 'annual' => '✳✳✳', 'sub' => '/one-time',
 		'note_m' => __( 'Contact for LTD Pricing', 'chatbotistic' ), 'note_a' => __( 'Contact for LTD Pricing', 'chatbotistic' ), 'save' => '',
 		'feats' => array( __( 'Everything in Agency', 'chatbotistic' ), __( 'Unlimited Widgets / Agents / Domains', 'chatbotistic' ), __( 'White-label with custom domain', 'chatbotistic' ), __( 'Lifetime updates', 'chatbotistic' ), __( 'Priority roadmap input', 'chatbotistic' ), __( 'Founder-direct support channel', 'chatbotistic' ), __( 'Custom contract & invoicing', 'chatbotistic' ) ),
-		'cta' => __( 'Contact for LTD Pricing', 'chatbotistic' ), 'href' => $cb_ltd_email, 'flavor' => 'lifetime',
+		'cta' => __( 'Contact for LTD Pricing', 'chatbotistic' ), 'href' => $cb_ltd_url, 'flavor' => 'lifetime',
 	),
 );
 

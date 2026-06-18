@@ -60,14 +60,14 @@ $cb_faqs = array(
 					<div>
 						<h5><?php echo esc_html( $cb_s[0] ); ?></h5>
 						<?php foreach ( $cb_s[1] as $cb_j => $cb_item ) : ?>
-							<a href="#" class="<?php echo ( 0 === $cb_i && 0 === $cb_j ) ? 'active' : ''; ?>"><?php echo esc_html( $cb_item ); ?></a>
+							<a href="#" data-doc="<?php echo esc_attr( $cb_i . '-' . $cb_j ); ?>" class="<?php echo ( 0 === $cb_i && 0 === $cb_j ) ? 'active' : ''; ?>"><?php echo esc_html( $cb_item ); ?></a>
 						<?php endforeach; ?>
 						<?php if ( $cb_i < count( $cb_sections ) - 1 ) : ?><div class="sep"></div><?php endif; ?>
 					</div>
 				<?php endforeach; ?>
 			</aside>
 
-			<article class="docs-content">
+			<article class="docs-content is-active" data-doc-panel="0-0">
 				<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'Getting started', 'chatbotistic' ); ?></span>
 				<h1 style="margin-top:18px;"><?php esc_html_e( 'Quickstart', 'chatbotistic' ); ?></h1>
 				<p><?php esc_html_e( 'Welcome to Chatbotistic. This guide gets your first widget live in under three minutes. You’ll create an account, build a chatbot, and embed it on your site.', 'chatbotistic' ); ?></p>
@@ -138,6 +138,40 @@ $cb_faqs = array(
 					<a class="btn btn-primary" href="<?php echo esc_url( home_url( '/support/' ) ); ?>"><?php esc_html_e( 'Open support', 'chatbotistic' ); ?></a>
 				</div>
 			</article>
+
+			<?php
+			// Generated panels for every other sidebar item, so each tab reveals
+			// its own section. Panel 0-0 (Quickstart) is the hand-written article above.
+			foreach ( $cb_sections as $cb_i => $cb_s ) :
+				foreach ( $cb_s[1] as $cb_j => $cb_item ) :
+					if ( 0 === $cb_i && 0 === $cb_j ) {
+						continue;
+					}
+					?>
+					<article class="docs-content" data-doc-panel="<?php echo esc_attr( $cb_i . '-' . $cb_j ); ?>">
+						<span class="section-eyebrow"><span class="dot"></span><?php echo esc_html( $cb_s[0] ); ?></span>
+						<h1 style="margin-top:18px;"><?php echo esc_html( $cb_item ); ?></h1>
+						<p>
+							<?php
+							printf(
+								/* translators: %s: documentation section title */
+								esc_html__( 'Documentation for %s is on its way. In the meantime, reach out to our team and we will walk you through it.', 'chatbotistic' ),
+								esc_html( $cb_item )
+							);
+							?>
+						</p>
+						<div style="padding:24px;border-radius:18px;background:linear-gradient(135deg,rgba(160,112,255,0.08),rgba(79,139,255,0.05));border:1px solid rgba(160,112,255,0.2);margin-top:48px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+							<div>
+								<h3 class="h-3"><?php esc_html_e( 'Need a hand?', 'chatbotistic' ); ?></h3>
+								<p style="color:var(--text-soft);margin:4px 0 0;"><?php esc_html_e( 'Our support team replies in under 2 hours during business days.', 'chatbotistic' ); ?></p>
+							</div>
+							<a class="btn btn-primary" href="<?php echo esc_url( home_url( '/support/' ) ); ?>"><?php esc_html_e( 'Open support', 'chatbotistic' ); ?></a>
+						</div>
+					</article>
+					<?php
+				endforeach;
+			endforeach;
+			?>
 
 			<aside class="docs-toc">
 				<h5><?php esc_html_e( 'On this page', 'chatbotistic' ); ?></h5>

@@ -37,9 +37,9 @@ $cb_topics = array(
 	<section class="section">
 		<div class="container">
 			<div class="features-grid" style="grid-template-columns:repeat(3,1fr);">
-				<?php foreach ( $cb_topics as $cb_t ) : ?>
+				<?php $cb_topic_icons = array( 'page', 'card', 'key', 'plug', 'play', 'chat' ); foreach ( $cb_topics as $cb_i => $cb_t ) : ?>
 					<a class="f-card" href="<?php echo esc_url( $cb_t[2] ); ?>" style="text-decoration:none;">
-						<div class="f-ico"></div>
+						<div class="f-ico"><?php echo cb_get_icon( $cb_topic_icons[ $cb_i ] ?? 'spark', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 						<h3><?php echo esc_html( $cb_t[0] ); ?></h3>
 						<p><?php echo esc_html( $cb_t[1] ); ?></p>
 						<span class="btn btn-ghost btn-sm" style="margin-top:14px;align-self:flex-start;"><?php echo esc_html( $cb_t[3] ); ?> →</span>

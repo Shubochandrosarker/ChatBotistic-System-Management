@@ -127,6 +127,7 @@ img, svg, video { max-width: 100%; }
 	max-width: 1060px; margin: 0 auto; padding: 40px 32px 80px;
 	display: grid; grid-template-columns: 1fr 380px; gap: 40px; align-items: start;
 }
+.cbk-wrap--single { max-width: 760px; grid-template-columns: minmax(0, 1fr); }
 .cbk-back {
 	display: inline-flex; align-items: center; gap: 7px; font-size: 13px;
 	color: var(--text-dim, #6b7491); text-decoration: none; margin-bottom: 18px;
