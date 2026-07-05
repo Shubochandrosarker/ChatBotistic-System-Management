@@ -3,7 +3,7 @@
  * Plugin Name:       Chatbotistic Connector
  * Plugin URI:        https://chatbotistic.com
  * Description:       Self-hosted dashboard for Chatbotistic users — provisions and manages WhatsApp widgets, agents, FAQs, leads and analytics through the Tochat.be API. Membership-gated via Memberistic. Users never leave your site.
- * Version: 3.1.1
+ * Version: 3.2.0
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            WordPressistic
@@ -16,7 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'CBC_VERSION',  '3.1.1' );
+define( 'CBC_VERSION',  '3.2.0' );
 define( 'CBC_FILE',     __FILE__ );
 define( 'CBC_DIR',      plugin_dir_path( __FILE__ ) );
 define( 'CBC_URL',      plugin_dir_url( __FILE__ ) );

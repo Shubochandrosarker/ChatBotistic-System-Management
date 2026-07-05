@@ -177,6 +177,7 @@ class Admin {
 		$email         = (string) Store::setting( 'api_email' );
 		$has_pass      = '' !== (string) Store::setting( 'api_password' );
 		$has_lead_key  = '' !== (string) Store::setting( 'lead_api_key' );
+		$dashboard_url = Store::dashboard_url();
 		$limits        = Membership::plan_limits();
 		$plans         = Membership::memberistic_plans();
 		// When the credentials are pinned in wp-config.php, lock the input
@@ -229,6 +230,17 @@ class Admin {
 					<?php esc_html_e( 'For production deployments, define the constants below in wp-config.php so secrets stay out of the database:', 'chatbotistic-connector' ); ?>
 					<code style="display:block;margin-top:6px;">define( 'CBC_API_EMAIL',    'master@your-account.com' );<br>define( 'CBC_API_PASSWORD', 'your-password' );<br>define( 'CBC_LEAD_API_KEY', 'optional-lead-key' );</code>
 				</p>
+
+				<h2><?php esc_html_e( 'Standalone Dashboard', 'chatbotistic-connector' ); ?></h2>
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row"><label for="cbc-dashboard-url"><?php esc_html_e( 'Dashboard URL', 'chatbotistic-connector' ); ?></label></th>
+						<td>
+							<input type="url" id="cbc-dashboard-url" name="dashboard_url" class="regular-text" value="<?php echo esc_attr( $dashboard_url ); ?>" placeholder="https://dashboard.chatbotistic.com">
+							<p class="description"><?php esc_html_e( 'Link shown to members pointing to the standalone Chatbotistic dashboard app.', 'chatbotistic-connector' ); ?></p>
+						</td>
+					</tr>
+				</table>
 
 				<h2><?php esc_html_e( 'Plan limits', 'chatbotistic-connector' ); ?></h2>
 				<p class="description"><?php esc_html_e( 'Widgets and WhatsApp agents allowed per Memberistic plan. Use -1 or “unlimited” for no limit.', 'chatbotistic-connector' ); ?></p>

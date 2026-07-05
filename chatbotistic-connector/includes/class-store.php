@@ -84,6 +84,20 @@ class Store {
 	}
 
 	/**
+	 * URL of the standalone Chatbotistic dashboard app
+	 * (https://dashboard.chatbotistic.com), where members will eventually
+	 * manage widgets more richly than this in-WordPress connector does.
+	 *
+	 * Falls back to the shipped default until an admin overrides it via the
+	 * Settings screen.
+	 *
+	 * @return string
+	 */
+	public static function dashboard_url(): string {
+		return (string) self::setting( 'dashboard_url', 'https://dashboard.chatbotistic.com' );
+	}
+
+	/**
 	 * Stable Tochat userClient tag for a WordPress user.
 	 *
 	 * Every widget a member creates is tagged with this string, so all

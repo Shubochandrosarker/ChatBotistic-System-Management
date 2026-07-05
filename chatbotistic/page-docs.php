@@ -39,6 +39,18 @@ $cb_faqs = array(
 	array( __( 'Can I customize the widget colors and branding?', 'chatbotistic' ), __( 'Yes. Every plan above Free includes color, position, and font customization. White Label plans get full CSS control and custom domains.', 'chatbotistic' ) ),
 	array( __( 'What happens to conversations after I cancel?', 'chatbotistic' ), __( 'You can export every conversation and lead at any time. After cancellation, your data is retained for 90 days and then permanently deleted.', 'chatbotistic' ) ),
 );
+
+// Deeper, always-current guides live inside the Chatbotistic Dashboard app
+// itself (dashboard.chatbotistic.com) rather than this marketing site, so
+// they stay in sync with the product. Link out to them via cb_dashboard_url().
+$cb_app_guides = array(
+	array( __( 'Getting Started', 'chatbotistic' ), 'rocket', 'docs/getting-started', __( 'Create your account, set up your workspace, and take the guided tour of the dashboard.', 'chatbotistic' ) ),
+	array( __( 'Create Your First Widget', 'chatbotistic' ), 'plug', 'docs/first-widget', __( 'Build a chat widget, style it to match your brand, and copy the embed snippet.', 'chatbotistic' ) ),
+	array( __( 'Connect WhatsApp', 'chatbotistic' ), 'wa', 'docs/connect-whatsapp', __( 'Link a WhatsApp Business number and assign it to an agent.', 'chatbotistic' ) ),
+	array( __( 'Booking Forms', 'chatbotistic' ), 'cal', 'docs/booking-forms', __( 'Set up services, availability, and calendar sync for in-chat bookings.', 'chatbotistic' ) ),
+	array( __( 'Campaigns & Message Limits', 'chatbotistic' ), 'chart', 'docs/campaigns-message-limits', __( 'Send WhatsApp campaigns and track your plan’s monthly message allowance.', 'chatbotistic' ) ),
+	array( __( 'White-Label Setup', 'chatbotistic' ), 'tag', 'docs/white-label-setup', __( 'Put your own logo, domain, and branding on the dashboard for clients.', 'chatbotistic' ) ),
+);
 ?>
 
 <main class="page-fade">
@@ -48,6 +60,24 @@ $cb_faqs = array(
 			<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'Documentation', 'chatbotistic' ); ?></span>
 			<h1 class="text-grad" style="max-width:760px;margin:18px auto 0;"><?php esc_html_e( 'Everything you need to ship faster.', 'chatbotistic' ); ?></h1>
 			<p style="max-width:640px;margin:18px auto 0;"><?php esc_html_e( 'Quickstarts, integration guides, API reference, and copy-paste embed snippets.', 'chatbotistic' ); ?></p>
+		</div>
+	</section>
+
+	<section class="section section-tight">
+		<div class="container">
+			<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'In the app', 'chatbotistic' ); ?></span>
+			<h2 style="margin-top:12px;"><?php esc_html_e( 'Guides inside your Dashboard', 'chatbotistic' ); ?></h2>
+			<p style="max-width:640px;"><?php esc_html_e( 'The quickstart below covers embedding the widget on this site. For the deeper, always up-to-date walkthroughs — building flows, connecting channels, and managing your team — open the in-app docs from your Chatbotistic Dashboard.', 'chatbotistic' ); ?></p>
+			<div class="features-grid" style="grid-template-columns:repeat(3,1fr);margin-top:32px;">
+				<?php foreach ( $cb_app_guides as $cb_g ) : ?>
+					<a class="f-card" href="<?php echo esc_url( cb_dashboard_url( $cb_g[2] ) ); ?>" style="text-decoration:none;">
+						<div class="f-ico"><?php echo cb_get_icon( $cb_g[1], 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+						<h3 style="margin-top:8px;"><?php echo esc_html( $cb_g[0] ); ?></h3>
+						<p style="color:var(--text-soft);font-size:13.5px;margin-top:6px;"><?php echo esc_html( $cb_g[3] ); ?></p>
+						<span class="btn btn-ghost btn-sm" style="margin-top:14px;align-self:flex-start;"><?php esc_html_e( 'Open in dashboard →', 'chatbotistic' ); ?></span>
+					</a>
+				<?php endforeach; ?>
+			</div>
 		</div>
 	</section>
 
