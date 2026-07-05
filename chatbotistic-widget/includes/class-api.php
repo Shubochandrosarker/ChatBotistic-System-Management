@@ -22,20 +22,27 @@ final class API {
 		if ( '' === $stored ) {
 			return '';
 		}
-		// Legacy plaintext rows (no v1: prefix) — read once, then re-write
-		// encrypted on the next set_credentials. We return the raw value so the
-		// Tochat API call still works during the migration window.
-		if ( 0 !== strpos( $stored, 'v1:' ) ) {
-			return $stored;
+		$decrypted = self::decrypt_secret( $stored );
+		if ( '' !== $decrypted ) {
+			return $decrypted;
 		}
-		return self::decrypt_secret( $stored );
+		// Doesn't decrypt to anything — either a legacy plaintext row saved
+		// before encryption-at-rest was added, or ciphertext that no longer
+		// matches the current key. Either way, treat the raw stored value as
+		// the password (so the Tochat API call keeps working) and
+		// transparently migrate it to encrypted storage right now, with no
+		// user action required.
+		update_option( 'cbw_tochat_password', self::encrypt_secret( $stored ) );
+		return $stored;
 	}
 
 	public static function set_credentials( string $email, string $password ): void {
 		update_option( 'cbw_tochat_email', sanitize_email( $email ) );
 		// Don't store the Tochat password as plaintext in wp_options. Encrypt
-		// at rest with AUTH_KEY (or sodium if available) so an attacker with
-		// read-only DB access can't lift the customer's Tochat credentials.
+		// at rest with AUTH_KEY/SECURE_AUTH_KEY — the same AES-256-CBC scheme
+		// used by the chatbotistic-connector plugin's Store class — so an
+		// attacker with read-only DB access can't lift the customer's Tochat
+		// credentials.
 		update_option( 'cbw_tochat_password', self::encrypt_secret( $password ) );
 		self::clear_token();
 	}
@@ -47,41 +54,53 @@ final class API {
 	}
 
 	/**
-	 * Derive a stable 32-byte key from WordPress's AUTH_KEY+AUTH_SALT for use
-	 * with openssl_encrypt. Survives plugin upgrades; rotating AUTH_KEY would
-	 * invalidate stored credentials, which is the correct security posture.
+	 * Encrypt a value at rest with the site's own salts.
+	 *
+	 * @param string $plain Plain value.
+	 * @return string
 	 */
-	private static function secret_key(): string {
-		$material = ( defined( 'AUTH_KEY' )  ? AUTH_KEY  : '' )
-			. '|cbw_tochat|'
-			. ( defined( 'AUTH_SALT' ) ? AUTH_SALT : '' );
-		return hash( 'sha256', $material, true );
-	}
-
 	private static function encrypt_secret( string $plain ): string {
 		if ( '' === $plain ) {
 			return '';
 		}
-		$iv     = random_bytes( 16 );
-		$cipher = openssl_encrypt( $plain, 'aes-256-cbc', self::secret_key(), OPENSSL_RAW_DATA, $iv );
+		$iv     = openssl_random_pseudo_bytes( 16 );
+		$cipher = openssl_encrypt( $plain, 'AES-256-CBC', self::secret_key(), OPENSSL_RAW_DATA, $iv );
 		if ( false === $cipher ) {
 			return $plain; // openssl unavailable — fall back to plain rather than lose creds.
 		}
-		return 'v1:' . base64_encode( $iv . $cipher );
+		return base64_encode( $iv . $cipher );
 	}
 
+	/**
+	 * Decrypt a stored value.
+	 *
+	 * @param string $stored Encrypted value.
+	 * @return string
+	 */
 	private static function decrypt_secret( string $stored ): string {
-		if ( 0 !== strpos( $stored, 'v1:' ) ) {
-			return $stored;
-		}
-		$blob = base64_decode( substr( $stored, 3 ), true );
-		if ( false === $blob || strlen( $blob ) < 17 ) {
+		if ( '' === $stored ) {
 			return '';
 		}
-		$iv     = substr( $blob, 0, 16 );
-		$cipher = substr( $blob, 16 );
-		$plain  = openssl_decrypt( $cipher, 'aes-256-cbc', self::secret_key(), OPENSSL_RAW_DATA, $iv );
-		return false === $plain ? '' : $plain;
+		$raw = base64_decode( $stored, true );
+		if ( false === $raw || strlen( $raw ) <= 16 ) {
+			return '';
+		}
+		$iv     = substr( $raw, 0, 16 );
+		$cipher = substr( $raw, 16 );
+		$plain  = openssl_decrypt( $cipher, 'AES-256-CBC', self::secret_key(), OPENSSL_RAW_DATA, $iv );
+		return is_string( $plain ) ? $plain : '';
+	}
+
+	/**
+	 * 32-byte key derived from WordPress secret keys. Same derivation as
+	 * chatbotistic-connector's Store::key(), for consistency across the
+	 * codebase.
+	 *
+	 * @return string
+	 */
+	private static function secret_key(): string {
+		$seed = ( defined( 'AUTH_KEY' ) ? AUTH_KEY : 'cbw' ) . ( defined( 'SECURE_AUTH_KEY' ) ? SECURE_AUTH_KEY : 'widget' );
+		return substr( hash( 'sha256', $seed ), 0, 32 );
 	}
 
 	public static function is_connected(): bool {
