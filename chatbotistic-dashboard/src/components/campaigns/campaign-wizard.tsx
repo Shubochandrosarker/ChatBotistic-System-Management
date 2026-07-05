@@ -5,7 +5,7 @@ import { Dialog, DialogBody, DialogFooter, DialogHeader } from "@/components/ui/
 import { Input, Label } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { createClient } from "@/lib/supabase/client";
-import { AlertCircle, Sparkles } from "lucide-react";
+import { AlertCircle, CheckCircle2, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
 export interface AudienceLead {
@@ -49,7 +49,9 @@ export function CampaignWizard({
   const [sendNow, setSendNow] = useState(true);
   const [scheduledAt, setScheduledAt] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sendResult, setSendResult] = useState<{ sent: number; failed: number; total: number } | null>(null);
 
   const widgetIds = useMemo(() => {
     const ids = new Set<string>();
@@ -79,6 +81,7 @@ export function CampaignWizard({
     setSendNow(true);
     setScheduledAt("");
     setError(null);
+    setSendResult(null);
   }
 
   async function submit(saveAsDraftOnly: boolean) {
@@ -116,46 +119,69 @@ export function CampaignWizard({
     // campaigns has a `FOR ALL` RLS policy scoped to the caller's org
     // (004_campaigns_usage_whatsapp.sql), so this insert can go
     // straight through the browser client.
-    const { error: insertError } = await supabase.from("campaigns").insert({
-      org_id: orgId,
-      name: name.trim(),
-      status,
-      message_body: body.trim(),
-      audience,
-      scheduled_at: status === "scheduled" && scheduledAt ? new Date(scheduledAt).toISOString() : null,
-    });
+    const { data: inserted, error: insertError } = await supabase
+      .from("campaigns")
+      .insert({
+        org_id: orgId,
+        name: name.trim(),
+        status,
+        message_body: body.trim(),
+        audience,
+        scheduled_at: status === "scheduled" && scheduledAt ? new Date(scheduledAt).toISOString() : null,
+      })
+      .select("id")
+      .single();
 
-    // TODO(send-implementation): when `status === "sending"` above, this
-    // is where the actual Meta Cloud API (or personal-number bridge)
-    // send loop would go — iterating the resolved audience, sending
-    // each message, then calling the `increment_message_usage` RPC
-    // once per message actually sent (or once with the batch count):
-    //   await supabase.rpc("increment_message_usage", {
-    //     p_org_id: orgId,
-    //     p_period: currentPeriodMonth(),
-    //     p_count: sentCount,
-    //   });
-    // No send implementation exists yet — out of scope for this pass.
-
-    setSubmitting(false);
     if (insertError) {
+      setSubmitting(false);
       setError(insertError.message);
       return;
     }
 
+    // `status === "sending"` means the campaign is going out through
+    // the org's connected WhatsApp provider right now — actually send
+    // it via /api/campaigns/[id]/send, which resolves the audience,
+    // checks quota, and calls `increment_message_usage` server-side.
+    if (status === "sending" && inserted?.id) {
+      setSending(true);
+      try {
+        const res = await fetch(`/api/campaigns/${inserted.id}/send`, { method: "POST" });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error || "Failed to send campaign.");
+        } else {
+          setSendResult({ sent: data.sent, failed: data.failed, total: data.total });
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to send campaign.");
+      } finally {
+        setSending(false);
+      }
+      setSubmitting(false);
+      // The campaign row now exists (sent or errored mid-send) —
+      // refresh the list, but keep the dialog open so the org can see
+      // the sent/failed summary (or the error) before dismissing it.
+      onCreated();
+      return;
+    }
+
+    setSubmitting(false);
     reset();
     onOpenChange(false);
     onCreated();
   }
 
   function handleOpenChange(nextOpen: boolean) {
+    // Don't let a backdrop click/Escape drop the dialog mid-send —
+    // the fetch to /api/campaigns/[id]/send is already in flight.
+    if (!nextOpen && sending) return;
     if (!nextOpen) reset();
     onOpenChange(nextOpen);
   }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange} className="max-w-xl">
-      <DialogHeader onClose={() => onOpenChange(false)}>New campaign</DialogHeader>
+      <DialogHeader onClose={() => handleOpenChange(false)}>New campaign</DialogHeader>
       <DialogBody className="flex flex-col gap-4">
         {error && (
           <div role="alert" className="flex items-start gap-2 rounded-xl bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive">
@@ -164,112 +190,143 @@ export function CampaignWizard({
           </div>
         )}
 
-        <div>
-          <Label htmlFor="campaign-name">Name</Label>
-          <Input id="campaign-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="July re-engagement" />
-        </div>
-
-        <div>
-          <div className="mb-1.5 flex items-center justify-between">
-            <Label htmlFor="campaign-body" className="mb-0">
-              Message
-            </Label>
-            <div className="flex gap-1">
-              {VARIABLE_CHIPS.map((chip) => (
-                <button
-                  key={chip}
-                  type="button"
-                  onClick={() => insertVariable(chip)}
-                  className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                >
-                  {chip}
-                </button>
-              ))}
+        {sendResult ? (
+          <div className="flex flex-col items-center gap-2 py-6 text-center">
+            <CheckCircle2 className="h-10 w-10 text-success" />
+            <p className="text-base font-medium text-foreground">Campaign sent</p>
+            <p className="text-sm text-muted-foreground">
+              {sendResult.sent} of {sendResult.total} message{sendResult.total === 1 ? "" : "s"} sent
+              {sendResult.failed > 0 ? ` — ${sendResult.failed} failed` : ""}.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div>
+              <Label htmlFor="campaign-name">Name</Label>
+              <Input id="campaign-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="July re-engagement" />
             </div>
-          </div>
-          <textarea
-            id="campaign-body"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            rows={4}
-            placeholder="Hi {{name}}, we've got a summer offer for you…"
-            className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </div>
 
-        <div>
-          <Label>Audience</Label>
-          <div className="flex flex-wrap items-center gap-2">
-            <Select value={audienceMode} onChange={(e) => setAudienceMode(e.target.value as AudienceMode)} className="w-40">
-              <option value="all">All leads</option>
-              <option value="widget">By widget</option>
-              <option value="status">By status</option>
-            </Select>
-            {audienceMode === "widget" && (
-              <Select value={audienceWidget} onChange={(e) => setAudienceWidget(e.target.value)} className="w-48">
-                <option value="">Choose widget…</option>
-                {widgetIds.map((id) => (
-                  <option key={id} value={id}>
-                    {widgetNames[id] || id}
-                  </option>
-                ))}
-              </Select>
-            )}
-            {audienceMode === "status" && (
-              <Select value={audienceStatus} onChange={(e) => setAudienceStatus(e.target.value)} className="w-40">
-                <option value="open">New</option>
-                <option value="contacted">Contacted</option>
-                <option value="won">Won</option>
-                <option value="lost">Lost</option>
-              </Select>
-            )}
-            <span className="text-sm text-muted-foreground">≈ {audienceCount} recipients</span>
-          </div>
-        </div>
-
-        <div>
-          <Label>Schedule</Label>
-          <div className="flex flex-wrap items-center gap-3">
-            <label className="flex items-center gap-1.5 text-sm">
-              <input type="radio" checked={sendNow} onChange={() => setSendNow(true)} />
-              Send now
-            </label>
-            <label className="flex items-center gap-1.5 text-sm">
-              <input type="radio" checked={!sendNow} onChange={() => setSendNow(false)} />
-              Schedule for later
-            </label>
-            {!sendNow && (
-              <Input
-                type="datetime-local"
-                value={scheduledAt}
-                onChange={(e) => setScheduledAt(e.target.value)}
-                className="w-56"
+            <div>
+              <div className="mb-1.5 flex items-center justify-between">
+                <Label htmlFor="campaign-body" className="mb-0">
+                  Message
+                </Label>
+                <div className="flex gap-1">
+                  {VARIABLE_CHIPS.map((chip) => (
+                    <button
+                      key={chip}
+                      type="button"
+                      onClick={() => insertVariable(chip)}
+                      className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      {chip}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <textarea
+                id="campaign-body"
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                rows={4}
+                placeholder="Hi {{name}}, we've got a summer offer for you…"
+                className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
-            )}
-          </div>
-          {sendNow && connectionStatus !== "connected" && (
-            <p className="mt-2 text-xs text-warning">
-              No WhatsApp connection yet — this will save as a draft. Connect WhatsApp in Settings to send.
-            </p>
-          )}
-          {sendNow && connectionStatus === "connected" && quotaExhausted && (
-            <p className="mt-2 text-xs text-destructive">
-              You&apos;ve used all of this month&apos;s message quota — this will save as a draft. Upgrade your plan to send more.
-            </p>
-          )}
-        </div>
+            </div>
+
+            <div>
+              <Label>Audience</Label>
+              <div className="flex flex-wrap items-center gap-2">
+                <Select value={audienceMode} onChange={(e) => setAudienceMode(e.target.value as AudienceMode)} className="w-40">
+                  <option value="all">All leads</option>
+                  <option value="widget">By widget</option>
+                  <option value="status">By status</option>
+                </Select>
+                {audienceMode === "widget" && (
+                  <Select value={audienceWidget} onChange={(e) => setAudienceWidget(e.target.value)} className="w-48">
+                    <option value="">Choose widget…</option>
+                    {widgetIds.map((id) => (
+                      <option key={id} value={id}>
+                        {widgetNames[id] || id}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+                {audienceMode === "status" && (
+                  <Select value={audienceStatus} onChange={(e) => setAudienceStatus(e.target.value)} className="w-40">
+                    <option value="open">New</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="won">Won</option>
+                    <option value="lost">Lost</option>
+                  </Select>
+                )}
+                <span className="text-sm text-muted-foreground">≈ {audienceCount} recipients</span>
+              </div>
+            </div>
+
+            <div>
+              <Label>Schedule</Label>
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="flex items-center gap-1.5 text-sm">
+                  <input type="radio" checked={sendNow} onChange={() => setSendNow(true)} />
+                  Send now
+                </label>
+                <label className="flex items-center gap-1.5 text-sm">
+                  <input type="radio" checked={!sendNow} onChange={() => setSendNow(false)} />
+                  Schedule for later
+                </label>
+                {!sendNow && (
+                  <Input
+                    type="datetime-local"
+                    value={scheduledAt}
+                    onChange={(e) => setScheduledAt(e.target.value)}
+                    className="w-56"
+                  />
+                )}
+              </div>
+              {sendNow && connectionStatus !== "connected" && (
+                <p className="mt-2 text-xs text-warning">
+                  No WhatsApp connection yet — this will save as a draft. Connect WhatsApp in Settings to send.
+                </p>
+              )}
+              {sendNow && connectionStatus === "connected" && quotaExhausted && (
+                <p className="mt-2 text-xs text-destructive">
+                  You&apos;ve used all of this month&apos;s message quota — this will save as a draft. Upgrade your plan to send more.
+                </p>
+              )}
+              {sending && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Sending campaign — this can take a moment for larger audiences…
+                </p>
+              )}
+            </div>
+          </>
+        )}
       </DialogBody>
       <DialogFooter>
-        <Button variant="ghost" onClick={() => onOpenChange(false)}>
-          Cancel
-        </Button>
-        <Button variant="outline" loading={submitting} onClick={() => submit(true)}>
-          Save as draft
-        </Button>
-        <Button loading={submitting} onClick={() => submit(false)}>
-          <Sparkles className="h-4 w-4" />
-          {sendNow ? (canSendNow ? "Send now" : "Save (can't send yet)") : "Schedule"}
-        </Button>
+        {sendResult ? (
+          <Button
+            onClick={() => {
+              reset();
+              onOpenChange(false);
+            }}
+          >
+            Done
+          </Button>
+        ) : (
+          <>
+            <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={sending}>
+              Cancel
+            </Button>
+            <Button variant="outline" loading={submitting && !sending} disabled={sending} onClick={() => submit(true)}>
+              Save as draft
+            </Button>
+            <Button loading={submitting || sending} onClick={() => submit(false)}>
+              <Sparkles className="h-4 w-4" />
+              {sending ? "Sending…" : sendNow ? (canSendNow ? "Send now" : "Save (can't send yet)") : "Schedule"}
+            </Button>
+          </>
+        )}
       </DialogFooter>
     </Dialog>
   );

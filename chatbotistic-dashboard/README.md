@@ -25,13 +25,22 @@ HMAC-signed SSO bridge.
 - **Leads** — view leads captured through widgets, synced from Tochat.be on
   demand.
 - **Campaigns** — compose broadcast campaigns with audience targeting
-  (by widget or lead status), scheduling, draft/save flow, and a live
-  message-usage meter tied to the org's monthly quota. (Actual message
-  *sending* is not yet wired — see "Known gaps" below.)
+  (by widget or lead status), scheduling, draft/save flow, a live
+  message-usage meter tied to the org's monthly quota, and real sending
+  through the org's own connected WhatsApp provider (Meta or Twilio),
+  with atomic double-send protection and per-recipient error isolation.
+- **Inbox** — a shared team inbox for the org's connected WhatsApp
+  number: conversation list + thread, reply from the dashboard, status
+  and assignment controls, unread badges. Inbound messages arrive via
+  the Meta/Twilio webhook routes below.
 - **Settings**
   - **Profile** and **Organization** tabs
-  - **WhatsApp connection** — personal-number or Meta Cloud API mode,
-    credentials encrypted at rest (AES-256-GCM)
+  - **WhatsApp connection** — bring your own Cloud API: personal-number
+    (leads only), Meta Cloud API, or Twilio, each with real live
+    "test connection" checks. Credentials encrypted at rest
+    (AES-256-GCM). Connecting Meta or Twilio unlocks Campaign sending
+    and the Inbox for that org; usage is metered against the plan's
+    monthly message quota.
   - **White-label** — brand name, primary color, custom domain, sender name
     (gated to the Agency plan)
   - **Team** — invite teammates by email/role, accept invites via token/link,
@@ -51,7 +60,7 @@ npm install
 cp .env.example .env.local   # then fill in real values, see below
 ```
 
-Run the SQL migrations in `supabase/migrations/` **in order** (001 → 006)
+Run the SQL migrations in `supabase/migrations/` **in order** (001 → 007)
 against your Supabase project (via the SQL editor, `supabase db push`, or
 the Supabase MCP `apply_migration` tool):
 
@@ -62,6 +71,7 @@ the Supabase MCP `apply_migration` tool):
 004_campaigns_usage_whatsapp.sql
 005_email_log.sql
 006_org_invites.sql
+007_whatsapp_provider_and_inbox.sql
 ```
 
 Then start the dev server:
@@ -119,6 +129,18 @@ descriptions. Summary:
 - **Credential encryption** (`src/lib/encryption.ts`): WhatsApp credentials
   (access tokens, etc.) are encrypted at rest with AES-256-GCM before being
   stored.
+- **WhatsApp provider abstraction** (`src/lib/whatsapp/`): a
+  `WhatsAppProvider` interface (`sendText`, `sendTemplate`,
+  `verifyWebhookSignature`) with Meta Cloud API and Twilio
+  implementations, selected per org via `loadProviderForOrg()`. Each
+  BYO org supplies its own credentials (Meta: phone number ID, WABA ID,
+  access token, app secret; Twilio: Account SID, auth token, WhatsApp
+  number) through Settings; the same interface backs both Campaign
+  sending and the Inbox. Inbound messages arrive at
+  `src/app/api/webhooks/{meta,twilio}/route.ts`, which identify the
+  owning org from the request itself (BYO multi-tenant — there's no
+  single shared platform secret) and verify each provider's signature
+  scheme before writing to `conversations`/`messages`.
 
 ## Deploying
 
@@ -137,14 +159,22 @@ verified clean in production.
 
 ## Known gaps / not yet wired
 
-- **Campaign sending is stubbed.** Creating a campaign with `status:
-  "sending"` inserts the campaign row but does not actually send any
-  WhatsApp messages yet — see the `TODO(send-implementation)` comment in
-  `src/components/campaigns/campaign-wizard.tsx` (around the campaign
-  insert) for exactly where the Meta Cloud API (or personal-number bridge)
-  send loop, plus the corresponding `increment_message_usage` RPC calls,
-  need to be implemented.
 - **Team invite emails are not sent.** Invites are created server-side and
   shown as a copyable token/link in the Team settings tab
   (`src/components/settings/team-tab.tsx`) — the inviter has to share the
   link with the invitee manually. There is no outbound email integration.
+- **Webhook org-lookup is O(n) in BYO connections.** Both inbound webhook
+  routes (`src/app/api/webhooks/{meta,twilio}/route.ts`) identify the
+  owning org by decrypting and comparing each connected org's
+  credentials against the incoming phone number ID / WhatsApp number,
+  since each org runs its own Meta app / Twilio account (no shared
+  platform secret to key off). Fine at current scale; if this becomes a
+  bottleneck, mirror the phone number identifier into a plaintext
+  indexed column on `whatsapp_connections` at connect-time.
+- **Inbox refresh is polling-based** (12s), not Supabase Realtime — a
+  simplification for this pass.
+- **Message templates for the 24-hour window.** `sendTemplate` exists on
+  both providers, but Campaigns and Inbox replies currently only use
+  `sendText` — sending to a contact outside WhatsApp's 24-hour
+  session window without an approved template will be rejected by
+  Meta/Twilio. A template-picker UI is a natural follow-up.
