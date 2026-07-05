@@ -17,8 +17,9 @@ if ( ! is_user_logged_in() ) {
 get_template_part( 'template-parts/auth-head' );
 
 $plans = array(
-	array( 'pro',    __( 'Pro', 'chatbotistic' ),    __( 'For growing businesses.', 'chatbotistic' ),     '$9',  '$90',  __( 'Most popular', 'chatbotistic' ) ),
-	array( 'agency', __( 'Agency', 'chatbotistic' ), __( 'White-label for agencies & teams.', 'chatbotistic' ), '$99', '$990', '' ),
+	array( 'starter', __( 'Starter', 'chatbotistic' ), __( 'Full access to the Chatbotistic Dashboard for small teams.', 'chatbotistic' ),         '$19',  '$190',   '' ),
+	array( 'growth',  __( 'Growth', 'chatbotistic' ),  __( 'Full access to the Chatbotistic Dashboard, built to scale.', 'chatbotistic' ),          '$49',  '$490',   __( 'Most popular', 'chatbotistic' ) ),
+	array( 'agency',  __( 'Agency', 'chatbotistic' ),  __( 'Full access to the Chatbotistic Dashboard, white-labeled for your agency.', 'chatbotistic' ), '$149', '$1,490', '' ),
 );
 ?>
 
@@ -38,7 +39,7 @@ $plans = array(
 
 	<section class="section section-tight">
 		<div class="container">
-			<div class="pricing-grid" style="grid-template-columns:repeat(2,1fr);max-width:760px;margin:0 auto;">
+			<div class="pricing-grid" style="grid-template-columns:repeat(3,1fr);max-width:1080px;margin:0 auto;">
 				<?php foreach ( $plans as $p ) : ?>
 					<div class="price-card<?php echo $p[5] ? ' featured' : ''; ?>" style="padding:28px;">
 						<?php if ( $p[5] ) : ?><div class="best-badge"><?php echo esc_html( $p[5] ); ?></div><?php endif; ?>
@@ -58,7 +59,7 @@ $plans = array(
 					</div>
 				<?php endforeach; ?>
 			</div>
-			<p style="text-align:center;color:var(--text-dim);font-size:12.5px;margin-top:24px;"><?php esc_html_e( 'Need the Lifetime deal?', 'chatbotistic' ); ?> <a href="mailto:hello@chatbotistic.com" style="color:var(--blue-bright);"><?php esc_html_e( 'Talk to us', 'chatbotistic' ); ?></a></p>
+			<p style="text-align:center;color:var(--text-dim);font-size:12.5px;margin-top:24px;"><?php esc_html_e( 'Looking for the legacy Lifetime plan?', 'chatbotistic' ); ?> <a href="mailto:hello@chatbotistic.com" style="color:var(--blue-bright);"><?php esc_html_e( 'Talk to us', 'chatbotistic' ); ?></a></p>
 		</div>
 	</section>
 </main>

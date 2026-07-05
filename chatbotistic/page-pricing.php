@@ -2,9 +2,10 @@
 /**
  * Template Name: Pricing (V4)
  *
- * Pricing page port from V4 features-pricing.jsx. Four plans (Free / Pro
- * / Agency / Lifetime), monthly + annual toggle (vanilla JS), feature-by-
- * feature compare, plan recommendation, FAQ, CTA.
+ * Pricing page port from V4 features-pricing.jsx. Five plans (Free Forever /
+ * Starter / Growth / Agency / Lifetime — the last one legacy/contact-only),
+ * monthly + annual toggle (vanilla JS), feature-by-feature compare, plan
+ * recommendation, FAQ, CTA.
  *
  * @package Chatbotistic
  */
@@ -16,14 +17,17 @@ get_header();
 // Build plan CTA links from the Memberistic helpers so every button lands on a
 // real checkout / inquiry URL (no 404). Paid plans go to the mapped checkout
 // page as /checkout/?memberistic_plan=<slug>; the Free plan reuses the
-// dedicated free-onboarding checkout URL; Lifetime is contact-only and routes
-// to the LTD inquiry flow.
+// dedicated free-onboarding checkout URL; Lifetime is legacy/contact-only and
+// routes to the LTD inquiry flow instead of Stripe checkout.
 $cb_free_url = function_exists( 'cb_free_checkout_url' )
 	? cb_free_checkout_url()
 	: home_url( '/checkout/?memberistic_plan=free' );
-$cb_pro_url = function_exists( 'cb_memberistic_checkout_url' )
-	? cb_memberistic_checkout_url( 'pro' )
-	: home_url( '/checkout/?memberistic_plan=pro' );
+$cb_starter_url = function_exists( 'cb_memberistic_checkout_url' )
+	? cb_memberistic_checkout_url( 'starter' )
+	: home_url( '/checkout/?memberistic_plan=starter' );
+$cb_growth_url = function_exists( 'cb_memberistic_checkout_url' )
+	? cb_memberistic_checkout_url( 'growth' )
+	: home_url( '/checkout/?memberistic_plan=growth' );
 $cb_ag_url = function_exists( 'cb_memberistic_checkout_url' )
 	? cb_memberistic_checkout_url( 'agency' )
 	: home_url( '/checkout/?memberistic_plan=agency' );
@@ -33,72 +37,76 @@ $cb_ltd_url = function_exists( 'cb_ltd_inquiry_url' )
 
 $cb_plans = array(
 	array(
-		'name' => __( 'Free Forever', 'chatbotistic' ), 'desc' => __( 'Try the platform, no credit card.', 'chatbotistic' ),
+		'name' => __( 'Free Forever', 'chatbotistic' ), 'desc' => __( 'Full access to the Chatbotistic Dashboard — no credit card.', 'chatbotistic' ),
 		'monthly' => '$0', 'annual' => '$0', 'sub' => '/mo',
 		'note_m' => __( 'free forever', 'chatbotistic' ), 'note_a' => __( 'free forever', 'chatbotistic' ), 'save' => '',
-		'feats' => array( __( '1 AI ChatBot Widget', 'chatbotistic' ), __( '1 WhatsApp Agent', 'chatbotistic' ), __( '1 Website Domain', 'chatbotistic' ), __( 'Email notifications', 'chatbotistic' ), __( 'Includes Chatbotistic branding', 'chatbotistic' ) ),
+		'feats' => array( __( '1 AI ChatBot Widget', 'chatbotistic' ), __( '1 WhatsApp Agent', 'chatbotistic' ), __( '1 Website Domain', 'chatbotistic' ), __( '100 campaign messages / mo', 'chatbotistic' ), __( 'Leads captured to your personal WhatsApp', 'chatbotistic' ), __( 'Includes Chatbotistic branding', 'chatbotistic' ) ),
 		'cta' => __( 'Get started free', 'chatbotistic' ), 'href' => $cb_free_url, 'flavor' => '',
 	),
 	array(
-		'name' => __( 'Pro', 'chatbotistic' ), 'desc' => __( 'For growing businesses.', 'chatbotistic' ),
-		'monthly' => '$9', 'annual' => '$7.50', 'sub' => '/mo',
-		'note_m' => __( 'billed monthly', 'chatbotistic' ), 'note_a' => __( '$90 billed yearly', 'chatbotistic' ), 'save' => __( 'Save $18', 'chatbotistic' ),
-		'feats' => array( __( '5 AI ChatBot Widgets', 'chatbotistic' ), __( '15 WhatsApp Agents', 'chatbotistic' ), __( '10 Website Domains', 'chatbotistic' ), __( 'Custom landing page per widget', 'chatbotistic' ), __( 'Chat Forms, CRM integrations, Webhooks', 'chatbotistic' ), __( 'WordPress widget plugin', 'chatbotistic' ) ),
-		'cta' => __( 'Choose Pro', 'chatbotistic' ), 'href' => $cb_pro_url, 'flavor' => 'featured',
+		'name' => __( 'Starter', 'chatbotistic' ), 'desc' => __( 'Full access to the Chatbotistic Dashboard for small teams.', 'chatbotistic' ),
+		'monthly' => '$19', 'annual' => '$15.83', 'sub' => '/mo',
+		'note_m' => __( 'billed monthly', 'chatbotistic' ), 'note_a' => __( '$190 billed yearly', 'chatbotistic' ), 'save' => __( 'Save $38', 'chatbotistic' ),
+		'feats' => array( __( '3 AI ChatBot Widgets', 'chatbotistic' ), __( '5 WhatsApp Agents', 'chatbotistic' ), __( '3 Website Domains', 'chatbotistic' ), __( '2 Team Seats', 'chatbotistic' ), __( '1,000 campaign messages / mo', 'chatbotistic' ), __( 'Booking forms', 'chatbotistic' ), __( 'Shared team inbox', 'chatbotistic' ) ),
+		'cta' => __( 'Choose Starter', 'chatbotistic' ), 'href' => $cb_starter_url, 'flavor' => '',
 	),
 	array(
-		'name' => __( 'Agency', 'chatbotistic' ), 'desc' => __( 'White-label for agencies & teams.', 'chatbotistic' ),
-		'monthly' => '$99', 'annual' => '$82.50', 'sub' => '/mo',
-		'note_m' => __( 'billed monthly', 'chatbotistic' ), 'note_a' => __( '$990 billed yearly', 'chatbotistic' ), 'save' => __( 'Save $198', 'chatbotistic' ),
-		'feats' => array( __( '30 AI ChatBot Widgets', 'chatbotistic' ), __( '100 WhatsApp Agents', 'chatbotistic' ), __( '50 Website Domains', 'chatbotistic' ), __( 'White-label dashboard & widgets', 'chatbotistic' ), __( 'WhatsApp priority support', 'chatbotistic' ), __( 'API & Webhooks (HubSpot, Zoho)', 'chatbotistic' ), __( 'Stripe integration for payments', 'chatbotistic' ), __( 'Team agents on your account', 'chatbotistic' ), __( 'Custom landing pages', 'chatbotistic' ) ),
+		'name' => __( 'Growth', 'chatbotistic' ), 'desc' => __( 'Full access to the Chatbotistic Dashboard, built to scale.', 'chatbotistic' ),
+		'monthly' => '$49', 'annual' => '$40.83', 'sub' => '/mo',
+		'note_m' => __( 'billed monthly', 'chatbotistic' ), 'note_a' => __( '$490 billed yearly', 'chatbotistic' ), 'save' => __( 'Save $98', 'chatbotistic' ),
+		'feats' => array( __( '10 AI ChatBot Widgets', 'chatbotistic' ), __( '20 WhatsApp Agents', 'chatbotistic' ), __( '10 Website Domains', 'chatbotistic' ), __( '5 Team Seats', 'chatbotistic' ), __( '5,000 campaign messages / mo', 'chatbotistic' ), __( 'Landing page editor', 'chatbotistic' ), __( 'AI replies', 'chatbotistic' ), __( 'Chatbotistic branding removed', 'chatbotistic' ), __( 'Ad attribution & ROAS dashboard', 'chatbotistic' ) ),
+		'cta' => __( 'Choose Growth', 'chatbotistic' ), 'href' => $cb_growth_url, 'flavor' => 'featured',
+	),
+	array(
+		'name' => __( 'Agency', 'chatbotistic' ), 'desc' => __( 'Full access to the Chatbotistic Dashboard, white-labeled for your agency.', 'chatbotistic' ),
+		'monthly' => '$149', 'annual' => '$124.17', 'sub' => '/mo',
+		'note_m' => __( 'billed monthly', 'chatbotistic' ), 'note_a' => __( '$1,490 billed yearly', 'chatbotistic' ), 'save' => __( 'Save $298', 'chatbotistic' ),
+		'feats' => array( __( '30 AI ChatBot Widgets', 'chatbotistic' ), __( 'Unlimited WhatsApp Agents', 'chatbotistic' ), __( '50 Website Domains', 'chatbotistic' ), __( '15 Team Seats', 'chatbotistic' ), __( '25,000 campaign messages / mo', 'chatbotistic' ), __( 'Full white-label + custom domain', 'chatbotistic' ), __( '10 client sub-accounts', 'chatbotistic' ), __( 'Branded client reports', 'chatbotistic' ) ),
 		'cta' => __( 'Choose Agency', 'chatbotistic' ), 'href' => $cb_ag_url, 'flavor' => '',
 	),
 	array(
-		'name' => __( 'Lifetime', 'chatbotistic' ), 'desc' => __( 'Pay once. Own it forever.', 'chatbotistic' ),
-		'monthly' => '✳✳✳', 'annual' => '✳✳✳', 'sub' => '/one-time',
-		'note_m' => __( 'Contact for LTD Pricing', 'chatbotistic' ), 'note_a' => __( 'Contact for LTD Pricing', 'chatbotistic' ), 'save' => '',
-		'feats' => array( __( 'Everything in Agency', 'chatbotistic' ), __( 'Unlimited Widgets / Agents / Domains', 'chatbotistic' ), __( 'White-label with custom domain', 'chatbotistic' ), __( 'Lifetime updates', 'chatbotistic' ), __( 'Priority roadmap input', 'chatbotistic' ), __( 'Founder-direct support channel', 'chatbotistic' ), __( 'Custom contract & invoicing', 'chatbotistic' ) ),
-		'cta' => __( 'Contact for LTD Pricing', 'chatbotistic' ), 'href' => $cb_ltd_url, 'flavor' => 'lifetime',
+		'name' => __( 'Lifetime — Contact Us', 'chatbotistic' ), 'desc' => __( 'Legacy plan, limited availability. Full access to the Chatbotistic Dashboard, custom-priced.', 'chatbotistic' ),
+		'monthly' => '✳✳✳', 'annual' => '✳✳✳', 'sub' => '/custom',
+		'note_m' => __( 'Contact for pricing', 'chatbotistic' ), 'note_a' => __( 'Contact for pricing', 'chatbotistic' ), 'save' => '',
+		'feats' => array( __( 'Legacy plan — limited availability', 'chatbotistic' ), __( 'Everything in Agency', 'chatbotistic' ), __( 'Unlimited Widgets / Agents / Domains', 'chatbotistic' ), __( 'White-label with custom domain', 'chatbotistic' ), __( 'Founder-direct support channel', 'chatbotistic' ), __( 'Custom contract & invoicing', 'chatbotistic' ) ),
+		'cta' => __( 'Contact us', 'chatbotistic' ), 'href' => $cb_ltd_url, 'flavor' => 'lifetime',
 	),
 );
 
 $cb_compare_rows = array(
-	array( 'AI ChatBot Widgets', '1', '5', '30', __( 'Unlimited', 'chatbotistic' ) ),
-	array( 'WhatsApp Agents',     '1', '15', '100', __( 'Unlimited', 'chatbotistic' ) ),
-	array( 'Website Domains',     '1', '10', '50',  __( 'Unlimited', 'chatbotistic' ) ),
-	array( __( 'Email notifications', 'chatbotistic' ), '✓', '✓', '✓', '✓' ),
-	array( __( 'Custom landing pages', 'chatbotistic' ), '—', __( 'Per widget', 'chatbotistic' ), '✓', '✓' ),
-	array( __( 'Chat Forms', 'chatbotistic' ),           '—', '✓', '✓', '✓' ),
-	array( __( 'CRM integrations', 'chatbotistic' ),     '—', '✓', '✓', '✓' ),
-	array( __( 'Webhook connections', 'chatbotistic' ),  '—', '✓', '✓', '✓' ),
-	array( __( 'WordPress plugin', 'chatbotistic' ),     '—', '✓', '✓', '✓' ),
-	array( __( 'White-label dashboard', 'chatbotistic' ), '—', '—', '✓', '✓' ),
-	array( __( 'WhatsApp priority support', 'chatbotistic' ), '—', '—', '✓', '✓' ),
-	array( __( 'API access (HubSpot, Zoho)', 'chatbotistic' ), '—', '—', '✓', '✓' ),
-	array( __( 'Stripe payments', 'chatbotistic' ),      '—', '—', '✓', '✓' ),
-	array( __( 'Team agents', 'chatbotistic' ),          '—', '—', '✓', '✓' ),
-	array( __( 'Custom-domain white-label', 'chatbotistic' ), '—', '—', '—', '✓' ),
-	array( __( 'Lifetime updates', 'chatbotistic' ),     '—', '—', '—', '✓' ),
-	array( __( 'Founder-direct support', 'chatbotistic' ), '—', '—', '—', '✓' ),
-	array( __( 'Branding', 'chatbotistic' ),             __( 'Chatbotistic', 'chatbotistic' ), __( 'Chatbotistic', 'chatbotistic' ), __( 'Removable', 'chatbotistic' ), __( 'Custom', 'chatbotistic' ) ),
+	array( 'AI ChatBot Widgets', '1', '3', '10', '30' ),
+	array( 'WhatsApp Agents',     '1', '5', '20', __( 'Unlimited', 'chatbotistic' ) ),
+	array( 'Website Domains',     '1', '3', '10',  '50' ),
+	array( __( 'Team seats', 'chatbotistic' ),           '1', '2', '5', '15' ),
+	array( __( 'Campaign messages / mo', 'chatbotistic' ), '100', '1,000', '5,000', '25,000' ),
+	array( __( 'Lead capture', 'chatbotistic' ), __( 'Personal WhatsApp', 'chatbotistic' ), '✓', '✓', '✓' ),
+	array( __( 'Booking forms', 'chatbotistic' ), '—', '✓', '✓', '✓' ),
+	array( __( 'Shared team inbox', 'chatbotistic' ),    '—', '✓', '✓', '✓' ),
+	array( __( 'Landing page editor', 'chatbotistic' ), '—', '—', '✓', '✓' ),
+	array( __( 'AI replies', 'chatbotistic' ),           '—', '—', '✓', '✓' ),
+	array( __( 'Ad attribution & ROAS dashboard', 'chatbotistic' ), '—', '—', '✓', '✓' ),
+	array( __( 'Full white-label + custom domain', 'chatbotistic' ), '—', '—', '—', '✓' ),
+	array( __( 'Client sub-accounts', 'chatbotistic' ),  '—', '—', '—', '10' ),
+	array( __( 'Branded client reports', 'chatbotistic' ), '—', '—', '—', '✓' ),
+	array( __( 'Branding', 'chatbotistic' ),             __( 'Chatbotistic shown', 'chatbotistic' ), __( 'Chatbotistic shown', 'chatbotistic' ), __( 'Removed', 'chatbotistic' ), __( 'Custom', 'chatbotistic' ) ),
 );
 
 $cb_recs = array(
 	array( __( 'Just getting started', 'chatbotistic' ), __( 'Free Forever', 'chatbotistic' ), __( 'Solo founders and small sites testing conversational lead capture on one domain.', 'chatbotistic' ), __( 'Get started free', 'chatbotistic' ), $cb_free_url, false, 'rocket' ),
-	array( __( 'Growing business', 'chatbotistic' ), __( 'Pro', 'chatbotistic' ), __( 'Teams that need multiple widgets, WhatsApp agents, CRM sync, and the WordPress plugin.', 'chatbotistic' ), __( 'Choose Pro', 'chatbotistic' ), $cb_pro_url, true, 'bolt' ),
-	array( __( 'Agencies & resellers', 'chatbotistic' ), __( 'Agency / Lifetime', 'chatbotistic' ), __( 'White-label the dashboard and widgets, manage clients, and resell under your own brand.', 'chatbotistic' ), __( 'Talk to us', 'chatbotistic' ), home_url( '/book-demo/' ), false, 'users' ),
+	array( __( 'Growing & running ads', 'chatbotistic' ), __( 'Growth', 'chatbotistic' ), __( 'Teams that need AI replies, a landing page editor, and an ad attribution / ROAS dashboard.', 'chatbotistic' ), __( 'Choose Growth', 'chatbotistic' ), $cb_growth_url, true, 'bolt' ),
+	array( __( 'Agencies & resellers', 'chatbotistic' ), __( 'Agency', 'chatbotistic' ), __( 'Full white-label with a custom domain, client sub-accounts, and branded client reports.', 'chatbotistic' ), __( 'Choose Agency', 'chatbotistic' ), $cb_ag_url, false, 'users' ),
 );
 
 $cb_faqs = array(
-	array( __( 'Can I use Chatbotistic on WordPress?', 'chatbotistic' ), __( 'Yes — install our native WordPress plugin (included on Pro and above), paste your account key, and manage every widget directly from your WP dashboard.', 'chatbotistic' ) ),
-	array( __( 'Can I connect WhatsApp?', 'chatbotistic' ), __( 'Yes. WhatsApp Agents are included on every plan, with priority support on Agency and Lifetime.', 'chatbotistic' ) ),
-	array( __( 'Can I capture leads?', 'chatbotistic' ), __( 'Every widget — chat, WhatsApp, forms, landing pages — captures leads automatically into your inbox.', 'chatbotistic' ) ),
-	array( __( 'Does it support bookings?', 'chatbotistic' ), __( 'Yes. Booking flows ship inside the chat widget and landing pages, with calendar sync and Stripe deposits on Agency.', 'chatbotistic' ) ),
-	array( __( 'Can agencies use it?', 'chatbotistic' ), __( 'Absolutely — the Agency plan adds unlimited widgets, white-label dashboards, team agents, and API access.', 'chatbotistic' ) ),
-	array( __( 'Is white label available?', 'chatbotistic' ), __( 'Yes, on Agency and Lifetime. Your logo, your domain, your customer login.', 'chatbotistic' ) ),
-	array( __( 'Can I connect payment gateways?', 'chatbotistic' ), __( 'Stripe is native on Agency. Take deposits, full payments, or subscriptions inside the chat flow.', 'chatbotistic' ) ),
-	array( __( 'Can I use it for multiple websites?', 'chatbotistic' ), __( 'Free covers 1 domain, Pro covers 10, Agency covers 50, and Lifetime is unlimited.', 'chatbotistic' ) ),
-	array( __( 'How does the Lifetime deal work?', 'chatbotistic' ), __( 'Pay once, own it forever — limited to the first 50 founders. Includes everything in Agency plus lifetime updates and founder-direct support. Email hello@chatbotistic.com to claim a seat.', 'chatbotistic' ) ),
+	array( __( 'Can I use Chatbotistic on WordPress?', 'chatbotistic' ), __( 'Yes — install our native WordPress plugin (included on Starter and above), paste your account key, and manage every widget directly from your WP dashboard.', 'chatbotistic' ) ),
+	array( __( 'Can I connect WhatsApp?', 'chatbotistic' ), __( 'Yes. WhatsApp Agents are included on every plan, from a single agent on Free Forever up to unlimited on Agency.', 'chatbotistic' ) ),
+	array( __( 'Can I capture leads?', 'chatbotistic' ), __( 'Every widget — chat, WhatsApp, forms, landing pages — captures leads automatically. On Free Forever, leads are also sent straight to your personal WhatsApp.', 'chatbotistic' ) ),
+	array( __( 'Does it support bookings?', 'chatbotistic' ), __( 'Yes. Booking forms are included from Starter and up, with a full landing page editor and AI replies on Growth and Agency.', 'chatbotistic' ) ),
+	array( __( 'What are campaign messages?', 'chatbotistic' ), __( 'Every outbound WhatsApp campaign send counts against your plan’s monthly message allowance — 100/mo on Free Forever, scaling up to 25,000/mo on Agency.', 'chatbotistic' ) ),
+	array( __( 'Can agencies use it?', 'chatbotistic' ), __( 'Absolutely — the Agency plan adds full white-label with a custom domain, 10 client sub-accounts, and branded client reports.', 'chatbotistic' ) ),
+	array( __( 'Is white label available?', 'chatbotistic' ), __( 'Chatbotistic branding is removed from Growth up. Full white-label with your own domain is available on Agency (and the legacy Lifetime plan).', 'chatbotistic' ) ),
+	array( __( 'Can I use it for multiple websites?', 'chatbotistic' ), __( 'Free Forever covers 1 domain, Starter covers 3, Growth covers 10, and Agency covers 50.', 'chatbotistic' ) ),
+	array( __( 'What happened to the Lifetime plan?', 'chatbotistic' ), __( 'Lifetime is a legacy plan with limited availability — it is no longer sold on the pricing grid. Existing lifetime members keep their plan; email hello@chatbotistic.com for custom pricing.', 'chatbotistic' ) ),
 );
 
 // Emit FAQPage JSON-LD so Google + AI engines render this page's FAQs as
@@ -117,7 +125,7 @@ if ( function_exists( 'cb_add_faq_schema' ) ) {
 		<div class="container" style="text-align:center;">
 			<span class="section-eyebrow"><span class="dot"></span><?php esc_html_e( 'Pricing', 'chatbotistic' ); ?></span>
 			<h1 class="h-1 text-grad" style="margin:18px auto 0;max-width:760px;"><?php esc_html_e( 'Honest pricing. Outrageous value.', 'chatbotistic' ); ?></h1>
-			<p class="lead" style="margin:18px auto 0;"><?php esc_html_e( 'Start free forever. Upgrade when you’re ready. Lifetime deals for the first 50 founders.', 'chatbotistic' ); ?></p>
+			<p class="lead" style="margin:18px auto 0;"><?php esc_html_e( 'Start free forever. Upgrade when you’re ready — every plan includes full access to the Chatbotistic Dashboard.', 'chatbotistic' ); ?></p>
 			<div class="toggle-wrap" style="margin-top:36px;" role="group" aria-label="<?php esc_attr_e( 'Billing cycle', 'chatbotistic' ); ?>">
 				<button class="active" type="button" data-pricing-mode="monthly" aria-pressed="true"><?php esc_html_e( 'Monthly', 'chatbotistic' ); ?></button>
 				<button type="button" data-pricing-mode="annual" aria-pressed="false"><?php esc_html_e( 'Annual', 'chatbotistic' ); ?> <span class="save-pill" style="margin-left:6px;"><?php esc_html_e( 'Save 20%', 'chatbotistic' ); ?></span></button>
@@ -127,13 +135,13 @@ if ( function_exists( 'cb_add_faq_schema' ) ) {
 
 	<section class="section section-tight">
 		<div class="container">
-			<div class="pricing-grid" style="grid-template-columns:repeat(4,1fr);">
+			<div class="pricing-grid" style="grid-template-columns:repeat(5,1fr);">
 				<?php foreach ( $cb_plans as $cb_p ) : ?>
 					<div class="price-card<?php echo $cb_p['flavor'] ? ' ' . esc_attr( $cb_p['flavor'] ) : ''; ?>" style="padding:24px;">
 						<?php if ( 'featured' === $cb_p['flavor'] ) : ?>
 							<div class="best-badge"><?php esc_html_e( 'Most popular', 'chatbotistic' ); ?></div>
 						<?php elseif ( 'lifetime' === $cb_p['flavor'] ) : ?>
-							<div class="lifetime-badge"><?php esc_html_e( '★ Limited · 50 seats', 'chatbotistic' ); ?></div>
+							<div class="lifetime-badge"><?php esc_html_e( '★ Legacy · Limited availability', 'chatbotistic' ); ?></div>
 						<?php endif; ?>
 						<div class="plan-name"><?php echo esc_html( $cb_p['name'] ); ?></div>
 						<div class="plan-desc" style="min-height:42px;"><?php echo esc_html( $cb_p['desc'] ); ?></div>
@@ -165,10 +173,10 @@ if ( function_exists( 'cb_add_faq_schema' ) ) {
 			<div class="compare-table" style="grid-template-columns:1.6fr repeat(4,1fr);margin-top:40px;">
 				<div class="compare-row head" style="grid-template-columns:1.6fr repeat(4,1fr);">
 					<span><?php esc_html_e( 'Feature', 'chatbotistic' ); ?></span>
-					<span><?php esc_html_e( 'Free', 'chatbotistic' ); ?></span>
-					<span><?php esc_html_e( 'Pro', 'chatbotistic' ); ?></span>
+					<span><?php esc_html_e( 'Free Forever', 'chatbotistic' ); ?></span>
+					<span><?php esc_html_e( 'Starter', 'chatbotistic' ); ?></span>
+					<span><?php esc_html_e( 'Growth', 'chatbotistic' ); ?></span>
 					<span><?php esc_html_e( 'Agency', 'chatbotistic' ); ?></span>
-					<span><?php esc_html_e( 'Lifetime', 'chatbotistic' ); ?></span>
 				</div>
 				<?php foreach ( $cb_compare_rows as $cb_r ) : ?>
 					<div class="compare-row" style="grid-template-columns:1.6fr repeat(4,1fr);">

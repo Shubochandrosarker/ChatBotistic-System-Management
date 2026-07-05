@@ -4,9 +4,9 @@
  *
  * Branded shell around Memberistic's own checkout, which creates the Stripe
  * Checkout Session and handles the real payment. Plan + cycle arrive as
- * ?memberistic_plan=pro|agency&cycle=monthly|annual (the theme's pricing cards
- * build these links via cb_memberistic_checkout_url()). The legacy ?plan=
- * param is still honoured as a fallback.
+ * ?memberistic_plan=starter|growth|agency&cycle=monthly|annual (the theme's
+ * pricing cards build these links via cb_memberistic_checkout_url()). The
+ * legacy ?plan= param is still honoured as a fallback.
  *
  * Card data is never collected on-site — Memberistic redirects to Stripe's
  * hosted Checkout. This template only provides the branded frame (logo, order
@@ -32,8 +32,9 @@ $cb_cycle = ( isset( $_GET['cycle'] ) && 'annual' === $_GET['cycle'] ) ? 'annual
 // Branding-only plan copy for the summary card. Memberistic's shortcode remains
 // the source of truth for the actual price charged, so no prices are shown here.
 $cb_plan_meta = array(
-	'pro'    => array( 'name' => __( 'Chatbotistic Pro', 'chatbotistic' ),    'feats' => array( __( '5 AI ChatBot Widgets', 'chatbotistic' ), __( '15 WhatsApp Agents', 'chatbotistic' ), __( '10 Website Domains', 'chatbotistic' ), __( 'Chat Forms, CRM, Webhooks', 'chatbotistic' ), __( 'WordPress widget plugin', 'chatbotistic' ) ) ),
-	'agency' => array( 'name' => __( 'Chatbotistic Agency', 'chatbotistic' ), 'feats' => array( __( '30 AI ChatBot Widgets', 'chatbotistic' ), __( '100 WhatsApp Agents', 'chatbotistic' ), __( '50 Website Domains', 'chatbotistic' ), __( 'White-label dashboard & widgets', 'chatbotistic' ), __( 'Team agents on your account', 'chatbotistic' ) ) ),
+	'starter' => array( 'name' => __( 'Chatbotistic Starter', 'chatbotistic' ), 'feats' => array( __( '3 AI ChatBot Widgets', 'chatbotistic' ), __( '5 WhatsApp Agents', 'chatbotistic' ), __( '3 Website Domains', 'chatbotistic' ), __( '2 Team Seats', 'chatbotistic' ), __( '1,000 campaign messages / mo', 'chatbotistic' ), __( 'Booking forms & shared team inbox', 'chatbotistic' ) ) ),
+	'growth'  => array( 'name' => __( 'Chatbotistic Growth', 'chatbotistic' ),  'feats' => array( __( '10 AI ChatBot Widgets', 'chatbotistic' ), __( '20 WhatsApp Agents', 'chatbotistic' ), __( '10 Website Domains', 'chatbotistic' ), __( '5 Team Seats', 'chatbotistic' ), __( '5,000 campaign messages / mo', 'chatbotistic' ), __( 'Landing page editor & AI replies', 'chatbotistic' ) ) ),
+	'agency'  => array( 'name' => __( 'Chatbotistic Agency', 'chatbotistic' ), 'feats' => array( __( '30 AI ChatBot Widgets', 'chatbotistic' ), __( 'Unlimited WhatsApp Agents', 'chatbotistic' ), __( '50 Website Domains', 'chatbotistic' ), __( '15 Team Seats', 'chatbotistic' ), __( '25,000 campaign messages / mo', 'chatbotistic' ), __( 'Full white-label + custom domain', 'chatbotistic' ) ) ),
 );
 $cb_meta = $cb_plan_meta[ $cb_plan_slug ] ?? null;
 ?>
