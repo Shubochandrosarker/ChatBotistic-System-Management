@@ -110,7 +110,8 @@ $cb_products = array(
 								<div style="font-size:11.5px;color:var(--cb-indigo-2);margin-top:2px;"><?php echo esc_html( $cb_member['plan_name'] ); ?></div>
 							<?php endif; ?>
 						</div>
-						<a href="<?php echo esc_url( $cb_account ); ?>" role="menuitem"><?php esc_html_e( 'Dashboard', 'chatbotistic' ); ?></a>
+						<a href="<?php echo esc_url( cb_dashboard_url() ); ?>" role="menuitem"><?php esc_html_e( 'Open Dashboard', 'chatbotistic' ); ?></a>
+						<a href="<?php echo esc_url( $cb_account ); ?>" role="menuitem"><?php esc_html_e( 'Member Portal', 'chatbotistic' ); ?></a>
 						<a href="<?php echo esc_url( add_query_arg( 'view', 'tools', $cb_account ) ); ?>" role="menuitem"><?php esc_html_e( 'Tools', 'chatbotistic' ); ?></a>
 						<a href="<?php echo esc_url( add_query_arg( 'view', 'subscription', $cb_account ) ); ?>" role="menuitem"><?php esc_html_e( 'Subscription', 'chatbotistic' ); ?></a>
 						<div class="cb-dropdown__sep"></div>
@@ -129,8 +130,8 @@ $cb_products = array(
 			</div>
 
 			<a class="cb-btn cb-btn--ghost cb-btn--sm" href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Talk to sales', 'chatbotistic' ); ?></a>
-			<a class="cb-btn cb-btn--primary cb-btn--sm" href="<?php echo esc_url( $cb_logged_in ? $cb_account : $cb_signup ); ?>">
-				<?php echo $cb_logged_in ? esc_html__( 'Dashboard', 'chatbotistic' ) : esc_html__( 'Get Started', 'chatbotistic' ); ?>
+			<a class="cb-btn cb-btn--primary cb-btn--sm" href="<?php echo esc_url( $cb_logged_in ? cb_dashboard_url() : $cb_signup ); ?>">
+				<?php echo $cb_logged_in ? esc_html__( 'Open Dashboard', 'chatbotistic' ) : esc_html__( 'Get Started', 'chatbotistic' ); ?>
 			</a>
 
 			<button type="button" class="cb-icon-btn cb-burger" data-burger aria-expanded="false" aria-label="<?php esc_attr_e( 'Menu', 'chatbotistic' ); ?>">
@@ -172,7 +173,8 @@ $cb_products = array(
 	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact', 'chatbotistic' ); ?></a>
 	<div class="cb-mobile-nav__cta">
 		<?php if ( $cb_logged_in ) : ?>
-			<a class="cb-btn cb-btn--primary" href="<?php echo esc_url( $cb_account ); ?>"><?php esc_html_e( 'My Dashboard', 'chatbotistic' ); ?></a>
+			<a class="cb-btn cb-btn--primary" href="<?php echo esc_url( cb_dashboard_url() ); ?>"><?php esc_html_e( 'Open Dashboard', 'chatbotistic' ); ?></a>
+			<a class="cb-btn cb-btn--ghost" href="<?php echo esc_url( $cb_account ); ?>"><?php esc_html_e( 'Member Portal', 'chatbotistic' ); ?></a>
 			<a class="cb-btn cb-btn--ghost" href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Log out', 'chatbotistic' ); ?></a>
 		<?php else : ?>
 			<a class="cb-btn cb-btn--primary" href="<?php echo esc_url( $cb_signup ); ?>"><?php esc_html_e( 'Get Started', 'chatbotistic' ); ?></a>
