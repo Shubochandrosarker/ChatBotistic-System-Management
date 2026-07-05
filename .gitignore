@@ -10,3 +10,4 @@
 # Composer / Node — only relevant if a plugin ever adds them
 vendor/
 node_modules/
+dist-release/
