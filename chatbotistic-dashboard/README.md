@@ -97,7 +97,7 @@ descriptions. Summary:
 | `TOCHAT_API_BASE` | Tochat.be API base URL (defaults to `https://services.tochat.be`) |
 | `TOCHAT_API_EMAIL` / `TOCHAT_API_PASSWORD` | Master account credentials used to mint the JWT for all `/api/tochat/*` and `/api/leads` proxy calls |
 | `TOCHAT_LEAD_API_KEY` | Separate long-lived key used only for lead export |
-| `SSO_SHARED_SECRET` | HMAC secret shared with the chatbotistic.com Memberistic/Licenseistic SSO bridge |
+| `SSO_SHARED_SECRET` | HMAC secret shared with the chatbotistic.com Memberistic/Licenseistic SSO bridge. Must be the *identical* value as `CB_SSO_SHARED_SECRET` in the WordPress site's `wp-config.php` (see `chatbotistic-profile/includes/class-sso-bridge.php`) — if that constant isn't set, the WordPress side auto-generates and encrypts a random one on first use and surfaces it once in a wp-admin notice to copy over. |
 | `SSO_MAX_SKEW_SECONDS` | Max allowed clock skew for SSO tokens (defaults to 300) |
 | `ENCRYPTION_KEY` | 64 hex chars (32 bytes) — AES-256-GCM key for WhatsApp credentials at rest. Generate with `openssl rand -hex 32` |
 | `NEXT_PUBLIC_SITE_URL` | Public origin used to build absolute redirect URLs (e.g. post-SSO-login redirect) |
@@ -125,7 +125,13 @@ descriptions. Summary:
   `src/lib/sso/token.ts`, `src/lib/sso/provision.ts`): verifies an
   HMAC-signed, short-lived token from chatbotistic.com, provisions/updates
   the Supabase auth user and organization (plan + entitlements), then hands
-  off through Supabase's magic-link verifier to establish the session.
+  off through Supabase's magic-link verifier to establish the session. The
+  token is *minted* on the WordPress side by
+  `chatbotistic-profile/includes/class-sso-bridge.php`, which hooks the
+  theme's `cb_dashboard_url` filter so every "Open Dashboard" link/button
+  carries a fresh token for the logged-in member — no separate dashboard
+  signup, and their live Memberistic plan + Licenseistic status are
+  asserted on every click, not just at signup.
 - **Credential encryption** (`src/lib/encryption.ts`): WhatsApp credentials
   (access tokens, etc.) are encrypted at rest with AES-256-GCM before being
   stored.

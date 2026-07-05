@@ -29,19 +29,26 @@ class Plugin {
 
 		// Re-route Memberistic's PMPro importer onto the Chatbotistic plan
 		// slugs. The plugin ships a Guns 2 Ammo-flavoured default map; we
-		// replace it with Chatbotistic's free/pro/agency/lifetime so any
-		// PMPro export imported on a Chatbotistic install lands on the
-		// right plan.
+		// replace it with Chatbotistic's free/starter/growth/agency/lifetime
+		// so any PMPro export imported on a Chatbotistic install lands on
+		// the right plan. ('pro' legacy exports map to 'starter', the
+		// closest replacement now that Pro has split into Starter/Growth.)
 		add_filter( 'memberistic_import_level_map', static function () {
 			return array(
 				'bronze'                                  => 'free',
 				'bronze yearly'                           => 'free',
 				'free'                                    => 'free',
-				'silver'                                  => 'pro',
-				'silver yearly'                           => 'pro',
-				'pro'                                     => 'pro',
-				'pro monthly'                             => 'pro',
-				'pro yearly'                              => 'pro',
+				'silver'                                  => 'starter',
+				'silver yearly'                           => 'starter',
+				'starter'                                 => 'starter',
+				'starter monthly'                         => 'starter',
+				'starter yearly'                          => 'starter',
+				'pro'                                     => 'starter',
+				'pro monthly'                             => 'starter',
+				'pro yearly'                              => 'starter',
+				'growth'                                  => 'growth',
+				'growth monthly'                          => 'growth',
+				'growth yearly'                           => 'growth',
 				'gold'                                    => 'agency',
 				'gold yearly'                             => 'agency',
 				'agency'                                  => 'agency',
@@ -56,8 +63,9 @@ class Plugin {
 			return array(
 				array( 'keywords' => array( 'lifetime', 'ltd', 'one-time' ),       'slug' => 'lifetime' ),
 				array( 'keywords' => array( 'agency', 'gold', 'enterprise' ),      'slug' => 'agency' ),
-				array( 'keywords' => array( 'pro', 'silver', 'business' ),         'slug' => 'pro' ),
-				array( 'keywords' => array( 'free', 'bronze', 'starter', 'trial' ), 'slug' => 'free' ),
+				array( 'keywords' => array( 'growth', 'scale' ),                  'slug' => 'growth' ),
+				array( 'keywords' => array( 'pro', 'starter', 'silver', 'business' ), 'slug' => 'starter' ),
+				array( 'keywords' => array( 'free', 'bronze', 'trial' ),          'slug' => 'free' ),
 			);
 		} );
 
@@ -74,6 +82,13 @@ class Plugin {
 		// Account-verification, welcome, license-activation and per-form
 		// auto-responder copy — every customer-facing automated email.
 		( new Emails_Automation() )->register();
+
+		// Mints the signed SSO token that hands a logged-in member off to
+		// dashboard.chatbotistic.com, carrying their live plan + license
+		// status. Hooks into the theme's existing `cb_dashboard_url`
+		// filter, so every "Open Dashboard" link becomes SSO'd with no
+		// theme changes required.
+		SSO_Bridge::register();
 
 		// Dismiss-welcome handler.
 		add_action( 'admin_post_cbp_dismiss_welcome', static function () {
