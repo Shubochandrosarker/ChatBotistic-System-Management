@@ -43,7 +43,7 @@ class Caps {
 	];
 
 	/**
-	 * Defaults seeded on first save — match the user's 4 Chatbotistic plans.
+	 * Defaults seeded on first save — match the user's 5 Chatbotistic plans.
 	 * Keys are plan slugs because plan IDs are install-specific; the admin
 	 * page maps slug → ID on save.
 	 *
@@ -60,11 +60,20 @@ class Caps {
 				'white_label' => false,
 				'branding'    => true,
 			],
-			'pro' => [
-				'tier'        => 'pro',
-				'plan_name'   => 'Pro',
-				'max_widgets' => 5,
-				'max_agents'  => 15,
+			'starter' => [
+				'tier'        => 'starter',
+				'plan_name'   => 'Starter',
+				'max_widgets' => 3,
+				'max_agents'  => 5,
+				'max_domains' => 3,
+				'white_label' => false,
+				'branding'    => true,
+			],
+			'growth' => [
+				'tier'        => 'growth',
+				'plan_name'   => 'Growth',
+				'max_widgets' => 10,
+				'max_agents'  => 20,
 				'max_domains' => 10,
 				'white_label' => false,
 				'branding'    => false,
@@ -73,7 +82,7 @@ class Caps {
 				'tier'        => 'agency',
 				'plan_name'   => 'Agency',
 				'max_widgets' => 30,
-				'max_agents'  => 100,
+				'max_agents'  => -1,
 				'max_domains' => 50,
 				'white_label' => true,
 				'branding'    => false,
