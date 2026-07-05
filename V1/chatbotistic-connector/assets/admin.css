@@ -1,0 +1,10 @@
+/* Chatbotistic Connector — admin */
+.cbc-admin h2 { margin-top: 28px; }
+.cbc-admin__notice {
+	margin: 14px 0; padding: 11px 15px; border-radius: 6px;
+	border-left: 4px solid #646970; background: #fff;
+}
+.cbc-admin__notice.is-ok  { border-left-color: #00a32a; }
+.cbc-admin__notice.is-err { border-left-color: #d63638; }
+.cbc-admin .small-text { width: 90px; }
+.cbc-admin code { font-size: 12px; }

@@ -1,0 +1,240 @@
+/* =========================================================================
+   Chatbotistic Connector — member dashboard
+   Self-contained dark UI; sits inside the Chatbotistic theme portal.
+   ========================================================================= */
+
+.cbc-app {
+	--cbc-bg:     #0a0e1a;
+	--cbc-card:   rgba(255,255,255,0.04);
+	--cbc-card-2: rgba(255,255,255,0.02);
+	--cbc-line:   rgba(255,255,255,0.10);
+	--cbc-line-2: rgba(255,255,255,0.16);
+	--cbc-text:   #e9ecf5;
+	--cbc-soft:   #a4adc4;
+	--cbc-dim:    #6b7491;
+	--cbc-blue:   #4f8bff;
+	--cbc-violet: #a070ff;
+	--cbc-green:  #34d399;
+	--cbc-red:    #ff6b81;
+	--cbc-amber:  #ffc46b;
+	--cbc-grad:   linear-gradient(135deg, #5a93ff, #9d6dff);
+	--cbc-r:      14px;
+	--cbc-font:   'Manrope', system-ui, -apple-system, sans-serif;
+	--cbc-mono:   'JetBrains Mono', ui-monospace, monospace;
+
+	font-family: var(--cbc-font);
+	color: var(--cbc-text);
+	position: relative;
+}
+.cbc-app *, .cbc-app *::before, .cbc-app *::after { box-sizing: border-box; }
+
+/* ---------- Header ---------- */
+.cbc-top {
+	display: flex; align-items: center; justify-content: space-between;
+	gap: 18px; flex-wrap: wrap; margin-bottom: 24px;
+	padding-bottom: 18px; border-bottom: 1px solid var(--cbc-line);
+}
+.cbc-top__id { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.cbc-plan {
+	display: inline-block; padding: 6px 13px; border-radius: 999px;
+	background: var(--cbc-grad); color: #fff; font-weight: 600; font-size: 13px;
+}
+.cbc-usage { font-family: var(--cbc-mono); font-size: 12px; color: var(--cbc-dim); }
+
+.cbc-tabs {
+	display: flex; gap: 4px; padding: 4px;
+	background: var(--cbc-card); border: 1px solid var(--cbc-line); border-radius: 999px;
+	/* Allow the pill bar to scroll horizontally on narrow viewports instead
+	   of wrapping into multiple rows (which breaks the pill shape). */
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none;
+	max-width: 100%;
+}
+.cbc-tabs::-webkit-scrollbar { display: none; }
+.cbc-tab { flex-shrink: 0; }
+.cbc-tab {
+	padding: 8px 18px; border: 0; border-radius: 999px; cursor: pointer;
+	background: transparent; color: var(--cbc-soft);
+	font-family: var(--cbc-font); font-weight: 600; font-size: 13.5px;
+	transition: background .15s, color .15s;
+}
+.cbc-tab:hover { color: var(--cbc-text); }
+.cbc-tab.is-active { background: var(--cbc-grad); color: #fff; }
+
+/* ---------- Panels ---------- */
+.cbc-panel[hidden] { display: none; }
+.cbc-panel__head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+.cbc-panel__head h2 { font-size: 19px; margin: 0; font-weight: 600; }
+
+.cbc-loading, .cbc-empty { padding: 40px 20px; text-align: center; color: var(--cbc-dim); font-size: 14px; }
+.cbc-empty strong { display: block; color: var(--cbc-text); font-size: 16px; margin-bottom: 6px; }
+
+/* ---------- Notice ---------- */
+.cbc-notice {
+	margin-bottom: 16px; padding: 12px 16px; border-radius: 11px;
+	font-size: 14px; border: 1px solid var(--cbc-line);
+}
+.cbc-notice[hidden] { display: none; }
+.cbc-notice.is-ok  { background: rgba(52,211,153,0.12); border-color: rgba(52,211,153,0.34); color: #a7ecdf; }
+.cbc-notice.is-err { background: rgba(255,107,129,0.12); border-color: rgba(255,107,129,0.34); color: #ffb3bf; }
+
+/* ---------- Buttons ---------- */
+.cbc-btn {
+	display: inline-flex; align-items: center; gap: 7px; justify-content: center;
+	padding: 10px 17px; border: 1px solid var(--cbc-line); border-radius: 10px;
+	background: var(--cbc-card); color: var(--cbc-text);
+	font-family: var(--cbc-font); font-weight: 600; font-size: 13.5px; cursor: pointer;
+	transition: transform .15s, background .15s, border-color .15s, opacity .15s;
+}
+.cbc-btn:hover { transform: translateY(-1px); border-color: var(--cbc-line-2); }
+.cbc-btn:disabled { opacity: .55; cursor: progress; transform: none; }
+.cbc-btn--primary { background: var(--cbc-grad); border-color: transparent; color: #fff; }
+.cbc-btn--danger { color: #ffb3bf; border-color: rgba(255,107,129,0.32); }
+.cbc-btn--sm { padding: 6px 12px; font-size: 12.5px; border-radius: 8px; }
+.cbc-btn--ghost { background: transparent; }
+
+/* ---------- Widget cards ---------- */
+.cbc-list { display: flex; flex-direction: column; gap: 14px; }
+.cbc-widget {
+	border: 1px solid var(--cbc-line); border-radius: var(--cbc-r);
+	background: linear-gradient(180deg, var(--cbc-card), var(--cbc-card-2));
+	overflow: hidden;
+}
+.cbc-widget__head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; }
+.cbc-widget__dot { width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18); }
+.cbc-widget__name { font-weight: 600; font-size: 15.5px; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.cbc-widget__meta { font-size: 12px; color: var(--cbc-dim); }
+.cbc-widget__actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.cbc-widget__body { border-top: 1px solid var(--cbc-line); padding: 14px 18px; display: none; }
+.cbc-widget.is-open .cbc-widget__body { display: block; }
+.cbc-widget__section-title {
+	font-family: var(--cbc-mono); font-size: 11px; letter-spacing: 0.1em;
+	text-transform: uppercase; color: var(--cbc-dim); margin: 4px 0 10px;
+}
+
+/* Agents */
+.cbc-agent {
+	display: flex; align-items: center; gap: 12px;
+	padding: 10px 12px; border-radius: 10px; background: var(--cbc-card-2);
+	border: 1px solid var(--cbc-line); margin-bottom: 8px;
+}
+.cbc-agent__info { flex: 1; min-width: 0; }
+.cbc-agent__info b { font-size: 14px; display: block; }
+.cbc-agent__info span { font-size: 12.5px; color: var(--cbc-dim); font-family: var(--cbc-mono); }
+
+/* Toggle switch */
+.cbc-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; cursor: pointer; }
+.cbc-switch input { position: absolute; opacity: 0; }
+.cbc-switch span {
+	position: absolute; inset: 0; border-radius: 999px;
+	background: rgba(255,255,255,0.12); transition: background .18s;
+}
+.cbc-switch span::after {
+	content: ""; position: absolute; top: 3px; left: 3px;
+	width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .18s;
+}
+.cbc-switch input:checked + span { background: var(--cbc-green); }
+.cbc-switch input:checked + span::after { transform: translateX(18px); }
+
+/* ---------- Modal ---------- */
+.cbc-modal {
+	position: fixed; inset: 0; z-index: 9999;
+	background: rgba(4,6,12,0.78); backdrop-filter: blur(4px);
+	display: flex; align-items: flex-start; justify-content: center;
+	padding: 6vh 16px; overflow-y: auto;
+}
+.cbc-modal[hidden] { display: none; }
+.cbc-modal__box {
+	position: relative; width: 100%; max-width: 540px;
+	background: #0e1326; border: 1px solid var(--cbc-line-2);
+	border-radius: 18px; padding: 26px;
+	box-shadow: 0 40px 100px -30px rgba(0,0,0,0.85);
+}
+.cbc-modal__x {
+	position: absolute; top: 14px; right: 16px;
+	width: 32px; height: 32px; border: 0; border-radius: 8px;
+	background: var(--cbc-card); color: var(--cbc-soft); font-size: 20px; cursor: pointer;
+}
+.cbc-modal__x:hover { color: var(--cbc-text); }
+.cbc-modal h3 { margin: 0 0 16px; font-size: 18px; }
+
+/* ---------- Forms ---------- */
+.cbc-field { margin-bottom: 14px; }
+.cbc-field label {
+	display: block; margin-bottom: 6px;
+	font-family: var(--cbc-mono); font-size: 11px; letter-spacing: 0.06em;
+	text-transform: uppercase; color: var(--cbc-dim);
+}
+.cbc-input, .cbc-app textarea, .cbc-app select {
+	width: 100%; padding: 11px 13px; border-radius: 10px;
+	background: rgba(0,0,0,0.4); border: 1px solid var(--cbc-line);
+	color: var(--cbc-text); font-family: var(--cbc-font); font-size: 14.5px;
+}
+.cbc-app textarea { resize: vertical; min-height: 80px; }
+.cbc-input:focus, .cbc-app textarea:focus, .cbc-app select:focus {
+	outline: none; border-color: rgba(99,128,255,0.6);
+}
+.cbc-input[type="color"] { padding: 4px; height: 42px; cursor: pointer; }
+.cbc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cbc-form-actions { display: flex; gap: 10px; margin-top: 18px; }
+.cbc-repeat__row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: start; }
+
+/* ---------- Analytics ---------- */
+.cbc-kpis { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 22px; }
+.cbc-kpi { padding: 18px; border-radius: var(--cbc-r); background: var(--cbc-card); border: 1px solid var(--cbc-line); }
+.cbc-kpi__label { font-family: var(--cbc-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cbc-dim); }
+.cbc-kpi__value { font-size: 30px; font-weight: 700; margin-top: 6px; }
+.cbc-kpi__value.is-grad { background: var(--cbc-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+.cbc-chart {
+	display: flex; align-items: flex-end; gap: 3px; height: 180px;
+	padding: 16px; border-radius: var(--cbc-r);
+	background: var(--cbc-card); border: 1px solid var(--cbc-line);
+}
+.cbc-chart__bar { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; }
+.cbc-chart__fill { background: var(--cbc-grad); border-radius: 3px 3px 0 0; min-height: 2px; transition: height .3s; }
+.cbc-chart__fill--clicks { background: rgba(79,139,255,0.45); }
+
+/* ---------- Leads table ---------- */
+.cbc-table { width: 100%; border-collapse: collapse; }
+.cbc-table th {
+	text-align: left; padding: 10px 12px;
+	font-family: var(--cbc-mono); font-size: 10.5px; letter-spacing: 0.08em;
+	text-transform: uppercase; color: var(--cbc-dim);
+	border-bottom: 1px solid var(--cbc-line);
+}
+.cbc-table td { padding: 12px; border-bottom: 1px solid var(--cbc-line); font-size: 13.5px; color: var(--cbc-soft); }
+.cbc-table tr:last-child td { border-bottom: 0; }
+.cbc-tag {
+	display: inline-block; padding: 2px 9px; border-radius: 999px;
+	font-family: var(--cbc-mono); font-size: 10px; letter-spacing: 0.05em;
+}
+.cbc-tag--new { background: rgba(63,220,255,0.14); color: #8fe6ff; }
+.cbc-tag--return { background: rgba(255,255,255,0.07); color: var(--cbc-dim); }
+
+.cbc-gate { padding: 40px; text-align: center; color: #a4adc4; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+	.cbc-kpis { grid-template-columns: 1fr 1fr; }
+	.cbc-row { grid-template-columns: 1fr; }
+	.cbc-repeat__row { grid-template-columns: 1fr; }
+	.cbc-top { flex-direction: column; align-items: flex-start; }
+	.cbc-table thead { display: none; }
+	.cbc-table tr { display: block; border-bottom: 1px solid var(--cbc-line); padding: 8px 0; }
+	.cbc-table td { display: flex; justify-content: space-between; border: 0; padding: 5px 12px; }
+	.cbc-table td::before { content: attr(data-label); color: var(--cbc-dim); font-size: 11px; }
+	.cbc-widget__head { flex-wrap: wrap; }
+	.cbc-widget__actions { width: 100%; }
+}
+@media (max-width: 480px) {
+	.cbc-kpis { grid-template-columns: 1fr; }
+	.cbc-kpi__value { font-size: 26px; }
+	.cbc-chart { height: 140px; padding: 12px; }
+	.cbc-modal { padding: 4vh 10px; }
+	.cbc-modal__box { padding: 20px; border-radius: 14px; }
+	.cbc-form-actions { flex-direction: column; }
+	.cbc-form-actions .cbc-btn { width: 100%; }
+}

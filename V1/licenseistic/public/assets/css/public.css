@@ -1,0 +1,79 @@
+/* Licenseistic public styles. */
+
+.wpistic-lsi-customer-dashboard {
+	margin: 20px 0;
+}
+
+/* Wrap any table inside the dashboard so it scrolls horizontally on
+   small screens instead of forcing the page to scroll. */
+.wpistic-lsi-customer-dashboard {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.wpistic-lsi-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 16px 0;
+}
+
+.wpistic-lsi-table code {
+	overflow-wrap: anywhere;
+	word-break: break-all;
+}
+
+.wpistic-lsi-table th,
+.wpistic-lsi-table td {
+	border-bottom: 1px solid #ddd;
+	padding: 10px 12px;
+	text-align: left;
+	vertical-align: middle;
+}
+
+.wpistic-lsi-table th {
+	background: #f6f7f7;
+	font-weight: 600;
+}
+
+.wpistic-lsi-table code {
+	background: #f3f4f5;
+	padding: 3px 6px;
+	border-radius: 3px;
+	font-size: 13px;
+}
+
+.wpistic-lsi-deactivate {
+	background: #dc3545;
+	color: #fff;
+	border: 0;
+	padding: 6px 12px;
+	border-radius: 3px;
+	cursor: pointer;
+}
+
+.wpistic-lsi-notice {
+	background: #fff8e1;
+	border-left: 4px solid #f0ad4e;
+	padding: 12px 16px;
+	margin: 16px 0;
+}
+
+.lsi-status {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 3px;
+	font-size: 12px;
+}
+
+.lsi-status-active    { background: #d4edda; color: #155724; }
+.lsi-status-expired   { background: #f8d7da; color: #721c24; }
+.lsi-status-revoked   { background: #f5c6cb; color: #491217; }
+.lsi-status-suspended { background: #fff3cd; color: #856404; }
+.lsi-status-pending   { background: #cce5ff; color: #004085; }
+.lsi-status-disabled  { background: #e2e3e5; color: #383d41; }
+
+@media (max-width: 560px) {
+	.wpistic-lsi-table th,
+	.wpistic-lsi-table td { padding: 8px 10px; font-size: 13px; }
+	.wpistic-lsi-deactivate { width: 100%; }
+}
