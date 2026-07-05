@@ -66,17 +66,7 @@ class WPCF_Preset {
 			$summary['autoresponder']++;
 		}
 		$ar_subject = 'Thanks for contacting ' . $brand . ' — we got your message';
-		$ar_body    = "Hey {name},\n\n"
-			. 'Thanks for reaching out to ' . $brand . ". We received your "
-			. "message and a real person will reply within one business day.\n\n"
-			. "Submitted: {date}\n"
-			. "Form: {form}\n\n"
-			. "Your message:\n"
-			. "----------\n"
-			. "{message}\n"
-			. "----------\n\n"
-			. "If you need urgent help, reply to this email and we'll prioritise it.\n\n"
-			. '— The ' . $brand . " team\n" . $site_url;
+		$ar_body    = self::default_ar_body( $brand, $site_url );
 
 		foreach ( array( 'WPISTIC_CF_ar_subject' => $ar_subject, 'WPISTIC_CF_ar_body' => $ar_body ) as $key => $value ) {
 			if ( self::is_writable_default( $key ) ) {
@@ -177,6 +167,51 @@ class WPCF_Preset {
 		$table = \WPISTIC_CF_Database::submissions_table();
 		$count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ); // phpcs:ignore WordPress.DB
 		return 0 === $count;
+	}
+
+	/**
+	 * Branded HTML body for the global (non-form-specific) auto-responder —
+	 * the "general enquiry" reply sent whenever a submitted form has no
+	 * dedicated template in Emails_Automation::per_form_ar_template().
+	 *
+	 * WPISTIC_CF_ar_body is a plain stored option string, not PHP, so we
+	 * pre-render the full Email_Template HTML once here and store *that*
+	 * string — the {name}/{form}/{message}/{date} placeholder tokens stay
+	 * literal text inside the markup and are still resolved later by
+	 * WPISTIC_CF_Autoresponder::maybe_send()'s strtr() call.
+	 */
+	private static function default_ar_body( string $brand, string $site_url ): string {
+		if ( ! class_exists( __NAMESPACE__ . '\\Email_Template' ) ) {
+			// Fallback plain text if the template class is unavailable for some reason.
+			return "Hey {name},\n\n"
+				. 'Thanks for reaching out to ' . $brand . ". We've received your "
+				. "message and reply within 24 hours.\n\n"
+				. "Submitted: {date}\n"
+				. "Form: {form}\n\n"
+				. "Your message:\n----------\n{message}\n----------\n\n"
+				. '— The ' . $brand . " team\n" . $site_url;
+		}
+
+		$dashboard_url = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url() : 'https://dashboard.chatbotistic.com';
+		$docs_url      = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url( 'docs' ) : 'https://dashboard.chatbotistic.com/docs';
+
+		$body  = '<p style="margin:0 0 16px 0;">Hey {name},</p>';
+		$body .= '<p style="margin:0 0 16px 0;">' . sprintf(
+			esc_html__( "Thanks for reaching out to %s. We've received your message and reply within 24 hours.", 'chatbotistic-profile' ),
+			esc_html( $brand )
+		) . '</p>';
+		$body .= '<p style="margin:0 0 4px 0;font-size:13px;color:#6b7280;">' . esc_html__( 'Submitted:', 'chatbotistic-profile' ) . ' {date} &middot; ' . esc_html__( 'Form:', 'chatbotistic-profile' ) . ' {form}</p>';
+		$body .= '<blockquote style="margin:12px 0 20px 0;padding:12px 16px;background:#f9fafb;border-left:3px solid ' . Email_Template::BRAND_GREEN . ';font-size:14px;color:#374151;">{message}</blockquote>';
+		$body .= '<p style="margin:0;">In the meantime: <a href="' . esc_url( $docs_url ) . '" style="color:' . Email_Template::BRAND_GREEN . ';">docs</a> &middot; <a href="' . esc_url( $dashboard_url ) . '" style="color:' . Email_Template::BRAND_GREEN . ';">your dashboard</a>.</p>';
+
+		return Email_Template::render( array(
+			'title'     => __( "We've received your message", 'chatbotistic-profile' ),
+			/* translators: %s: brand label */
+			'preheader' => sprintf( __( 'Thanks for contacting %s — a real person replies within 24 hours.', 'chatbotistic-profile' ), $brand ),
+			'body_html' => $body,
+			'cta_label' => __( 'Open Your Dashboard', 'chatbotistic-profile' ),
+			'cta_url'   => $dashboard_url,
+		) );
 	}
 
 	private static function default_faq_text( string $brand, string $site_url ): string {
