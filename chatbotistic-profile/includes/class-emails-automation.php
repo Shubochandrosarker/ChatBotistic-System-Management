@@ -571,7 +571,7 @@ class Emails_Automation {
 		$body .= '<p style="margin:0;">' . sprintf( wp_kses_post( __( 'Curious what the platform can do right now? Read the <a href="%s" style="color:' . Email_Template::BRAND_GREEN . '">docs</a>.', 'chatbotistic-profile' ) ), esc_url( $docs_url ) ) . '</p>';
 
 		$html = Email_Template::render( array(
-			'title'       => sprintf( __( "You're on the list", 'chatbotistic-profile' ), $brand ),
+			'title'       => sprintf( __( "You're on the %s list", 'chatbotistic-profile' ), $brand ),
 			'preheader'   => sprintf( __( 'Welcome to the %s newsletter.', 'chatbotistic-profile' ), $brand ),
 			'body_html'   => $body,
 			'cta_label'   => __( 'Explore the Dashboard', 'chatbotistic-profile' ),
