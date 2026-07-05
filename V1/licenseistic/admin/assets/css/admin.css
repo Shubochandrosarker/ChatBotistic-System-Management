@@ -1,0 +1,69 @@
+/* Licenseistic admin styles. */
+
+.wpistic-lsi-wrap {
+	max-width: 1400px;
+}
+
+.wpistic-lsi-cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+	gap: 16px;
+	margin: 20px 0;
+}
+
+.wpistic-lsi-card {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-left: 4px solid #2271b1;
+	padding: 16px 18px;
+	border-radius: 4px;
+}
+
+.wpistic-lsi-card-label {
+	color: #50575e;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.wpistic-lsi-card-value {
+	font-size: 28px;
+	font-weight: 600;
+	margin-top: 6px;
+}
+
+.wpistic-lsi-flex {
+	display: flex;
+	gap: 24px;
+	align-items: flex-start;
+	margin-top: 20px;
+}
+
+.wpistic-lsi-flex-grow {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.wpistic-lsi-flex-side {
+	flex: 0 0 360px;
+	background: #fff;
+	padding: 16px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+}
+
+.lsi-status {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 3px;
+	font-size: 12px;
+	background: #eee;
+}
+
+.lsi-status-active    { background: #d4edda; color: #155724; }
+.lsi-status-expired   { background: #f8d7da; color: #721c24; }
+.lsi-status-revoked   { background: #f5c6cb; color: #491217; }
+.lsi-status-suspended { background: #fff3cd; color: #856404; }
+.lsi-status-pending   { background: #cce5ff; color: #004085; }
+.lsi-status-disabled  { background: #e2e3e5; color: #383d41; }
+.lsi-status-inactive  { background: #e2e3e5; color: #383d41; }

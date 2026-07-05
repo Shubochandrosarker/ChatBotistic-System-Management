@@ -1,0 +1,249 @@
+/* =========================================================================
+   Chatbotistic — Design audit fixes
+   Loaded LAST so these targeted corrections win the cascade. Covers:
+     1. Global overflow / viewport safety
+     2. Brand logo image (header, footer, auth, checkout)
+     3. Mobile drawer polish (now rendered outside <header>)
+     4. Account / products dropdown kept inside the viewport on phones
+     5. Hero mobile optimisation (no clipping, readable headline)
+     6. Checkbox/consent row fix on register + login
+     7. Auth pages mobile polish
+     8. Branded checkout UI (.cbk-*)
+   ========================================================================= */
+
+/* ---------- 1. Viewport safety ------------------------------------------ */
+html { overflow-x: hidden; }
+.cb-site { overflow-x: clip; }
+img, svg, video { max-width: 100%; }
+
+/* ---------- 2. Brand logo ----------------------------------------------- */
+.cb-logo { display: inline-flex; align-items: center; text-decoration: none; }
+.cb-logo__img {
+	display: block; height: 40px; width: auto;
+	max-width: 220px; object-fit: contain;
+}
+.cb-logo--footer .cb-logo__img { height: 44px; max-width: 240px; }
+.cb-logo--auth .cb-logo__img,
+.cbk-top .cb-logo__img { height: 36px; max-width: 200px; }
+/* the bundled wordmark already contains the icon + name, so hide the legacy
+   inline mark/text fallbacks if they ever render alongside it. */
+.cb-logo .cb-logo__img ~ .cb-logo__mark,
+.cb-logo .cb-logo__img ~ span { display: none; }
+@media (max-width: 480px) {
+	.cb-logo__img { height: 34px; max-width: 170px; }
+}
+
+/* ---------- 3. Mobile drawer -------------------------------------------- */
+.cb-mobile-nav__user {
+	display: flex; align-items: center; gap: 12px;
+	padding: 0 0 16px; margin-bottom: 8px;
+	border-bottom: 1px solid var(--cb-line, rgba(255,255,255,0.08));
+}
+.cb-mobile-nav__user img { width: 40px; height: 40px; border-radius: 50%; }
+.cb-mobile-nav__user strong { display: block; font-size: 15px; }
+.cb-mobile-nav__user span { font-size: 12px; color: var(--cb-indigo-2, #a8c1ff); }
+.cb-mobile-nav__cta { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+.cb-mobile-nav__cta .cb-btn { width: 100%; justify-content: center; }
+
+/* ---------- 4. Header dropdowns within viewport ------------------------- */
+@media (max-width: 600px) {
+	.cb-account-menu .cb-dropdown,
+	.cb-has-menu .cb-dropdown {
+		position: fixed;
+		top: 64px; right: 12px; left: 12px;
+		min-width: 0; width: auto; max-width: none;
+	}
+}
+
+/* ---------- 5. Hero mobile optimisation --------------------------------- */
+.h-display, .h-1, .h-2 { overflow-wrap: break-word; word-break: break-word; }
+.hero-grid > div { min-width: 0; }
+.widget-stack { max-width: 100%; }
+.chat-widget { max-width: 100%; }
+/* keep the operational-flow chips on one scrollable rail instead of
+   spilling past the screen edge on any phone width */
+.op-flowstrip { overflow: hidden; }
+@media (max-width: 900px) {
+	.sysmap-track {
+		overflow-x: auto; padding-bottom: 6px;
+		-webkit-overflow-scrolling: touch; scrollbar-width: none;
+	}
+	.sysmap-track::-webkit-scrollbar { display: none; }
+}
+@media (max-width: 460px) {
+	.h-display { font-size: clamp(27px, 8.4vw, 40px); line-height: 1.08; }
+	.hero { padding: 40px 0 36px; }
+	.hero .btn, .cta-actions .btn { width: 100%; justify-content: center; }
+}
+
+/* ---------- 6. Consent checkbox (register) + remember-me (login) -------- */
+/* theme.css sets `.cb-form input { width:100% }`; a bare attribute selector
+   here is more specific, so checkboxes/radios stop stretching full-width and
+   the "I agree to the Terms…" line lays out correctly again. */
+.cb-form input[type="checkbox"],
+.cb-form input[type="radio"],
+.check-line input {
+	width: 18px; height: 18px; min-width: 18px;
+	flex: 0 0 18px; margin-top: 2px; padding: 0;
+	accent-color: var(--blue, #4f8bff);
+}
+.check-line {
+	display: flex; align-items: flex-start; gap: 11px;
+	font-size: 13.5px; line-height: 1.5; color: var(--text-soft, #a4adc4);
+	cursor: pointer; flex-wrap: nowrap;
+}
+.check-line > * { min-width: 0; }
+.pw-row { gap: 12px; flex-wrap: wrap; }
+
+/* ---------- 7. Auth pages mobile ---------------------------------------- */
+@media (max-width: 600px) {
+	.auth-card h1 { font-size: 26px; }
+	.auth-main { padding: 32px 18px 56px; }
+	.auth-top { padding: 0 18px !important; }
+	.grid-2 { grid-template-columns: 1fr; }
+}
+
+/* =========================================================================
+   8. Branded checkout
+   ========================================================================= */
+.cbk-top {
+	height: 72px; display: flex; align-items: center; justify-content: space-between;
+	padding: 0 32px; position: sticky; top: 0; z-index: 30;
+	border-bottom: 1px solid var(--line-soft, rgba(255,255,255,0.05));
+	background: rgba(4,6,12,0.72);
+	backdrop-filter: saturate(150%) blur(16px);
+	-webkit-backdrop-filter: saturate(150%) blur(16px);
+}
+.cbk-secure {
+	display: inline-flex; align-items: center; gap: 8px;
+	font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em;
+	color: #9be9c8; padding: 7px 13px; border-radius: 999px;
+	background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.28);
+}
+.cbk-secure svg { width: 13px; height: 13px; }
+
+.cbk { animation: fadeUp .5s ease; }
+.cbk-wrap {
+	max-width: 1060px; margin: 0 auto; padding: 40px 32px 80px;
+	display: grid; grid-template-columns: 1fr 380px; gap: 40px; align-items: start;
+}
+.cbk-wrap--single { max-width: 760px; grid-template-columns: minmax(0, 1fr); }
+.cbk-back {
+	display: inline-flex; align-items: center; gap: 7px; font-size: 13px;
+	color: var(--text-dim, #6b7491); text-decoration: none; margin-bottom: 18px;
+	transition: color .2s;
+}
+.cbk-back:hover { color: var(--text, #e9ecf5); }
+.cbk-main h1 { font-size: 30px; letter-spacing: -0.02em; line-height: 1.1; }
+.cbk-sub { color: var(--text-soft, #a4adc4); margin-top: 8px; font-size: 15px; }
+.cbk-sub b { color: var(--text, #e9ecf5); }
+
+.cbk-card {
+	margin-top: 26px; padding: 28px;
+	border-radius: 20px; border: 1px solid var(--line, rgba(255,255,255,0.08));
+	background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.012));
+}
+.cbk-seclabel {
+	font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+	text-transform: uppercase; color: var(--text-dim, #6b7491);
+	display: flex; align-items: center; gap: 12px; margin: 4px 0 16px;
+}
+.cbk-seclabel:not(:first-child) { margin-top: 30px; }
+.cbk-seclabel::after { content: ""; flex: 1; height: 1px; background: var(--line-soft, rgba(255,255,255,0.06)); }
+.cbk-card-input { position: relative; }
+.cbk-cardbrands {
+	position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+	display: flex; gap: 6px; pointer-events: none;
+}
+.cbk-cardbrands span {
+	width: 30px; height: 20px; border-radius: 4px; display: grid; place-items: center;
+	font-family: var(--font-mono); font-size: 8px; font-weight: 700; letter-spacing: 0.02em;
+	color: #fff; background: rgba(255,255,255,0.08); border: 1px solid var(--line, rgba(255,255,255,0.08));
+}
+.cbk-cardbrands .visa { background: linear-gradient(135deg,#1a1f71,#2b3a9c); }
+.cbk-cardbrands .mc { background: linear-gradient(135deg,#eb001b,#f79e1b); }
+.cbk-cardbrands .amex { background: linear-gradient(135deg,#1379c4,#1f9ed1); }
+.cbk-pay { width: 100%; justify-content: center; margin-top: 24px; }
+.cbk-finenote {
+	font-size: 12px; color: var(--text-dim, #6b7491); text-align: center;
+	margin: 12px 0 0; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+
+.cbk-trust {
+	display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 22px;
+	font-size: 12px; color: var(--text-dim, #6b7491);
+}
+.cbk-trust span { display: inline-flex; align-items: center; gap: 7px; }
+.cbk-trust svg { width: 14px; height: 14px; color: var(--green, #34d399); }
+
+/* summary card */
+.cbk-summary {
+	position: sticky; top: 96px; padding: 24px; border-radius: 20px;
+	border: 1px solid var(--line-strong, rgba(255,255,255,0.14));
+	background:
+		radial-gradient(420px 220px at 100% 0%, rgba(160,112,255,0.16), transparent 62%),
+		linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+	overflow: hidden;
+}
+.cbk-plan { display: flex; align-items: center; gap: 13px; }
+.cbk-plan .ico {
+	width: 46px; height: 46px; border-radius: 13px; flex-shrink: 0; display: grid; place-items: center;
+	background: linear-gradient(135deg, rgba(79,139,255,0.2), rgba(160,112,255,0.2));
+	border: 1px solid rgba(79,139,255,0.3); color: #cfdcff;
+}
+.cbk-plan .ico svg { width: 22px; height: 22px; }
+.cbk-plan .nm { font-family: var(--font-display); font-weight: 600; font-size: 17px; letter-spacing: -0.01em; }
+.cbk-plan .tag { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim, #6b7491); }
+
+.cbk-toggle {
+	display: flex; width: 100%; margin: 20px 0 18px; padding: 4px;
+	background: rgba(255,255,255,0.04); border: 1px solid var(--line, rgba(255,255,255,0.08));
+	border-radius: 999px;
+}
+.cbk-toggle button {
+	flex: 1; padding: 8px 10px; border: 0; border-radius: 999px; cursor: pointer;
+	background: transparent; color: var(--text-soft, #a4adc4);
+	font-family: var(--font-body); font-size: 13px; font-weight: 600;
+	transition: background .2s, color .2s;
+}
+.cbk-toggle button.active {
+	background: var(--grad-button, linear-gradient(135deg,#5a93ff,#9d6dff)); color: #fff;
+	box-shadow: 0 4px 12px -2px rgba(120,90,255,0.4);
+}
+.cbk-toggle .save { font-size: 10px; opacity: 0.85; margin-left: 5px; }
+
+.cbk-price { display: flex; align-items: baseline; gap: 6px; }
+.cbk-price .amt { font-family: var(--font-display); font-size: 40px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; }
+.cbk-price .per { color: var(--text-soft, #a4adc4); font-size: 14px; }
+.cbk-note { font-size: 12.5px; margin-top: 5px; }
+
+.cbk-feats { list-style: none; margin: 20px 0; padding: 18px 0; border-top: 1px solid var(--line-soft, rgba(255,255,255,0.06)); border-bottom: 1px solid var(--line-soft, rgba(255,255,255,0.06)); display: flex; flex-direction: column; gap: 11px; }
+.cbk-feats li { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text-soft, #a4adc4); }
+.cbk-feats svg { flex-shrink: 0; margin-top: 2px; color: var(--green, #34d399); width: 15px; height: 15px; }
+
+.cbk-rows { display: flex; flex-direction: column; gap: 9px; }
+.cbk-row { display: flex; justify-content: space-between; font-size: 13.5px; color: var(--text-soft, #a4adc4); }
+.cbk-row .v { font-family: var(--font-mono); font-size: 13px; color: var(--text, #e9ecf5); }
+.cbk-row.total { margin-top: 5px; padding-top: 13px; border-top: 1px solid var(--line, rgba(255,255,255,0.08)); font-weight: 700; }
+.cbk-row.total .k { color: var(--text, #e9ecf5); }
+.cbk-row.total .v { font-size: 16px; color: var(--text, #e9ecf5); }
+
+.cbk-guarantee {
+	display: flex; gap: 11px; align-items: flex-start; margin-top: 18px; padding: 13px 15px;
+	border-radius: 13px; background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.22);
+	font-size: 12.5px; color: var(--text-soft, #a4adc4); line-height: 1.5;
+}
+.cbk-guarantee svg { flex-shrink: 0; color: var(--green, #34d399); width: 18px; height: 18px; margin-top: 1px; }
+.cbk-guarantee b { color: var(--text, #e9ecf5); display: block; }
+
+@media (max-width: 880px) {
+	.cbk-wrap { grid-template-columns: 1fr; gap: 24px; padding: 28px 20px 64px; }
+	.cbk-summary { position: static; order: -1; }
+	.cbk-main h1 { font-size: 26px; }
+}
+@media (max-width: 480px) {
+	.cbk-top { padding: 0 18px; }
+	.cbk-card { padding: 22px 18px; }
+	.cbk-secure { font-size: 0; gap: 0; padding: 9px; }
+	.cbk-secure svg { width: 15px; height: 15px; }
+}

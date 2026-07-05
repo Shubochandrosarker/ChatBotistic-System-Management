@@ -1,0 +1,20 @@
+/*
+Theme Name: Chatbotistic
+Theme URI: https://chatbotistic.com
+Description: Standalone premium SaaS theme for Chatbotistic — AI WhatsApp Agents, chat widgets, booking forms, and lead automation. Built for speed: one design system, one script, zero third-party bloat. Part of the WordPressistic ecosystem.
+Author: WordPressistic
+Author URI: https://www.wordpressistic.com
+Version: 1.2.5
+Requires at least: 6.0
+Requires PHP: 8.0
+License: GNU General Public License v3 or later
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
+Text Domain: chatbotistic
+Tags: saas, business, ai, chatbot, dark, custom-menu, custom-logo, featured-images, translation-ready, full-width-template
+*/
+
+/*
+ * This file carries theme metadata only.
+ * The design system lives in /assets/css/theme.css and /assets/css/portal.css,
+ * enqueued with per-file filemtime() cache-busting (see /inc/enqueue.php).
+ */
