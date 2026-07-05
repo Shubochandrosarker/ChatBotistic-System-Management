@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { StaggerItem, StaggerList } from "@/components/motion/stagger-list";
 import { formatDateTime } from "@/lib/utils";
-import { Info, Megaphone, Plus } from "lucide-react";
+import { AlertCircle, Info, Megaphone, Plus, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CampaignWizard, type AudienceLead } from "./campaign-wizard";
@@ -48,6 +48,33 @@ export function CampaignsPageClient({
 }) {
   const router = useRouter();
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [sendingId, setSendingId] = useState<string | null>(null);
+  const [sendError, setSendError] = useState<string | null>(null);
+
+  // Whether *any* draft/scheduled campaign can actually be fired right
+  // now — gates the per-row "Send now" action below. Orgs without a
+  // connection or with exhausted quota keep the existing banner/usage
+  // guidance instead of a button that would just 400.
+  const quotaExhausted = messagesLimit >= 0 && messagesUsed >= messagesLimit;
+  const canSendNow = connectionStatus === "connected" && !quotaExhausted;
+
+  async function sendCampaign(id: string) {
+    setSendingId(id);
+    setSendError(null);
+    try {
+      const res = await fetch(`/api/campaigns/${id}/send`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        setSendError(data.error || "Failed to send campaign.");
+      } else {
+        router.refresh();
+      }
+    } catch (err) {
+      setSendError(err instanceof Error ? err.message : "Failed to send campaign.");
+    } finally {
+      setSendingId(null);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -65,6 +92,13 @@ export function CampaignsPageClient({
       </div>
 
       <UsageMeter used={messagesUsed} limit={messagesLimit} />
+
+      {sendError && (
+        <div role="alert" className="flex items-start gap-2 rounded-xl bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{sendError}</span>
+        </div>
+      )}
 
       {connectionStatus !== "connected" && (
         <Card className="border-warning/40 bg-warning/5">
@@ -109,6 +143,18 @@ export function CampaignsPageClient({
                       <p className="text-xs uppercase tracking-wide">Sent</p>
                       <p className="text-foreground">{c.sent_count}</p>
                     </div>
+                    {(c.status === "draft" || c.status === "scheduled") && canSendNow && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        loading={sendingId === c.id}
+                        disabled={sendingId !== null && sendingId !== c.id}
+                        onClick={() => sendCampaign(c.id)}
+                      >
+                        <Send className="h-4 w-4" />
+                        Send now
+                      </Button>
+                    )}
                     <div>
                       <p className="text-xs uppercase tracking-wide">
                         {c.status === "scheduled" ? "Scheduled for" : "Created"}
