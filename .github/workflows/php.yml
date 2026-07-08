@@ -1,4 +1,9 @@
-name: PHP Composer
+name: PHP Lint
+
+# Replaces the stock "PHP Composer" starter workflow: this repo is a
+# collection of WordPress plugins + a theme with no composer.json, so
+# `composer validate` failed on every push. A syntax check across every
+# shipped PHP file is the check that actually protects installs.
 
 on:
   push:
@@ -10,30 +15,24 @@ permissions:
   contents: read
 
 jobs:
+  # Keep the job id "build" so anything pinned to the old required
+  # check name keeps matching.
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
-
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v3
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
-
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
-
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
-
-    # - name: Run test suite
-    #   run: composer run-script test
+    - name: PHP syntax check (plugins + theme, excluding the frozen V1 archive and node_modules)
+      run: |
+        set -u
+        FAILED=0
+        COUNT=0
+        while IFS= read -r -d '' file; do
+          COUNT=$((COUNT + 1))
+          if ! php -l "$file" >/dev/null; then
+            FAILED=1
+          fi
+        done < <(find . \( -path ./V1 -o -name node_modules \) -prune -o -name '*.php' -print0)
+        echo "Checked $COUNT PHP files."
+        exit $FAILED
