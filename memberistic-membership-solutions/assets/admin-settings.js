@@ -168,8 +168,7 @@
 				h('div', null,
 					h('h1', null, __('Memberistic Settings', 'memberistic')),
 					h('p', { className: 'mb-app__sub' }, __('Brand, pages, payments, emails, and integration toggles. Changes save instantly to the same option as before.', 'memberistic'))
-				),
-				h('button', { type: 'submit', className: 'button button-primary', disabled: saving }, saving ? __('Saving…', 'memberistic') : __('Save changes', 'memberistic'))
+				)
 			),
 
 			error ? h('div', { className: 'mb-banner mb-banner--error' }, error) : null,
@@ -309,6 +308,13 @@
 			h('h2', { className: 'mb-card__head' }, __('Integrations', 'memberistic')),
 			h(Field, { label: __('WooCommerce bridge', 'memberistic'), hint: __('Sync completed orders to membership payments.', 'memberistic') },
 				h(YesNo, { value: v.woocommerce_enabled, onChange: update('woocommerce_enabled') })
+			),
+			h('h3', { className: 'mb-form__section' }, __('Optional features', 'memberistic')),
+			h(Field, { label: __('Waiver tracking', 'memberistic'), hint: __('Show waiver status on the dashboard, member records, and member account. Leave disabled unless your business collects signed waivers.', 'memberistic') },
+				h(YesNo, { value: v.waiver_enabled, onChange: update('waiver_enabled') })
+			),
+			h(Field, { label: __('Booking tools on member account', 'memberistic'), hint: __('Show booking shortcuts and booking history on the member account page.', 'memberistic') },
+				h(YesNo, { value: v.account_show_lane_tools, onChange: update('account_show_lane_tools') })
 			)
 		);
 	}

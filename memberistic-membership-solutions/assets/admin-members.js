@@ -31,6 +31,7 @@
 	const canCreate = !!settings.canCreate;
 	const initialAction = settings.initialAction || '';
 	const initialSelectedId = Number(settings.initialSelectedId) || 0;
+	const WAIVER_ENABLED = !!(window.memberisticAdmin && window.memberisticAdmin.waiverEnabled);
 
 	/* ------------------------------------------------------------------ */
 	/* Formatters                                                          */
@@ -157,11 +158,11 @@
 				h(Field, { label: __('Relationship', 'memberistic') },
 					h('input', { type: 'text', value: values.relationship, onChange: update('relationship'), placeholder: __('e.g. Spouse, Child', 'memberistic') })
 				),
-				h(Field, { label: __('Waiver Status', 'memberistic') },
+				WAIVER_ENABLED ? h(Field, { label: __('Waiver Status', 'memberistic') },
 					h('select', { value: values.waiver_status, onChange: update('waiver_status') },
 						WAIVER_OPTIONS.map(function (w) { return h('option', { key: w, value: w }, statusLabel(w)); })
 					)
-				)
+				) : null
 			),
 			h(FormActions, { busy: busy, onCancel: props.onCancel, submitLabel: __('Add person', 'memberistic') })
 		);
@@ -368,17 +369,17 @@
 						disabled: isPrimary,
 					})
 				),
-				h(Field, { label: __('Waiver status', 'memberistic') },
+				WAIVER_ENABLED ? h(Field, { label: __('Waiver status', 'memberistic') },
 					h('select', { value: values.waiver_status, onChange: update('waiver_status') },
 						WAIVER_OPTIONS.map(function (w) { return h('option', { key: w, value: w }, statusLabel(w)); })
 					)
-				),
-				h(Field, { label: __('Waiver signed on', 'memberistic') },
+				) : null,
+				WAIVER_ENABLED ? h(Field, { label: __('Waiver signed on', 'memberistic') },
 					h('input', { type: 'date', value: values.waiver_signed_at, onChange: update('waiver_signed_at') })
-				),
-				h(Field, { label: __('Waiver expires on', 'memberistic') },
+				) : null,
+				WAIVER_ENABLED ? h(Field, { label: __('Waiver expires on', 'memberistic') },
 					h('input', { type: 'date', value: values.waiver_expires_at, onChange: update('waiver_expires_at') })
-				),
+				) : null,
 				h(Field, { label: __('Member status', 'memberistic') },
 					h('select', { value: values.status, onChange: update('status') },
 						personStatuses.map(function (s) { return h('option', { key: s, value: s }, statusLabel(s)); })
@@ -549,11 +550,11 @@
 							h(Field, { label: __('Phone', 'memberistic') },
 								h('input', { type: 'text', value: values.phone, onChange: update('phone') })
 							),
-							h(Field, { label: __('Waiver status', 'memberistic') },
+							WAIVER_ENABLED ? h(Field, { label: __('Waiver status', 'memberistic') },
 								h('select', { value: values.waiver_status, onChange: update('waiver_status') },
 									WAIVER_OPTIONS.map(function (w) { return h('option', { key: w, value: w }, statusLabel(w)); })
 								)
-							)
+							) : null
 						),
 						h(Field, { label: __('Notes', 'memberistic'), full: true },
 							h('textarea', { rows: 2, value: values.notes, onChange: update('notes') })
@@ -848,7 +849,7 @@
 					h('th', null, __('Role', 'memberistic')),
 					h('th', null, __('Email', 'memberistic')),
 					h('th', null, __('Phone', 'memberistic')),
-					h('th', null, __('Waiver', 'memberistic')),
+					WAIVER_ENABLED ? h('th', null, __('Waiver', 'memberistic')) : null,
 					h('th', null, __('Status', 'memberistic')),
 					h('th', { className: 'mb-table__actions' }, __('Actions', 'memberistic'))
 				)
@@ -865,12 +866,12 @@
 							h('td', null, statusLabel(p.role || '')),
 							h('td', null, p.email || '—'),
 							h('td', null, p.phone || '—'),
-							h('td', null,
+							WAIVER_ENABLED ? h('td', null,
 								h(StatusPill, { status: p.waiver_status || 'missing' }),
 								p.waiver_expires_at
 									? h('span', { className: 'mb-cell-meta' }, sprintf(__('exp. %s', 'memberistic'), formatDate(p.waiver_expires_at)))
 									: null
-							),
+							) : null,
 							h('td', null, h(StatusPill, { status: p.status || 'unknown' })),
 							h('td', { className: 'mb-table__actions' },
 								h('button', {
@@ -898,7 +899,7 @@
 					if (isEditing) {
 						rows.push(
 							h('tr', { key: 'edit-' + p.id, className: 'mb-row-editor' },
-								h('td', { colSpan: 7 },
+								h('td', { colSpan: WAIVER_ENABLED ? 7 : 6 },
 									h(EditPersonForm, {
 										person: p,
 										onCancel: handlers.onCancelEditPerson,
@@ -1238,10 +1239,11 @@
 			if (bulkAction === 'export') {
 				const map = {};
 				members.forEach(function (m) { map[m.id] = m; });
-				const header = ['Member ID', 'Primary Member', 'Plan', 'Status', 'Billing', 'Renewal', 'People', 'Waiver'];
+				const header = ['Member ID', 'Primary Member', 'Plan', 'Status', 'Billing', 'Renewal', 'People'];
+				if (WAIVER_ENABLED) header.push('Waiver');
 				const rows = selectedIds.map(function (id) {
 					const m = map[id] || {};
-					return [
+					const row = [
 						m.membership_uuid || '',
 						m.full_name || '',
 						m.plan_name || '',
@@ -1249,8 +1251,9 @@
 						m.billing_cycle || '',
 						m.renewal_date || '',
 						Number(m.people_count) || 0,
-						m.waiver_status || '',
 					];
+					if (WAIVER_ENABLED) row.push(m.waiver_status || '');
+					return row;
 				});
 				downloadCsv('memberistic-members-' + new Date().toISOString().slice(0, 10) + '.csv', [header].concat(rows));
 				return;
@@ -1435,7 +1438,7 @@
 						h('option', { value: '' }, __('Choose bulk action…', 'memberistic')),
 						h('option', { value: 'renew' }, __('Renew memberships', 'memberistic')),
 						h('option', { value: 'cancel' }, __('Cancel memberships', 'memberistic')),
-						h('option', { value: 'waiver' }, __('Change waiver status…', 'memberistic')),
+						WAIVER_ENABLED ? h('option', { value: 'waiver' }, __('Change waiver status…', 'memberistic')) : null,
 						h('option', { value: 'export' }, __('Export to CSV', 'memberistic'))
 					),
 					bulkAction === 'waiver'
@@ -1481,7 +1484,7 @@
 									h('th', null, __('Billing', 'memberistic')),
 									h('th', null, __('Renewal', 'memberistic')),
 									h('th', null, __('People', 'memberistic')),
-									h('th', null, __('Waiver', 'memberistic')),
+									WAIVER_ENABLED ? h('th', null, __('Waiver', 'memberistic')) : null,
 									h('th', { className: 'mb-table__actions' }, __('Actions', 'memberistic'))
 								)
 							),
@@ -1509,7 +1512,7 @@
 										h('td', null, statusLabel(m.billing_cycle || '')),
 										h('td', null, formatDate(m.renewal_date)),
 										h('td', null, Number(m.people_count) || 0),
-										h('td', null, h(StatusPill, { status: m.waiver_status || 'missing' })),
+										WAIVER_ENABLED ? h('td', null, h(StatusPill, { status: m.waiver_status || 'missing' })) : null,
 										h('td', { className: 'mb-table__actions', onClick: function (e) { e.stopPropagation(); } },
 											h('button', { className: 'button-link', onClick: function () { setSelectedId(m.id); } }, __('Open', 'memberistic'))
 										)

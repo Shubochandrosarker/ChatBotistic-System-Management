@@ -19,6 +19,7 @@
 	const NS = 'memberistic/v1';
 	const STATUS_OPTIONS = ['', 'active', 'pending', 'past_due', 'expired', 'cancelled', 'paused', 'comped', 'trial', 'needs_review'];
 	const WAIVER_OPTIONS = ['', 'missing', 'signed', 'expired', 'needs_review', 'rejected'];
+	const WAIVER_ENABLED = !!(window.memberisticAdmin && window.memberisticAdmin.waiverEnabled);
 
 	function statusLabel(s) {
 		return String(s || '').replace(/_/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
@@ -211,13 +212,13 @@
 						__('Membership Status', 'memberistic'),
 						__('Billing Cycle', 'memberistic'),
 						__('Renewal Date', 'memberistic'),
-						__('Waiver Status', 'memberistic'),
-						__('Waiver Signed', 'memberistic'),
-						__('Waiver Expires', 'memberistic'),
-						__('Created', 'memberistic'),
 					];
+					if (WAIVER_ENABLED) {
+						header.push(__('Waiver Status', 'memberistic'), __('Waiver Signed', 'memberistic'), __('Waiver Expires', 'memberistic'));
+					}
+					header.push(__('Created', 'memberistic'));
 					const dataRows = allRows.map(function (r) {
-						return [
+						const row = [
 							r.full_name || '',
 							r.email || '',
 							r.phone || '',
@@ -227,11 +228,12 @@
 							statusLabel(r.membership_status || ''),
 							statusLabel(r.billing_cycle || ''),
 							r.renewal_date || '',
-							statusLabel(r.waiver_status || ''),
-							r.waiver_signed_at || '',
-							r.waiver_expires_at || '',
-							r.person_created_at || '',
 						];
+						if (WAIVER_ENABLED) {
+							row.push(statusLabel(r.waiver_status || ''), r.waiver_signed_at || '', r.waiver_expires_at || '');
+						}
+						row.push(r.person_created_at || '');
+						return row;
 					});
 					downloadCsv('memberistic-member-emails-' + new Date().toISOString().slice(0, 10) + '.csv', [header].concat(dataRows));
 					setExporting(false);
@@ -268,7 +270,9 @@
 			h('header', { className: 'mb-app__header' },
 				h('div', null,
 					h('h1', null, __('Member Email Directory', 'memberistic')),
-					h('p', { className: 'mb-app__sub' }, __('A clean export-ready list of primary and linked member contacts for campaigns, staff follow-up, renewals, and waiver operations.', 'memberistic'))
+					h('p', { className: 'mb-app__sub' }, WAIVER_ENABLED
+						? __('A clean export-ready list of primary and linked member contacts for campaigns, staff follow-up, renewals, and waiver operations.', 'memberistic')
+						: __('A clean export-ready list of primary and linked member contacts for campaigns, staff follow-up, and renewals.', 'memberistic'))
 				),
 				h('button', {
 					className: 'button button-primary',
@@ -294,9 +298,9 @@
 				h('select', { className: 'mb-toolbar__select', value: filters.status, onChange: update('status') },
 					STATUS_OPTIONS.map(function (s) { return h('option', { key: 's-' + s, value: s }, s === '' ? __('All Member Statuses', 'memberistic') : statusLabel(s)); })
 				),
-				h('select', { className: 'mb-toolbar__select', value: filters.waiver_status, onChange: update('waiver_status') },
+				WAIVER_ENABLED ? h('select', { className: 'mb-toolbar__select', value: filters.waiver_status, onChange: update('waiver_status') },
 					WAIVER_OPTIONS.map(function (w) { return h('option', { key: 'w-' + w, value: w }, w === '' ? __('All Waiver Statuses', 'memberistic') : statusLabel(w)); })
-				),
+				) : null,
 				h('span', { className: 'mb-toolbar__count' },
 					total > 0
 						? sprintf(__('Showing %1$d–%2$d of %3$d', 'memberistic'),
@@ -323,7 +327,7 @@
 									h('th', null, __('Role', 'memberistic')),
 									h('th', null, __('Plan', 'memberistic')),
 									h('th', null, __('Member Status', 'memberistic')),
-									h('th', null, __('Waiver', 'memberistic')),
+									WAIVER_ENABLED ? h('th', null, __('Waiver', 'memberistic')) : null,
 									h('th', null, __('Renewal', 'memberistic')),
 									h('th', { className: 'mb-table__actions' }, __('Actions', 'memberistic'))
 								)
@@ -343,7 +347,7 @@
 										h('td', null, statusLabel(r.role || '')),
 										h('td', null, r.plan_name || '—'),
 										h('td', null, h(StatusPill, { status: r.membership_status || 'unknown' })),
-										h('td', null, h(StatusPill, { status: r.waiver_status || 'missing' })),
+										WAIVER_ENABLED ? h('td', null, h(StatusPill, { status: r.waiver_status || 'missing' })) : null,
 										h('td', null, formatDate(r.renewal_date)),
 										h('td', { className: 'mb-table__actions' },
 											h('a', { className: 'button-link', href: memberHref }, __('Open member', 'memberistic'))

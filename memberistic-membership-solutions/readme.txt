@@ -4,7 +4,7 @@ Tags: membership, operations, staff dashboard, stripe, woocommerce, rest api
 Requires at least: 6.0
 Requires PHP: 8.0
 Tested up to: 6.6
-Stable tag: 1.12.2
+Stable tag: 1.12.3
 License: GPLv2 or later
 
 A modern membership operations engine for service and SaaS businesses.

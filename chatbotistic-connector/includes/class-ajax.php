@@ -871,14 +871,18 @@ class Ajax {
 	/**
 	 * Build the widget embed snippet.
 	 *
+	 * Uses the same loader URL shape as the Chatbotistic Widget plugin
+	 * (includes/class-widget-renderer.php) and the standalone dashboard's
+	 * embed dialog, so a snippet copied from any surface behaves identically.
+	 *
 	 * @param string $widget_id Widget UUID.
 	 * @return string
 	 */
 	private function embed_code( string $widget_id ): string {
 		return sprintf(
-			'<script defer src="%s/build/bundle.js?key=%s"></script>',
+			'<script async src="%s/widget/%s/load.js"></script>',
 			esc_url( CBC_API_BASE ),
-			esc_attr( $widget_id )
+			rawurlencode( $widget_id )
 		);
 	}
 }

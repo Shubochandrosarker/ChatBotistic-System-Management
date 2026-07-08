@@ -11,6 +11,10 @@ bookings, campaigns).
 See `docs/CHATBOTISTIC-DASHBOARD-MASTER-PLAN.md` for the full product
 plan, feature roadmap, and business model behind this V2 release.
 
+**Installing?** Read [INSTALL.md](INSTALL.md) first — in particular,
+`chatbotistic/` is a **theme** (upload under Appearance → Themes), not a
+plugin, and the plugins have a recommended activation order.
+
 ## What's in this repo
 
 | Folder | What it is | Runs on |
