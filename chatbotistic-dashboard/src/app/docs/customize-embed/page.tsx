@@ -26,7 +26,7 @@ export default function Page() {
       <DocH2>Embed the snippet</DocH2>
       <DocP>Every widget has a small install snippet — paste it before the closing <DocCode>&lt;/body&gt;</DocCode> tag on any page you want it to appear on:</DocP>
       <pre className="overflow-x-auto rounded-xl bg-muted/50 p-4 text-[13px] leading-relaxed">
-        <code>{`<script src="https://cdn.tochat.be/widget.js" data-widget-id="YOUR_WIDGET_ID" async></script>`}</code>
+        <code>{`<script async src="https://services.tochat.be/widget/YOUR_WIDGET_ID/load.js"></script>`}</code>
       </pre>
 
       <DocOL>

@@ -249,7 +249,9 @@ class Admin {
 		$rest_ok = false;
 		if ( function_exists( 'rest_get_server' ) ) {
 			$routes  = rest_get_server()->get_routes();
-			$rest_ok = isset( $routes['/licenseistic/v1/activate'] ) && isset( $routes['/licenseistic/v1/entitlements'] );
+			$rest_ok = isset( $routes['/licenseistic/v1/activate'] )
+				&& isset( $routes['/licenseistic/v1/heartbeat'] )
+				&& isset( $routes['/licenseistic/v1/entitlements'] );
 		}
 		$rows[] = [
 			'label'  => 'Licenseistic REST routes',

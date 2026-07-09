@@ -35,12 +35,14 @@ if ( ! defined( 'CBC_API_BASE' ) ) {
 
 /**
  * White-label customer-facing URL. This is what end-users see in their
- * dashboards, emails, and "manage widgets in app.chatbotistic.com" hints.
- * Default is app.chatbotistic.com; sub-brands and reseller deployments
- * override via wp-config.
+ * dashboards, emails, and "manage widgets in dashboard.chatbotistic.com"
+ * hints. Default is dashboard.chatbotistic.com (the real dashboard app's
+ * domain — see chatbotistic-dashboard's own NEXT_PUBLIC_SITE_URL default
+ * and the theme's cb_dashboard_url()); sub-brands and reseller
+ * deployments override via wp-config.
  */
 if ( ! defined( 'CBC_APP_BASE' ) ) {
-	define( 'CBC_APP_BASE', 'https://app.chatbotistic.com' );
+	define( 'CBC_APP_BASE', 'https://dashboard.chatbotistic.com' );
 }
 
 /**
