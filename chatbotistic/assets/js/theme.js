@@ -23,6 +23,8 @@
 		reveal();
 		ecoCycle();
 		docsTabs();
+		docsScrollspy();
+		docsCopyCode();
 	});
 
 	/* ---- Docs sidebar tabs — switch the visible content panel ---- */
@@ -42,6 +44,78 @@
 				panels.forEach(function (p) {
 					p.classList.toggle('is-active', p.getAttribute('data-doc-panel') === target);
 				});
+			});
+		});
+	}
+
+	/* ---- Docs page (page-docs.php) — sidebar highlights the article
+	   currently in view, and clicking a link smooth-scrolls to it. All
+	   articles stay in the DOM and visible; nothing is hidden/swapped. ---- */
+	function docsScrollspy() {
+		var side = document.querySelector('.docs2-side, .docs2-mobile-nav');
+		if (!side) { return; }
+		var links = Array.prototype.slice.call(document.querySelectorAll('.docs2-side a[href^="#"], .docs2-mobile-nav a[href^="#"]'));
+		var articles = Array.prototype.slice.call(document.querySelectorAll('.docs2-article[id]'));
+		if (!links.length || !articles.length) { return; }
+
+		function setActive( id ) {
+			links.forEach(function (l) {
+				l.classList.toggle('is-active', l.getAttribute('href') === '#' + id);
+			});
+		}
+
+		links.forEach(function (link) {
+			link.addEventListener('click', function (e) {
+				var id = link.getAttribute('href').slice(1);
+				var target = document.getElementById(id);
+				if (!target) { return; }
+				e.preventDefault();
+				target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				history.replaceState(null, '', '#' + id);
+			});
+		});
+
+		if (!('IntersectionObserver' in window)) { return; }
+
+		var current = articles[0].id;
+		var io = new IntersectionObserver(function (entries) {
+			entries.forEach(function (entry) {
+				if (entry.isIntersecting) {
+					current = entry.target.id;
+				}
+			});
+			setActive( current );
+		}, { rootMargin: '-96px 0px -70% 0px', threshold: 0 });
+		articles.forEach(function (el) { io.observe(el); });
+
+		if (window.location.hash) {
+			var initial = document.getElementById(window.location.hash.slice(1));
+			if (initial) {
+				setActive( window.location.hash.slice(1) );
+				window.setTimeout(function () { initial.scrollIntoView({ block: 'start' }); }, 0);
+			}
+		} else {
+			setActive( current );
+		}
+	}
+
+	/* ---- Docs page — copy-to-clipboard on code snippets ---- */
+	function docsCopyCode() {
+		var buttons = Array.prototype.slice.call(document.querySelectorAll('.doc-code-copy'));
+		buttons.forEach(function (btn) {
+			btn.addEventListener('click', function () {
+				var pre = btn.parentElement && btn.parentElement.querySelector('pre');
+				if (!pre || !navigator.clipboard) { return; }
+				navigator.clipboard.writeText(pre.textContent || '').then(function () {
+					var label = btn.querySelector('span');
+					var original = label ? label.textContent : '';
+					btn.classList.add('is-copied');
+					if (label) { label.textContent = 'Copied'; }
+					window.setTimeout(function () {
+						btn.classList.remove('is-copied');
+						if (label) { label.textContent = original; }
+					}, 1600);
+				}).catch(function () { /* clipboard unavailable — snippet is still selectable */ });
 			});
 		});
 	}

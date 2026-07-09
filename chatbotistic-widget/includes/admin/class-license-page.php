@@ -226,8 +226,8 @@ final class License_Page {
 	/**
 	 * Manual "Refresh widgets" — pulls the current Chatbotistic-side widget
 	 * catalog without waiting for the next 12h heartbeat. Useful right
-	 * after a customer creates a new widget in app.chatbotistic.com and
-	 * wants it to appear in their WP dropdown immediately.
+	 * after a customer creates a new widget in dashboard.chatbotistic.com
+	 * and wants it to appear in their WP dropdown immediately.
 	 */
 	public static function handle_refresh_widgets(): void {
 		if ( ! current_user_can( 'manage_options' ) ) wp_die( 'Forbidden' );

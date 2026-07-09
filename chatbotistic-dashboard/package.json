@@ -1,6 +1,6 @@
 {
   "name": "chatbotistic-dashboard",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "description": "Chatbotistic Dashboard — multi-tenant SaaS dashboard for WhatsApp chat widgets, landing pages, bookings, leads, and campaigns. Powered by Tochat.be (white-labeled) with billing on chatbotistic.com.",
   "engines": {
