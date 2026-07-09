@@ -19,6 +19,7 @@
 	const ROOT_ID = 'memberistic-dashboard-app';
 	const NS = 'memberistic/v1';
 	const REFRESH_MS = 30000;
+	const WAIVER_ENABLED = !!(window.memberisticAdmin && window.memberisticAdmin.waiverEnabled);
 
 	function formatCurrency(value) {
 		const n = Number(value) || 0;
@@ -322,7 +323,7 @@
 
 			h('section', { className: 'mb-grid mb-grid--stats' },
 				isLoading
-					? [0, 1, 2, 3, 4, 5].map(function (i) { return h('div', { key: 'sk' + i, className: 'mb-stat mb-stat--skeleton' }); })
+					? (WAIVER_ENABLED ? [0, 1, 2, 3, 4, 5] : [0, 1, 2, 3, 4]).map(function (i) { return h('div', { key: 'sk' + i, className: 'mb-stat mb-stat--skeleton' }); })
 					: [
 						h(StatCard, {
 							key: 'active',
@@ -360,14 +361,14 @@
 							sub: __('Front desk activity', 'memberistic'),
 							tone: 'info',
 						}),
-						h(StatCard, {
+						WAIVER_ENABLED ? h(StatCard, {
 							key: 'waiver',
 							label: __('Waivers Missing', 'memberistic'),
 							value: formatNumber(data.waiver_missing),
 							sub: __('Across all active members', 'memberistic'),
 							tone: data.waiver_missing > 0 ? 'warning' : 'neutral',
-						}),
-					]
+						}) : null,
+					].filter(Boolean)
 			),
 
 			h('section', { className: 'mb-grid mb-grid--charts' },

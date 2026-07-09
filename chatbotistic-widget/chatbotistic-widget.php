@@ -3,7 +3,7 @@
  * Plugin Name:       Chatbotistic Widget
  * Plugin URI:        https://chatbotistic.com/wordpress-plugin
  * Description:       WhatsApp + AI chat widget for WordPress, by Chatbotistic. A WordPressistic product.
- * Version:           1.2.0
+ * Version:           1.2.1
  * Requires at least: 5.6
  * Requires PHP:      7.4
  * Author:            Chatbotistic (a WordPressistic product)
@@ -23,7 +23,7 @@ define( 'CBW_PLUGIN_FILE',     __FILE__ );
 define( 'CBW_PLUGIN_PATH',     plugin_dir_path( __FILE__ ) );
 define( 'CBW_PLUGIN_URL',      plugin_dir_url( __FILE__ ) );
 define( 'CBW_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
-define( 'CBW_VERSION',         '1.2.0' );
+define( 'CBW_VERSION',         '1.2.1' );
 
 // ── Branding (real defaults so promo/app links resolve; a white-label site
 //    can override any of these via wp-config.php, and the Brand class still

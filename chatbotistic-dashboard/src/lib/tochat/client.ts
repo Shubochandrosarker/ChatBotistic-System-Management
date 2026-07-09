@@ -514,7 +514,10 @@ export async function widgetStats(
   userClient: string
 ): Promise<unknown> {
   await ownedWidget(widgetId, userClient);
-  return request<unknown>(`/api/v2/${encodeURIComponent(widgetId)}/widget-stats`);
+  // Path shape matches the Chatbotistic Widget plugin's analytics client
+  // (GET /api/v2/widget_stats/{id}) — the previous /{id}/widget-stats
+  // shape is not a Tochat route.
+  return request<unknown>(`/api/v2/widget_stats/${encodeURIComponent(widgetId)}`);
 }
 
 // ── Landing links ─────────────────────────────────────────────────────

@@ -36,7 +36,7 @@ final class Widget_Renderer {
 			'<!-- Chatbotistic Widget v%1$s -->%2$s<script async src="%3$s/widget/%4$s/load.js"></script>%2$s',
 			esc_attr( CBW_VERSION ),
 			"\n",
-			esc_url( CBW_API_BASE ),
+			esc_url( Brand::api_base_url() ),
 			rawurlencode( $key )
 		);
 	}

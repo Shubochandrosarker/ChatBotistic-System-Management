@@ -89,7 +89,7 @@ class Dashboard {
 					<button class="cbc-tab<?php echo 'analytics' === $default_tab ? ' is-active' : ''; ?>" data-tab="analytics" role="tab" aria-selected="<?php echo 'analytics' === $default_tab ? 'true' : 'false'; ?>"><?php esc_html_e( 'Analytics', 'chatbotistic-connector' ); ?></button>
 					<button class="cbc-tab<?php echo 'leads'     === $default_tab ? ' is-active' : ''; ?>" data-tab="leads"     role="tab" aria-selected="<?php echo 'leads'     === $default_tab ? 'true' : 'false'; ?>"><?php esc_html_e( 'Leads', 'chatbotistic-connector' ); ?></button>
 				</nav>
-				<a class="cbc-btn cbc-btn--ghost cbc-btn--sm cbc-top__dashboard-link" id="cbc-dashboard-link" href="<?php echo esc_url( Store::dashboard_url() ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Open Full Dashboard', 'chatbotistic-connector' ); ?></a>
+				<a class="cbc-btn cbc-btn--ghost cbc-btn--sm cbc-top__dashboard-link" id="cbc-dashboard-link" href="<?php echo esc_url( apply_filters( 'cb_dashboard_url', Store::dashboard_url(), '' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Open Full Dashboard', 'chatbotistic-connector' ); ?></a>
 			</header>
 
 			<div class="cbc-notice" id="cbc-notice" role="status" hidden></div>

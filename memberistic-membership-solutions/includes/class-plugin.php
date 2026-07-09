@@ -168,6 +168,7 @@ final class Plugin {
 			'memberisticAdmin',
 			array(
 				'confirmDelete' => __( 'Are you sure you want to delete this item?', 'memberistic' ),
+				'waiverEnabled' => 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' ),
 			)
 		);
 

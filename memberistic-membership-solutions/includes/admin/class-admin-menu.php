@@ -76,16 +76,23 @@ final class Admin_Menu {
 
 	public static function render_integrations() {
 		self::guard_dashboard();
+		$waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
+		$email_desc     = $waiver_enabled
+			? __( 'Lifecycle notifications for checkout, activation, failed payment, cancellation, renewals, and waivers.', 'memberistic' )
+			: __( 'Lifecycle notifications for checkout, activation, failed payment, cancellation, and renewals.', 'memberistic' );
 		$cards = array(
 			array( 'name' => __( 'Booking Engine', 'memberistic' ), 'desc' => __( 'Member eligibility, booking rules, booking activity, and front-desk visibility.', 'memberistic' ), 'active' => class_exists( 'G2AB_Plugin' ), 'icon' => 'B', 'status' => class_exists( 'G2AB_Plugin' ) ? 'connected' : 'not_connected' ),
 			array( 'name' => 'Stripe Checkout', 'desc' => __( 'Hosted membership subscription checkout and webhooks.', 'memberistic' ), 'active' => 'yes' === memberistic_get_setting( 'stripe_enabled', 'no' ), 'icon' => 'S', 'status' => 'yes' === memberistic_get_setting( 'stripe_enabled', 'no' ) ? 'connected' : 'not_connected' ),
 			array( 'name' => 'WooCommerce', 'desc' => __( 'Completed-order sync for membership purchases.', 'memberistic' ), 'active' => class_exists( 'WooCommerce' ) && 'yes' === memberistic_get_setting( 'woocommerce_enabled', 'no' ), 'icon' => 'W', 'status' => class_exists( 'WooCommerce' ) && 'yes' === memberistic_get_setting( 'woocommerce_enabled', 'no' ) ? 'connected' : 'not_connected' ),
-			array( 'name' => 'Email Automation', 'desc' => __( 'Lifecycle notifications for checkout, activation, failed payment, cancellation, renewals, and waivers.', 'memberistic' ), 'active' => true, 'icon' => 'M', 'status' => 'connected' ),
+			array( 'name' => 'Email Automation', 'desc' => $email_desc, 'active' => true, 'icon' => 'M', 'status' => 'connected' ),
 			array( 'name' => 'Klaviyo Sync', 'desc' => __( 'Export member segments, renewal windows, and failed payment audiences into marketing automation.', 'memberistic' ), 'active' => false, 'icon' => 'K', 'status' => 'coming_soon' ),
 			array( 'name' => 'POS Bridge', 'desc' => __( 'Connect memberships with retail counter sales, barcode lookup, and staff checkout workflows.', 'memberistic' ), 'active' => false, 'icon' => 'P', 'status' => 'coming_soon' ),
-			array( 'name' => __( 'Waiver Provider', 'memberistic' ), 'desc' => __( 'Connect signed waivers with each person record and staff check-in status.', 'memberistic' ), 'active' => false, 'icon' => 'W', 'status' => 'coming_soon' ),
 			array( 'name' => 'SMS Reminders', 'desc' => __( 'Send renewal, failed payment, check-in, and booking reminders by text message.', 'memberistic' ), 'active' => false, 'icon' => 'T', 'status' => 'coming_soon' ),
 		);
+
+		if ( $waiver_enabled ) {
+			$cards[] = array( 'name' => __( 'Waiver Provider', 'memberistic' ), 'desc' => __( 'Connect signed waivers with each person record and staff check-in status.', 'memberistic' ), 'active' => false, 'icon' => 'W', 'status' => 'coming_soon' );
+		}
 		?>
 		<div class="wrap memberistic-wrap">
 			<h1><?php esc_html_e( 'Memberistic Integrations', 'memberistic' ); ?></h1>
@@ -154,47 +161,52 @@ final class Admin_Menu {
 	}
 
 	private static function download_email_csv( $rows ) {
+		$waiver_enabled = 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' );
+
 		nocache_headers();
 		header( 'Content-Type: text/csv; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename=memberistic-member-emails-' . gmdate( 'Y-m-d' ) . '.csv' );
 		$out = fopen( 'php://output', 'w' );
-		fputcsv(
-			$out,
-			array(
-				'Name',
-				'Email',
-				'Phone',
-				'Role',
-				'Membership ID',
-				'Plan',
-				'Membership Status',
-				'Billing Cycle',
-				'Renewal Date',
-				'Waiver Status',
-				'Waiver Signed At',
-				'Waiver Expires At',
-				'Created',
-			)
+
+		$header = array(
+			'Name',
+			'Email',
+			'Phone',
+			'Role',
+			'Membership ID',
+			'Plan',
+			'Membership Status',
+			'Billing Cycle',
+			'Renewal Date',
 		);
+		if ( $waiver_enabled ) {
+			array_push( $header, 'Waiver Status', 'Waiver Signed At', 'Waiver Expires At' );
+		}
+		$header[] = 'Created';
+		fputcsv( $out, $header );
+
 		foreach ( $rows as $row ) {
-			fputcsv(
-				$out,
-				array(
-					$row['full_name'],
-					$row['email'],
-					$row['phone'],
-					ucfirst( (string) ( $row['role'] ?? '' ) ),
-					$row['membership_uuid'],
-					$row['plan_name'],
-					ucfirst( str_replace( '_', ' ', (string) $row['membership_status'] ) ),
-					ucfirst( (string) ( $row['billing_cycle'] ?? '' ) ),
-					$row['renewal_date'],
+			$line = array(
+				$row['full_name'],
+				$row['email'],
+				$row['phone'],
+				ucfirst( (string) ( $row['role'] ?? '' ) ),
+				$row['membership_uuid'],
+				$row['plan_name'],
+				ucfirst( str_replace( '_', ' ', (string) $row['membership_status'] ) ),
+				ucfirst( (string) ( $row['billing_cycle'] ?? '' ) ),
+				$row['renewal_date'],
+			);
+			if ( $waiver_enabled ) {
+				array_push(
+					$line,
 					ucfirst( str_replace( '_', ' ', (string) ( $row['waiver_status'] ?? '' ) ) ),
 					$row['waiver_signed_at'],
-					$row['waiver_expires_at'],
-					$row['person_created_at'],
-				)
-			);
+					$row['waiver_expires_at']
+				);
+			}
+			$line[] = $row['person_created_at'];
+			fputcsv( $out, $line );
 		}
 		fclose( $out );
 		exit;

@@ -2,6 +2,17 @@
 
 All notable changes are tracked here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 1.12.3 — Waiver gating + settings polish
+
+### Changed
+
+- **Waiver UI now respects the `waiver_enabled` setting everywhere in the admin.** With waivers disabled (the default), the Dashboard no longer shows the "Waivers Missing" stat card, the Members app hides waiver form fields, list/table columns, the bulk waiver action, and CSV columns, the Email Directory hides its waiver filter/column/CSV fields, and the Integrations screen hides the Waiver Provider tile. Waiver-enabled sites see everything exactly as before.
+- **Settings console shows a single Save button.** The duplicate header button is gone; the sticky action bar at the bottom saves the whole form from any tab.
+
+### Added
+
+- **Integrations → Optional features toggles** for `waiver_enabled` and `account_show_lane_tools`, and both keys are now preserved by the settings sanitizer (previously a settings save silently dropped them).
+
 ## 1.10.0 — Operations dashboard release
 
 A broad admin operations upgrade: pagination, KPI cards across every list page, a card-based Plans console, a permissive importer that never drops a row, and a React-rebuilt Email Directory.
