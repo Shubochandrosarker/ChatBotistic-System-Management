@@ -15,6 +15,10 @@
 defined( 'ABSPATH' ) || exit;
 
 define( 'CBP_VERSION',  '1.3.2' );
+define( 'CBP_FILE',     __FILE__ );
+define( 'CBP_DIR',      plugin_dir_path( __FILE__ ) );
+define( 'CBP_URL',      plugin_dir_url( __FILE__ ) );
+define( 'CBP_BASENAME', plugin_basename( __FILE__ ) );
 
 // All site-facing URLs the profile expects. Keep absolute so emails work
 // regardless of which host wp_mail is fired from (multisite, cron, CLI).
