@@ -129,6 +129,7 @@ class Installer {
 			'business_email'        => CBP_FROM_EMAIL,
 			'support_email'         => CBP_FROM_EMAIL,
 			'waiver_enabled'        => 'no',
+			'checkins_enabled'      => 'no',
 			'default_currency'      => 'USD',
 			'currency_symbol'       => '$',
 			'site_brand_url'        => CBP_BASE_URL,
@@ -147,10 +148,12 @@ class Installer {
 		// the brand-y stuff which we want canonical.
 		$canonical = [
 			'brand_label',
+			'admin_menu_label',
 			'business_name',
 			'business_email',
 			'support_email',
 			'waiver_enabled',
+			'checkins_enabled',
 			'member_id_prefix',
 			'login_tagline',
 			'qr_verification_label',

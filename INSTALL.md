@@ -4,14 +4,13 @@ The #1 install mistake with this repo: **`chatbotistic/` is a WordPress
 _theme_, not a plugin.** If you upload it under *Plugins → Add New →
 Upload*, WordPress rejects it with "No valid plugins were found." Upload
 it under **Appearance → Themes → Add New → Upload Theme** instead.
-Everything else in the repo (except `chatbotistic-dashboard/`, which is
-a Node app) is a normal plugin.
+Everything else in this repo is a normal plugin. The standalone
+customer dashboard app is a separate repo (`ChatBotistic-App`) with its
+own deploy process — see "Chatbotistic Dashboard" below.
 
 ## Requirements
 
 - WordPress 6.4+, PHP 8.0+ (8.1+ recommended)
-- For `chatbotistic-dashboard/`: Node.js 20+, a Supabase project, and
-  Tochat.be API credentials
 
 ## chatbotistic.com (the SaaS/marketing site)
 
@@ -51,23 +50,21 @@ The plugin then prints the loader
 (`https://services.tochat.be/widget/<key>/load.js`) on the public site.
 No theme edits, no code snippets required.
 
-## Chatbotistic Dashboard (`chatbotistic-dashboard/`)
+## Chatbotistic Dashboard (`ChatBotistic-App`, separate repo)
 
-The standalone Next.js app served at `dashboard.chatbotistic.com`:
+The standalone dashboard app served at `chatbot.wpistic.cloud` lives in
+its own repo (github.com/Shubochandrosarker/ChatBotistic-App) and
+deploys to Hostinger hPanel — see that repo's `README.md` and
+`DEPLOY.md` for the full build/deploy process; it isn't part of this
+repo and doesn't run alongside it locally.
 
-```bash
-cd chatbotistic-dashboard
-cp .env.example .env.local   # fill in Supabase, Tochat, SSO secrets
-npm install
-npm run build
-npm start
-```
-
-`SSO_SHARED_SECRET` must equal the WordPress side's secret
+`SSO_SHARED_SECRET` on that app must equal the WordPress side's secret
 (`CB_SSO_SHARED_SECRET` in wp-config.php, or the auto-generated one
 surfaced by chatbotistic-profile's admin notice). With that in place,
 every "Open Dashboard" link on chatbotistic.com carries a short-lived
-signed token and lands the member in the dashboard already signed in.
+signed token to `{dashboard}/api/sso/login`, which verifies it,
+provisions/updates the member's org from their live plan + license, and
+lands them in the dashboard already signed in.
 
 ## Troubleshooting installs
 

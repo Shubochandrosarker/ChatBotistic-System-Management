@@ -169,6 +169,7 @@ final class Plugin {
 			array(
 				'confirmDelete' => __( 'Are you sure you want to delete this item?', 'memberistic' ),
 				'waiverEnabled' => 'yes' === memberistic_get_setting( 'waiver_enabled', 'no' ),
+				'checkinsEnabled' => 'yes' === memberistic_get_setting( 'checkins_enabled', 'yes' ),
 			)
 		);
 

@@ -237,7 +237,9 @@
 			h('p', { className: 'mb-app__sub' }, __('Map each Memberistic shortcode page or let us create them for you.', 'memberistic')),
 
 			h('div', { className: 'mb-form__grid' },
-				PAGE_FIELDS.map(function (f) {
+				PAGE_FIELDS.filter(function (f) {
+					return f.key !== 'staff_dashboard_page_id' || v.checkins_enabled === 'yes';
+				}).map(function (f) {
 					return h(Field, { key: f.key, label: f.label },
 						h(PageSelect, { value: v[f.key], pages: pages, onChange: update(f.key) })
 					);
@@ -312,6 +314,9 @@
 			h('h3', { className: 'mb-form__section' }, __('Optional features', 'memberistic')),
 			h(Field, { label: __('Waiver tracking', 'memberistic'), hint: __('Show waiver status on the dashboard, member records, and member account. Leave disabled unless your business collects signed waivers.', 'memberistic') },
 				h(YesNo, { value: v.waiver_enabled, onChange: update('waiver_enabled') })
+			),
+			h(Field, { label: __('Check-in tracking', 'memberistic'), hint: __('Show the Check-Ins menu, dashboard stat, member check-in tab, and Staff Dashboard page. Leave disabled unless your business does front-desk check-ins.', 'memberistic') },
+				h(YesNo, { value: v.checkins_enabled, onChange: update('checkins_enabled') })
 			),
 			h(Field, { label: __('Booking tools on member account', 'memberistic'), hint: __('Show booking shortcuts and booking history on the member account page.', 'memberistic') },
 				h(YesNo, { value: v.account_show_lane_tools, onChange: update('account_show_lane_tools') })

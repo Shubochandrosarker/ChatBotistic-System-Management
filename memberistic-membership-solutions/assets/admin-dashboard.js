@@ -20,6 +20,7 @@
 	const NS = 'memberistic/v1';
 	const REFRESH_MS = 30000;
 	const WAIVER_ENABLED = !!(window.memberisticAdmin && window.memberisticAdmin.waiverEnabled);
+	const CHECKINS_ENABLED = !!(window.memberisticAdmin && window.memberisticAdmin.checkinsEnabled);
 
 	function formatCurrency(value) {
 		const n = Number(value) || 0;
@@ -323,7 +324,7 @@
 
 			h('section', { className: 'mb-grid mb-grid--stats' },
 				isLoading
-					? (WAIVER_ENABLED ? [0, 1, 2, 3, 4, 5] : [0, 1, 2, 3, 4]).map(function (i) { return h('div', { key: 'sk' + i, className: 'mb-stat mb-stat--skeleton' }); })
+					? Array.from({ length: 4 + (CHECKINS_ENABLED ? 1 : 0) + (WAIVER_ENABLED ? 1 : 0) }).map(function (_, i) { return h('div', { key: 'sk' + i, className: 'mb-stat mb-stat--skeleton' }); })
 					: [
 						h(StatCard, {
 							key: 'active',
@@ -354,13 +355,13 @@
 							sub: sprintf(__('%s failed payments', 'memberistic'), formatNumber(data.payment_failed)),
 							tone: data.past_due > 0 ? 'danger' : 'neutral',
 						}),
-						h(StatCard, {
+						CHECKINS_ENABLED ? h(StatCard, {
 							key: 'checkins',
 							label: __('Check-ins Today', 'memberistic'),
 							value: formatNumber(data.checkins_today),
 							sub: __('Front desk activity', 'memberistic'),
 							tone: 'info',
-						}),
+						}) : null,
 						WAIVER_ENABLED ? h(StatCard, {
 							key: 'waiver',
 							label: __('Waivers Missing', 'memberistic'),
