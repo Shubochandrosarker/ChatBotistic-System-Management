@@ -51,9 +51,21 @@ final class Analytics_Page {
 		<form method="get" class="cbw-analytics-filter">
 			<input type="hidden" name="page" value="<?php echo esc_attr( Admin::ANALYTICS_SLUG ); ?>" />
 			<label for="cbw-widget-picker"><?php esc_html_e( 'Widget:', 'chatbotistic-widget' ); ?></label>
+			<?php
+			// Friendly names sourced from the cached widget catalog, same as
+			// the Settings page's dropdown -- fall back to the raw key (UUID)
+			// if a name isn't available for some reason.
+			$remote_widgets = method_exists( License::class, 'get_widget_list' ) ? (array) License::get_widget_list() : array();
+			$widget_names   = array();
+			foreach ( $remote_widgets as $rw ) {
+				if ( isset( $rw['key'] ) && '' !== $rw['key'] ) {
+					$widget_names[ (string) $rw['key'] ] = isset( $rw['name'] ) && '' !== $rw['name'] ? (string) $rw['name'] : (string) $rw['key'];
+				}
+			}
+			?>
 			<select id="cbw-widget-picker" name="widget" onchange="this.form.submit()">
 				<?php foreach ( $widget_keys as $k ) : ?>
-					<option value="<?php echo esc_attr( $k ); ?>" <?php selected( $selected, $k ); ?>><?php echo esc_html( $k ); ?></option>
+					<option value="<?php echo esc_attr( $k ); ?>" <?php selected( $selected, $k ); ?>><?php echo esc_html( $widget_names[ $k ] ?? $k ); ?></option>
 				<?php endforeach; ?>
 			</select>
 			<a class="cbw-btn cbw-btn--ghost cbw-btn--compact" href="<?php echo esc_url( CBW_APP_BASE_URL . '/widget/' . rawurlencode( $selected ) ); ?>" target="_blank" rel="noopener">
