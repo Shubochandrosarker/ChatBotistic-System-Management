@@ -14,6 +14,32 @@ class Admin {
 	public function register(): void {
 		add_action( 'admin_menu', [ $this, 'menu' ], 60 );
 		add_action( 'admin_init', [ $this, 'handle_actions' ] );
+		add_action( 'wp_ajax_cbp_reveal_secret', [ $this, 'ajax_reveal_secret' ] );
+	}
+
+	/**
+	 * AJAX endpoint backing the "Reveal secret" buttons on this page.
+	 *
+	 * The secret value is intentionally NEVER written into the page's
+	 * initial HTML (no data-* attribute, no hidden DOM node holding the
+	 * plaintext) — it only exists in the response of this nonce-gated,
+	 * manage_options-only request, fetched on demand when an admin
+	 * explicitly clicks Reveal/Copy. This keeps the credential out of
+	 * page source, browser cache, and anything else that inspects the
+	 * static markup rather than making an authenticated request.
+	 */
+	public function ajax_reveal_secret(): void {
+		check_ajax_referer( 'cbp_reveal_secret', 'nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'forbidden', 403 );
+		}
+
+		$key = isset( $_POST['key'] ) ? sanitize_key( wp_unslash( $_POST['key'] ) ) : '';
+		if ( 'sso' === $key && class_exists( '\\Chatbotistic\\Profile\\SSO_Bridge' ) ) {
+			wp_send_json_success( [ 'value' => (string) SSO_Bridge::secret() ] );
+		}
+
+		wp_send_json_error( 'unknown_key', 400 );
 	}
 
 	public function menu(): void {
@@ -125,7 +151,20 @@ class Admin {
 									<span style="color:#b71c1c;">○ Not set</span>
 								<?php endif; ?>
 							</td>
-							<td><?php echo esc_html( $row['detail'] ); ?></td>
+							<td>
+								<?php echo esc_html( $row['detail'] ); ?>
+								<?php if ( ! empty( $row['revealable'] ) ) : ?>
+									<div class="cbp-secret-reveal" data-service="<?php echo esc_attr( $row['revealable'] ); ?>">
+										<button type="button" class="button button-small cbp-secret-toggle" aria-expanded="false"><?php esc_html_e( 'Reveal secret', 'chatbotistic-profile' ); ?></button>
+										<button type="button" class="button button-small cbp-secret-copy"><?php esc_html_e( 'Copy', 'chatbotistic-profile' ); ?></button>
+										<span class="cbp-secret-copied" style="display:none;color:#1e8e3e;"><?php esc_html_e( 'Copied!', 'chatbotistic-profile' ); ?></span>
+										<span class="cbp-secret-error" style="display:none;color:#b71c1c;"><?php esc_html_e( 'Could not load the secret — reload the page and try again.', 'chatbotistic-profile' ); ?></span>
+										<div class="cbp-secret-value" style="display:none;margin-top:4px;">
+											<code style="user-select:all;padding:4px 8px;background:#f0f0f1;display:inline-block;word-break:break-all;"></code>
+										</div>
+									</div>
+								<?php endif; ?>
+							</td>
 						</tr>
 					<?php endforeach; ?>
 				</tbody>
@@ -182,6 +221,94 @@ class Admin {
 				</p>
 			</form>
 		</div>
+		<script>
+		(function () {
+			var ajaxUrl = <?php echo wp_json_encode( admin_url( 'admin-ajax.php' ) ); ?>;
+			var nonce   = <?php echo wp_json_encode( wp_create_nonce( 'cbp_reveal_secret' ) ); ?>;
+
+			// Fetches the secret from the server on first use only — never
+			// present in the page's initial HTML. Caches the resolved value
+			// on the wrapper element for subsequent toggles/copies within
+			// the same page view (a fresh page load re-fetches).
+			function fetchSecret( wrap ) {
+				var cached = wrap.getAttribute( 'data-loaded' );
+				if ( cached ) {
+					return Promise.resolve( cached );
+				}
+				var body = new URLSearchParams();
+				body.set( 'action', 'cbp_reveal_secret' );
+				body.set( 'nonce', nonce );
+				body.set( 'key', wrap.getAttribute( 'data-service' ) || '' );
+				return fetch( ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body } )
+					.then( function ( r ) { return r.json(); } )
+					.then( function ( json ) {
+						if ( ! json || ! json.success || typeof json.data.value !== 'string' ) {
+							throw new Error( 'bad response' );
+						}
+						wrap.setAttribute( 'data-loaded', json.data.value );
+						return json.data.value;
+					} );
+			}
+
+			function showError( wrap ) {
+				var err = wrap.querySelector( '.cbp-secret-error' );
+				if ( err ) {
+					err.style.display = 'inline';
+					setTimeout( function () { err.style.display = 'none'; }, 3000 );
+				}
+			}
+
+			document.querySelectorAll( '.cbp-secret-toggle' ).forEach( function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					var wrap  = btn.closest( '.cbp-secret-reveal' );
+					var value = wrap ? wrap.querySelector( '.cbp-secret-value' ) : null;
+					var code  = wrap ? wrap.querySelector( '.cbp-secret-value code' ) : null;
+					if ( ! wrap || ! value || ! code ) { return; }
+
+					var shown = value.style.display !== 'none';
+					if ( shown ) {
+						value.style.display = 'none';
+						btn.setAttribute( 'aria-expanded', 'false' );
+						return;
+					}
+
+					fetchSecret( wrap ).then( function ( secret ) {
+						code.textContent = secret;
+						value.style.display = 'block';
+						btn.setAttribute( 'aria-expanded', 'true' );
+					} ).catch( function () { showError( wrap ); } );
+				} );
+			} );
+
+			document.querySelectorAll( '.cbp-secret-copy' ).forEach( function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					var wrap = btn.closest( '.cbp-secret-reveal' );
+					if ( ! wrap ) { return; }
+
+					fetchSecret( wrap ).then( function ( text ) {
+						var done = function () {
+							var note = wrap.querySelector( '.cbp-secret-copied' );
+							if ( note ) {
+								note.style.display = 'inline';
+								setTimeout( function () { note.style.display = 'none'; }, 1500 );
+							}
+						};
+						if ( navigator.clipboard && navigator.clipboard.writeText ) {
+							navigator.clipboard.writeText( text ).then( done );
+						} else {
+							var tmp = document.createElement( 'textarea' );
+							tmp.value = text;
+							document.body.appendChild( tmp );
+							tmp.select();
+							document.execCommand( 'copy' );
+							document.body.removeChild( tmp );
+							done();
+						}
+					} ).catch( function () { showError( wrap ); } );
+				} );
+			} );
+		})();
+		</script>
 		<?php
 	}
 
@@ -266,6 +393,27 @@ class Admin {
 			'state'  => $product_id ? 'ok' : 'fail',
 			'detail' => $product_id ? 'Chatbotistic Widget product linked (#' . $product_id . ').' : 'Not linked — run repair to create the license product.',
 		];
+
+		// Dashboard SSO shared secret — status only. The value itself is
+		// NEVER read into this array/the page HTML; the "Reveal secret" /
+		// "Copy" buttons fetch it on demand via ajax_reveal_secret(), so a
+		// static view of this page (source, cache, screenshot) never
+		// contains the plaintext secret.
+		$sso_class = '\\Chatbotistic\\Profile\\SSO_Bridge';
+		if ( class_exists( $sso_class ) && method_exists( $sso_class, 'secret_is_constant' ) ) {
+			// A non-empty secret always exists once SSO_Bridge boots (it
+			// auto-generates one on first read), so this row is really
+			// reporting *source*, not presence/absence.
+			$sso_is_constant = $sso_class::secret_is_constant();
+			$rows[] = [
+				'label'      => 'Dashboard SSO',
+				'state'      => 'ok',
+				'detail'     => $sso_is_constant
+					? 'Source: CB_SSO_SHARED_SECRET constant in wp-config.php.'
+					: 'Source: auto-generated, stored encrypted in options. Copy it into the dashboard app\'s SSO_SHARED_SECRET env whenever needed.',
+				'revealable' => 'sso',
+			];
+		}
 
 		return $rows;
 	}

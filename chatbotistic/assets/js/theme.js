@@ -16,6 +16,7 @@
 	document.documentElement.classList.add('cbjs');
 
 	ready(function () {
+		cbThemeToggle();
 		dropdowns();
 		mobileNav();
 		faq();
@@ -26,6 +27,60 @@
 		docsScrollspy();
 		docsCopyCode();
 	});
+
+	/* ---- Light/dark theme toggle ----
+	 * The <head> inline script (header.php) already set data-theme on
+	 * <html> synchronously before first paint (no flash of wrong theme).
+	 * This just wires the header button to flip + persist that choice.
+	 */
+	function cbThemeToggle() {
+		var STORAGE_KEY = 'cb-theme';
+		var root = document.documentElement;
+		var btn = document.querySelector('[data-theme-toggle]');
+
+		function currentTheme() {
+			var attr = root.getAttribute('data-theme');
+			if (attr === 'light' || attr === 'dark') { return attr; }
+			var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+			return prefersDark ? 'dark' : 'light';
+		}
+
+		function applyTheme(theme, persist) {
+			root.setAttribute('data-theme', theme);
+			if (btn) { btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false'); }
+			var metaColor = document.querySelector('meta[data-theme-color]');
+			if (metaColor) { metaColor.setAttribute('content', theme === 'dark' ? '#04060c' : '#f8f9fd'); }
+			if (persist) {
+				try { localStorage.setItem(STORAGE_KEY, theme); } catch (e) { /* storage unavailable — theme still applies for this load */ }
+			}
+		}
+
+		// Sync the button's a11y state with whatever the inline head
+		// script already applied (it doesn't know about the button).
+		applyTheme(currentTheme(), false);
+
+		if (!btn) { return; }
+
+		btn.addEventListener('click', function () {
+			applyTheme(currentTheme() === 'dark' ? 'light' : 'dark', true);
+		});
+
+		// If the user hasn't made an explicit choice yet, keep following
+		// the OS preference live (matches the prefers-color-scheme CSS
+		// fallback). Once they click the toggle, localStorage takes over
+		// and this listener naturally stops mattering for this tab.
+		if (window.matchMedia) {
+			var mq = window.matchMedia('(prefers-color-scheme: dark)');
+			var onSchemeChange = function (e) {
+				var stored = null;
+				try { stored = localStorage.getItem(STORAGE_KEY); } catch (err) { /* ignore */ }
+				if (stored === 'light' || stored === 'dark') { return; }
+				applyTheme(e.matches ? 'dark' : 'light', false);
+			};
+			if (mq.addEventListener) { mq.addEventListener('change', onSchemeChange); }
+			else if (mq.addListener) { mq.addListener(onSchemeChange); }
+		}
+	}
 
 	/* ---- Docs sidebar tabs — switch the visible content panel ---- */
 	function docsTabs() {
