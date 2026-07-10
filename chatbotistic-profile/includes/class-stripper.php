@@ -49,14 +49,10 @@ class Stripper {
 		wp_register_style( 'cbp-hide-waiver', false, [], CBP_VERSION );
 		wp_enqueue_style( 'cbp-hide-waiver' );
 		$css = '
-			[data-mem-col="waiver"],
-			.memberistic-waiver-column,
-			th.column-waiver, td.column-waiver,
-			.memberistic-card--waiver,
-			.memberistic-kpi-card[data-key="waiver_missing"],
+			[data-stat-key="waiver_missing"],
+			.mb-table__col--waiver,
+			.mb-filter--waiver,
 			a[href*="page=memberistic-waivers"],
-			tr.memberistic-row--waiver,
-			.memberistic-waiver-status,
 			label[for*="waiver"],
 			input[name*="waiver"],
 			select[name*="waiver"] {

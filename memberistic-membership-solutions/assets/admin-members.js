@@ -848,7 +848,7 @@
 					h('th', null, __('Role', 'memberistic')),
 					h('th', null, __('Email', 'memberistic')),
 					h('th', null, __('Phone', 'memberistic')),
-					h('th', null, __('Waiver', 'memberistic')),
+					h('th', { className: 'mb-table__col--waiver' }, __('Waiver', 'memberistic')),
 					h('th', null, __('Status', 'memberistic')),
 					h('th', { className: 'mb-table__actions' }, __('Actions', 'memberistic'))
 				)
@@ -865,7 +865,7 @@
 							h('td', null, statusLabel(p.role || '')),
 							h('td', null, p.email || '—'),
 							h('td', null, p.phone || '—'),
-							h('td', null,
+							h('td', { className: 'mb-table__col--waiver' },
 								h(StatusPill, { status: p.waiver_status || 'missing' }),
 								p.waiver_expires_at
 									? h('span', { className: 'mb-cell-meta' }, sprintf(__('exp. %s', 'memberistic'), formatDate(p.waiver_expires_at)))
@@ -1119,7 +1119,11 @@
 
 	function StatCard(props) {
 		const trend = (typeof props.trend === 'number') ? props.trend : null;
-		return h('div', { className: 'mb-stat mb-stat--' + (props.tone || 'primary') },
+		const rootProps = { className: 'mb-stat mb-stat--' + (props.tone || 'primary') };
+		if (props.statKey) {
+			rootProps['data-stat-key'] = props.statKey;
+		}
+		return h('div', rootProps,
 			h('div', { className: 'mb-stat__head' },
 				h('span', { className: 'mb-stat__label' }, props.label),
 				props.hint ? h('span', { className: 'mb-stat__hint', title: props.hint }, '?') : null
@@ -1341,7 +1345,7 @@
 					trend: (typeof stats.new_growth_pct === 'number') ? stats.new_growth_pct : null,
 					tone: 'success',
 				},
-				{ label: __('Waiver missing', 'memberistic'), value: (Number(stats.waiver_missing) || 0).toLocaleString(), tone: 'warning' },
+				{ label: __('Waiver missing', 'memberistic'), value: (Number(stats.waiver_missing) || 0).toLocaleString(), tone: 'warning', statKey: 'waiver_missing' },
 			];
 		})();
 
@@ -1481,7 +1485,7 @@
 									h('th', null, __('Billing', 'memberistic')),
 									h('th', null, __('Renewal', 'memberistic')),
 									h('th', null, __('People', 'memberistic')),
-									h('th', null, __('Waiver', 'memberistic')),
+									h('th', { className: 'mb-table__col--waiver' }, __('Waiver', 'memberistic')),
 									h('th', { className: 'mb-table__actions' }, __('Actions', 'memberistic'))
 								)
 							),
@@ -1509,7 +1513,7 @@
 										h('td', null, statusLabel(m.billing_cycle || '')),
 										h('td', null, formatDate(m.renewal_date)),
 										h('td', null, Number(m.people_count) || 0),
-										h('td', null, h(StatusPill, { status: m.waiver_status || 'missing' })),
+										h('td', { className: 'mb-table__col--waiver' }, h(StatusPill, { status: m.waiver_status || 'missing' })),
 										h('td', { className: 'mb-table__actions', onClick: function (e) { e.stopPropagation(); } },
 											h('button', { className: 'button-link', onClick: function () { setSelectedId(m.id); } }, __('Open', 'memberistic'))
 										)

@@ -294,7 +294,7 @@
 				h('select', { className: 'mb-toolbar__select', value: filters.status, onChange: update('status') },
 					STATUS_OPTIONS.map(function (s) { return h('option', { key: 's-' + s, value: s }, s === '' ? __('All Member Statuses', 'memberistic') : statusLabel(s)); })
 				),
-				h('select', { className: 'mb-toolbar__select', value: filters.waiver_status, onChange: update('waiver_status') },
+				h('select', { className: 'mb-toolbar__select mb-filter--waiver', value: filters.waiver_status, onChange: update('waiver_status') },
 					WAIVER_OPTIONS.map(function (w) { return h('option', { key: 'w-' + w, value: w }, w === '' ? __('All Waiver Statuses', 'memberistic') : statusLabel(w)); })
 				),
 				h('span', { className: 'mb-toolbar__count' },
@@ -323,7 +323,7 @@
 									h('th', null, __('Role', 'memberistic')),
 									h('th', null, __('Plan', 'memberistic')),
 									h('th', null, __('Member Status', 'memberistic')),
-									h('th', null, __('Waiver', 'memberistic')),
+									h('th', { className: 'mb-table__col--waiver' }, __('Waiver', 'memberistic')),
 									h('th', null, __('Renewal', 'memberistic')),
 									h('th', { className: 'mb-table__actions' }, __('Actions', 'memberistic'))
 								)
@@ -343,7 +343,7 @@
 										h('td', null, statusLabel(r.role || '')),
 										h('td', null, r.plan_name || '—'),
 										h('td', null, h(StatusPill, { status: r.membership_status || 'unknown' })),
-										h('td', null, h(StatusPill, { status: r.waiver_status || 'missing' })),
+										h('td', { className: 'mb-table__col--waiver' }, h(StatusPill, { status: r.waiver_status || 'missing' })),
 										h('td', null, formatDate(r.renewal_date)),
 										h('td', { className: 'mb-table__actions' },
 											h('a', { className: 'button-link', href: memberHref }, __('Open member', 'memberistic'))

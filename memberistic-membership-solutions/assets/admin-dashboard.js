@@ -69,7 +69,11 @@
 	function StatCard(props) {
 		const tone = props.tone || 'neutral';
 		const trend = typeof props.trend === 'number' ? props.trend : null;
-		return h('div', { className: 'mb-stat mb-stat--' + tone },
+		const rootProps = { className: 'mb-stat mb-stat--' + tone };
+		if (props.statKey) {
+			rootProps['data-stat-key'] = props.statKey;
+		}
+		return h('div', rootProps,
 			h('div', { className: 'mb-stat__head' },
 				h('span', { className: 'mb-stat__label' }, props.label),
 				props.hint ? h('span', { className: 'mb-stat__hint', title: props.hint }, '?') : null
@@ -366,6 +370,7 @@
 							value: formatNumber(data.waiver_missing),
 							sub: __('Across all active members', 'memberistic'),
 							tone: data.waiver_missing > 0 ? 'warning' : 'neutral',
+							statKey: 'waiver_missing',
 						}),
 					]
 			),
