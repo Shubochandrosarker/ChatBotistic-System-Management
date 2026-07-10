@@ -51,7 +51,27 @@ $cb_products = array(
 <head>
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#05070e">
+<meta name="theme-color" content="#f8f9fd" data-theme-color>
+<script>
+/* Set the theme attribute synchronously, before first paint, so there is
+   no flash of the wrong theme. Mirrors the persistence key + logic used
+   by the toggle in assets/js/theme.js (cbThemeToggle()). */
+(function(){
+	try {
+		var stored = localStorage.getItem('cb-theme');
+		var theme  = stored === 'light' || stored === 'dark'
+			? stored
+			: ( window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light' );
+		document.documentElement.setAttribute('data-theme', theme);
+		if ( theme === 'dark' ) {
+			var meta = document.querySelector('meta[data-theme-color]');
+			if ( meta ) { meta.setAttribute('content', '#04060c'); }
+		}
+	} catch (e) {
+		document.documentElement.setAttribute('data-theme', 'light');
+	}
+})();
+</script>
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
@@ -91,6 +111,11 @@ $cb_products = array(
 		</nav>
 
 		<div class="cb-header__cta">
+
+			<button type="button" class="cb-icon-btn cb-theme-toggle" data-theme-toggle aria-label="<?php esc_attr_e( 'Toggle dark mode', 'chatbotistic' ); ?>" aria-pressed="false">
+				<span class="cb-theme-toggle__ico cb-theme-toggle__ico--sun"><?php cb_icon( 'sun', 17 ); ?></span>
+				<span class="cb-theme-toggle__ico cb-theme-toggle__ico--moon"><?php cb_icon( 'moon', 17 ); ?></span>
+			</button>
 
 			<div class="cb-account-menu" data-menu aria-expanded="false">
 				<button type="button" class="cb-icon-btn" data-menu-trigger aria-haspopup="true" aria-label="<?php esc_attr_e( 'Account', 'chatbotistic' ); ?>">

@@ -33,7 +33,7 @@
 	background: rgba(79,139,255,0.08);
 	border: 1px solid rgba(79,139,255,0.22);
 	font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em;
-	text-transform: uppercase; color: #a8c1ff;
+	text-transform: uppercase; color: var(--blue-bright);
 }
 .cb-eyebrow .cb-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
 
@@ -57,7 +57,7 @@
 	color: var(--text); cursor: pointer; text-decoration: none;
 	transition: transform .15s, background .2s, border-color .2s, box-shadow .2s;
 }
-.cb-btn:hover { transform: translateY(-1px); background: var(--glass-2); border-color: rgba(255,255,255,0.22); }
+.cb-btn:hover { transform: translateY(-1px); background: var(--glass-2); border-color: rgba(var(--tint-surface),0.22); }
 .cb-btn--primary {
 	background: var(--grad-button); border-color: transparent; color: #fff;
 	box-shadow: 0 14px 36px -10px rgba(120,90,255,0.55);
@@ -73,7 +73,7 @@
 .cb-card,
 .cb-panel,
 .cb-glass {
-	background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012));
+	background: linear-gradient(180deg, rgba(var(--tint-surface),0.045), rgba(var(--tint-surface),0.012));
 	border: 1px solid var(--line);
 	border-radius: var(--radius-lg);
 	padding: 24px;
@@ -82,7 +82,7 @@
 .cb-glass-edge { position: relative; }
 .cb-glass-edge::before {
 	content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
-	background: linear-gradient(135deg, rgba(255,255,255,0.20), rgba(255,255,255,0) 42%, rgba(160,112,255,0.28) 100%);
+	background: linear-gradient(135deg, rgba(var(--tint-surface),0.20), rgba(var(--tint-surface),0) 42%, rgba(160,112,255,0.28) 100%);
 	-webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
 	-webkit-mask-composite: xor; mask-composite: exclude;
 	pointer-events: none;
@@ -96,7 +96,7 @@
 
 /* ---------- Feature / step / pricing repurposed onto V4 .card ---------- */
 .cb-feature, .cb-step {
-	background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012));
+	background: linear-gradient(180deg, rgba(var(--tint-surface),0.045), rgba(var(--tint-surface),0.012));
 	border: 1px solid var(--line);
 	border-radius: var(--radius);
 	padding: 22px;
@@ -108,7 +108,7 @@
 	width: 38px; height: 38px; border-radius: 11px;
 	background: linear-gradient(135deg, rgba(99,128,255,0.28), rgba(160,112,255,0.16));
 	border: 1px solid rgba(99,128,255,0.34);
-	display: grid; place-items: center; color: #c8cdff; margin-bottom: 14px;
+	display: grid; place-items: center; color: var(--violet); margin-bottom: 14px;
 }
 .cb-feature h3 { font-size: 16.5px; }
 .cb-feature p  { margin-top: 7px; font-size: 14px; color: var(--text-soft); }
@@ -118,7 +118,7 @@
 	display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 48px; align-items: stretch;
 }
 .cb-plan {
-	background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012));
+	background: linear-gradient(180deg, rgba(var(--tint-surface),0.045), rgba(var(--tint-surface),0.012));
 	border: 1px solid var(--line); border-radius: var(--radius-lg);
 	padding: 28px 24px; display: flex; flex-direction: column; gap: 14px; position: relative;
 }
@@ -149,7 +149,7 @@
 .cb-prose p, .cb-prose li { margin: 0 0 12px; }
 .cb-prose ul, .cb-prose ol { padding-left: 22px; }
 .cb-prose a { color: var(--blue-bright); text-decoration: underline; }
-.cb-prose code { font-family: var(--font-mono); font-size: 13px; background: rgba(255,255,255,0.06); padding: 2px 7px; border-radius: 6px; }
+.cb-prose code { font-family: var(--font-mono); font-size: 13px; background: rgba(var(--tint-surface),0.06); padding: 2px 7px; border-radius: 6px; }
 .cb-prose img { border-radius: var(--radius); margin: 18px 0; max-width: 100%; height: auto; }
 
 /* ---------- Fields ---------- */
@@ -159,7 +159,7 @@
 .cb-field textarea,
 .cb-field select {
 	width: 100%; padding: 12px 14px; border-radius: 12px;
-	background: rgba(0,0,0,0.4); border: 1px solid var(--line);
+	background: rgba(var(--tint-surface),0.035); border: 1px solid var(--line);
 	color: var(--text); font-family: var(--font-body); font-size: 15px;
 }
 .cb-field input:focus, .cb-field textarea:focus, .cb-field select:focus {
@@ -173,7 +173,7 @@
 
 /* ---------- Stats band (used on portal overview) ---------- */
 .cb-stats         { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-.cb-stat          { padding: 20px; border-radius: var(--radius-lg); background: rgba(255,255,255,0.03); border: 1px solid var(--line); }
+.cb-stat          { padding: 20px; border-radius: var(--radius-lg); background: rgba(var(--tint-surface),0.03); border: 1px solid var(--line); }
 .cb-stat__label   { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
 .cb-stat__value   { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin: 8px 0 10px; }
 .cb-stat__value--ok { color: var(--green); }
@@ -183,7 +183,7 @@
 /* ---------- Badges ---------- */
 .cb-badge        { display: inline-block; padding: 3px 10px; border-radius: 999px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
 .cb-badge--active { background: var(--grad-button); color: #fff; }
-.cb-badge--muted  { background: rgba(255,255,255,0.06); color: var(--text-dim); border: 1px solid var(--line); }
+.cb-badge--muted  { background: rgba(var(--tint-surface),0.06); color: var(--text-dim); border: 1px solid var(--line); }
 
 /* ---------- Footer ---------- */
 .cb-footer { padding: 80px 0 28px; border-top: 1px solid var(--line); margin-top: 80px; }
@@ -259,7 +259,7 @@
 .field select,
 .field textarea {
 	width: 100%; padding: 12px 14px; border-radius: 12px;
-	background: rgba(0,0,0,0.4); border: 1px solid var(--line);
+	background: rgba(var(--tint-surface),0.035); border: 1px solid var(--line);
 	color: var(--text); font-family: var(--font-body); font-size: 15px;
 }
 .field input:focus,
@@ -289,7 +289,7 @@
 .demo-step .n {
 	flex-shrink: 0; width: 22px; height: 22px; border-radius: 7px;
 	background: linear-gradient(135deg, rgba(99,128,255,0.28), rgba(160,112,255,0.18));
-	border: 1px solid rgba(99,128,255,0.36); color: #c8cdff;
+	border: 1px solid rgba(99,128,255,0.36); color: var(--violet);
 	font-family: var(--font-mono); font-size: 11px;
 	display: grid; place-items: center;
 }
@@ -300,9 +300,9 @@
 .result-ico.ok { background: rgba(52,211,153,0.14); color: var(--green); border: 1px solid rgba(52,211,153,0.34); }
 
 /* Pricing card extras V4 doesn't fully cover */
-.price-card { padding: 24px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); display: flex; flex-direction: column; position: relative; }
+.price-card { padding: 24px; border-radius: 18px; background: rgba(var(--tint-surface),0.03); border: 1px solid var(--line); display: flex; flex-direction: column; position: relative; }
 .price-card.featured { border-color: rgba(99,128,255,0.45); box-shadow: 0 30px 80px -32px rgba(99,128,255,0.55); }
-.price-card.lifetime { background: linear-gradient(180deg, rgba(255,180,80,0.06), rgba(255,255,255,0.02)); border-color: rgba(255,180,80,0.35); }
+.price-card.lifetime { background: linear-gradient(180deg, rgba(255,180,80,0.06), rgba(var(--tint-surface),0.02)); border-color: rgba(255,180,80,0.35); }
 .price-card .plan-name { font-family: var(--font-display); font-weight: 600; font-size: 18px; }
 .price-card .plan-desc { color: var(--text-soft); font-size: 13.5px; margin-top: 4px; }
 .price-card .price-amount { font-family: var(--font-display); font-weight: 600; margin-top: 18px; line-height: 1; }
@@ -313,12 +313,12 @@
 
 /* Recommendation cards */
 .rec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 32px; }
-.rec-card { padding: 24px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.rec-card { padding: 24px; border-radius: 18px; background: rgba(var(--tint-surface),0.03); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
 .rec-card .pick { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--text-dim); text-transform: uppercase; }
 .rec-card .pick b { color: var(--blue-bright); }
 .rec-card h3 { font-size: 17px; }
 .rec-card p { color: var(--text-soft); font-size: 13.5px; }
-.rec-card .ico { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, rgba(99,128,255,0.25), rgba(160,112,255,0.16)); display: grid; place-items: center; color: #cfdcff; border: 1px solid rgba(99,128,255,0.28); }
+.rec-card .ico { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, rgba(99,128,255,0.25), rgba(160,112,255,0.16)); display: grid; place-items: center; color: var(--blue-bright); border: 1px solid rgba(99,128,255,0.28); }
 @media (max-width: 900px) { .rec-grid { grid-template-columns: 1fr; } }
 
 /* FAQ list (details/summary native) */
@@ -327,7 +327,7 @@
 	padding: 16px 20px;
 	border: 1px solid var(--line);
 	border-top: 0;
-	background: rgba(255,255,255,0.02);
+	background: rgba(var(--tint-surface),0.02);
 }
 .faq-list .faq-item:first-child { border-top: 1px solid var(--line); border-radius: 14px 14px 0 0; }
 .faq-list .faq-item:last-child  { border-radius: 0 0 14px 14px; }
@@ -363,13 +363,13 @@
 .uc-flow-step {
 	display: flex; align-items: center; gap: 10px;
 	padding: 14px 18px; border-radius: 12px;
-	background: rgba(255,255,255,0.03); border: 1px solid var(--line);
+	background: rgba(var(--tint-surface),0.03); border: 1px solid var(--line);
 	font-size: 13.5px; color: var(--text); min-width: 160px;
 }
 .uc-flow-step .n {
 	width: 28px; height: 28px; border-radius: 8px;
 	background: linear-gradient(135deg, rgba(79,139,255,0.25), rgba(160,112,255,0.18));
-	border: 1px solid rgba(79,139,255,0.36); color: #cfdcff;
+	border: 1px solid rgba(79,139,255,0.36); color: var(--blue-bright);
 	font-family: var(--font-mono); font-size: 11px;
 	display: grid; place-items: center; flex-shrink: 0;
 }
@@ -391,32 +391,32 @@
 }
 
 /* Product page little stat-tag used in the WP plugin mock */
-.tag.won { padding: 4px 10px; border-radius: 999px; background: rgba(52,211,153,0.14); color: #a7ecdf; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; }
+.tag.won { padding: 4px 10px; border-radius: 999px; background: rgba(52,211,153,0.14); color: var(--green); font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; }
 
 /* Docs search input + kbd hint (V4 styles the wrapper; we polish the
    interior so it works as a real search field on the support page too). */
-.docs-search { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--line); }
+.docs-search { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 12px; background: rgba(var(--tint-surface),0.04); border: 1px solid var(--line); }
 .docs-search input { flex: 1; background: transparent; border: 0; color: var(--text); font-size: 14px; outline: none; }
-.docs-search kbd { font-family: var(--font-mono); font-size: 11px; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 6px; color: var(--text-dim); }
+.docs-search kbd { font-family: var(--font-mono); font-size: 11px; background: rgba(var(--tint-surface),0.06); padding: 2px 6px; border-radius: 6px; color: var(--text-dim); }
 
 /* ---------- Portal state component (empty / loading / error / locked / success) ---------- */
 .cb-portal-state {
 	display: flex; flex-direction: column; align-items: center; justify-content: center;
 	text-align: center; padding: 48px 28px; gap: 16px;
-	background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.005));
+	background: linear-gradient(180deg, rgba(var(--tint-surface),0.025), rgba(var(--tint-surface),0.005));
 	border: 1px dashed var(--line-strong); border-radius: 20px;
 }
 .cb-portal-state__ico { width: 56px; height: 56px; border-radius: 16px; font-size: 24px; font-weight: 700; }
-.cb-portal-state__ico.muted { background: rgba(255,255,255,0.04); border: 1px solid var(--line); color: var(--text-dim); }
+.cb-portal-state__ico.muted { background: rgba(var(--tint-surface),0.04); border: 1px solid var(--line); color: var(--text-dim); }
 .cb-portal-state__title { font-family: var(--font-display); font-weight: 600; font-size: 18px; color: var(--text); margin: 0; }
 .cb-portal-state__lead { color: var(--text-soft); font-size: 14.5px; line-height: 1.6; max-width: 460px; margin: 0; }
 .cb-portal-state--loading .cb-portal-state__ico { animation: op-pulse 1.6s infinite; }
 
 /* Auth fine-tuning where V4 portal.css leaves room */
-.cb-form .field-err  { font-size: 12.5px; color: #ff8aa0; margin-top: 5px; display: flex; align-items: center; gap: 6px; }
+.cb-form .field-err  { font-size: 12.5px; color: var(--danger); margin-top: 5px; display: flex; align-items: center; gap: 6px; }
 .cb-form .field-hint { font-size: 12.5px; color: var(--text-dim); margin-top: 5px; }
 .auth-main           { display: grid; place-items: center; padding: 48px 32px; }
-.auth-card           { max-width: 460px; width: 100%; padding: 36px 32px; border-radius: 22px; background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015)); border: 1px solid var(--line-strong); }
+.auth-card           { max-width: 460px; width: 100%; padding: 36px 32px; border-radius: 22px; background: linear-gradient(180deg, rgba(var(--tint-surface),0.045), rgba(var(--tint-surface),0.015)); border: 1px solid var(--line-strong); }
 .auth-card h1        { font-size: 28px; letter-spacing: -0.02em; margin: 0; }
 
 /* =========================================================================

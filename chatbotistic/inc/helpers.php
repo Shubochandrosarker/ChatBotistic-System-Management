@@ -70,6 +70,8 @@ function cb_get_icon( $name, $size = 18, $class = '' ) {
 		'spa'    => '<path d="M12 2c3 4 3 8 0 12-3-4-3-8 0-12zM6 13c4 0 6 2 6 7M18 13c-4 0-6 2-6 7"/>',
 		'plane'  => '<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>',
 		'book'   => '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM19 3v16"/>',
+		'sun'    => '<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
+		'moon'   => '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
 	);
 
 	$cls = trim( 'cb-ico ' . $class );
