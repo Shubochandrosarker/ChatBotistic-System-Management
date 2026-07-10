@@ -30,7 +30,7 @@ class Page {
 	}
 
 	public function save(): void {
-		if ( ! isset( $_POST['mlb_save'] ) ) {
+		if ( ! isset( $_POST['mlb_save'] ) && ! isset( $_POST['mlb_sync_now'] ) ) {
 			return;
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -169,7 +169,8 @@ class Page {
 
 				<p class="submit">
 					<button type="submit" name="mlb_save" value="1" class="button button-primary"><?php esc_html_e( 'Save caps', 'memberistic-licenseistic-bridge' ); ?></button>
-					<button type="submit" name="mlb_sync_now" value="1" class="button"><?php esc_html_e( 'Save + sync every license now', 'memberistic-licenseistic-bridge' ); ?></button>
+					<button type="submit" name="mlb_sync_now" value="1" class="button button-secondary" style="margin-left:6px;"><?php esc_html_e( 'Save & Sync Now', 'memberistic-licenseistic-bridge' ); ?></button>
+					<span class="description" style="margin-left:8px;"><?php esc_html_e( '(also re-syncs every existing license immediately)', 'memberistic-licenseistic-bridge' ); ?></span>
 				</p>
 			</form>
 

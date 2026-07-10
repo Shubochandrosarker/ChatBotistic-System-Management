@@ -3,7 +3,7 @@
  * Plugin Name:       Memberistic → Licenseistic Bridge
  * Plugin URI:        https://chatbotistic.com
  * Description:       Auto-issues a Licenseistic license key when a Memberistic membership activates, revokes on cancel/expiry, and enriches the license activation response with plan caps (widgets, agents, domains) for downstream client plugins like the Chatbotistic Widget.
- * Version:           1.2.2
+ * Version:           1.2.3
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            WordPressistic
@@ -16,7 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'MLB_VERSION',  '1.2.2' );
+define( 'MLB_VERSION',  '1.2.3' );
 define( 'MLB_FILE',     __FILE__ );
 define( 'MLB_DIR',      plugin_dir_path( __FILE__ ) );
 define( 'MLB_URL',      plugin_dir_url( __FILE__ ) );
