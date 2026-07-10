@@ -20,7 +20,14 @@ final class Admin_Menu {
 	 * Register plugin admin menu.
 	 */
 	public static function register() {
-		$label = apply_filters( 'memberistic_admin_menu_label', memberistic_get_brand_label() );
+		// The admin-facing top-level menu label can differ from the
+		// customer-facing brand_label used in emails/portal copy -- a host
+		// product may want its own admin menus (e.g. a separate connector
+		// plugin) to carry the customer brand while this plugin's own menu
+		// stays recognizable as "Memberistic" to avoid two identically
+		// labeled top-level menus. Falls back to the customer brand label
+		// when no distinct admin_menu_label has been set.
+		$label = apply_filters( 'memberistic_admin_menu_label', memberistic_get_setting( 'admin_menu_label', memberistic_get_brand_label() ) );
 
 		add_menu_page(
 			$label,
@@ -32,11 +39,15 @@ final class Admin_Menu {
 			56
 		);
 
+		$checkins_enabled = 'yes' === memberistic_get_setting( 'checkins_enabled', 'yes' );
+
 		add_submenu_page( 'memberistic-dashboard', __( 'Dashboard', 'memberistic' ), __( 'Dashboard', 'memberistic' ), 'view_memberistic_dashboard', 'memberistic-dashboard', array( Dashboard_Page::class, 'render' ) );
 		add_submenu_page( 'memberistic-dashboard', __( 'Members', 'memberistic' ), __( 'Members', 'memberistic' ), 'view_memberistic_members', 'memberistic-members', array( Members_Page::class, 'render' ) );
 		add_submenu_page( 'memberistic-dashboard', __( 'Plans', 'memberistic' ), __( 'Plans', 'memberistic' ), 'manage_memberistic_plans', 'memberistic-plans', array( Plans_Page::class, 'render' ) );
 		add_submenu_page( 'memberistic-dashboard', __( 'Payments', 'memberistic' ), __( 'Payments', 'memberistic' ), 'manage_memberistic_payments', 'memberistic-payments', array( Payments_Page::class, 'render' ) );
-		add_submenu_page( 'memberistic-dashboard', __( 'Check-Ins', 'memberistic' ), __( 'Check-Ins', 'memberistic' ), 'memberistic_checkin_members', 'memberistic-checkins', array( Checkins_Page::class, 'render' ) );
+		if ( $checkins_enabled ) {
+			add_submenu_page( 'memberistic-dashboard', __( 'Check-Ins', 'memberistic' ), __( 'Check-Ins', 'memberistic' ), 'memberistic_checkin_members', 'memberistic-checkins', array( Checkins_Page::class, 'render' ) );
+		}
 		add_submenu_page( 'memberistic-dashboard', __( 'Activity', 'memberistic' ), __( 'Activity', 'memberistic' ), 'view_memberistic_dashboard', 'memberistic-activity', array( Activity_Page::class, 'render' ) );
 
 		add_submenu_page( 'memberistic-dashboard', __( 'Emails', 'memberistic' ), __( 'Emails', 'memberistic' ), 'view_memberistic_dashboard', 'memberistic-emails', array( self::class, 'render_emails' ) );

@@ -243,14 +243,14 @@ function cb_free_checkout_url() {
 /**
  * Canonical URL of the standalone Chatbotistic dashboard app.
  *
- * The dashboard lives at dashboard.chatbotistic.com (Next.js app) — the
+ * The dashboard lives at chatbot.wpistic.cloud (Next.js app) — the
  * WordPress site stays marketing + billing + license server, and members
  * click through to the app from every "Open Dashboard" CTA.
  *
  * Resolution order:
  *   1. `cb_dashboard_url` option (set via wp option / WP-CLI — the theme
  *      has no settings screen, so this is the per-site override hook)
- *   2. The hard default https://dashboard.chatbotistic.com
+ *   2. The hard default https://chatbot.wpistic.cloud
  * The result is filterable via `cb_dashboard_url` for staging deploys.
  *
  * @param string $path Optional path appended to the base, e.g. 'docs'.
@@ -259,7 +259,7 @@ function cb_free_checkout_url() {
 function cb_dashboard_url( $path = '' ) {
 	$base = trim( (string) get_option( 'cb_dashboard_url', '' ) );
 	if ( '' === $base ) {
-		$base = 'https://dashboard.chatbotistic.com';
+		$base = 'https://chatbot.wpistic.cloud';
 	}
 	$url = untrailingslashit( $base ) . '/' . ltrim( (string) $path, '/' );
 	return (string) apply_filters( 'cb_dashboard_url', $url, $path );

@@ -94,6 +94,7 @@ final class Settings_Page {
 			'woocommerce_enabled'         => isset( $settings['woocommerce_enabled'] ) ? memberistic_sanitize_yes_no( $settings['woocommerce_enabled'] ) : 'no',
 			'woocommerce_webhook_secret'  => isset( $settings['woocommerce_webhook_secret'] ) ? memberistic_sanitize_text( $settings['woocommerce_webhook_secret'] ) : '',
 			'waiver_enabled'              => isset( $settings['waiver_enabled'] ) ? memberistic_sanitize_yes_no( $settings['waiver_enabled'] ) : 'no',
+			'checkins_enabled'            => isset( $settings['checkins_enabled'] ) ? memberistic_sanitize_yes_no( $settings['checkins_enabled'] ) : 'yes',
 			'account_show_lane_tools'     => isset( $settings['account_show_lane_tools'] ) ? memberistic_sanitize_yes_no( $settings['account_show_lane_tools'] ) : 'yes',
 			'email_from_name'             => isset( $settings['email_from_name'] ) ? memberistic_sanitize_text( $settings['email_from_name'] ) : 'Memberistic',
 			'email_from_address'          => isset( $settings['email_from_address'] ) ? sanitize_email( $settings['email_from_address'] ) : get_option( 'admin_email' ),

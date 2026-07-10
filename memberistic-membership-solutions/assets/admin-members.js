@@ -32,6 +32,7 @@
 	const initialAction = settings.initialAction || '';
 	const initialSelectedId = Number(settings.initialSelectedId) || 0;
 	const WAIVER_ENABLED = !!(window.memberisticAdmin && window.memberisticAdmin.waiverEnabled);
+	const CHECKINS_ENABLED = !!(window.memberisticAdmin && window.memberisticAdmin.checkinsEnabled);
 
 	/* ------------------------------------------------------------------ */
 	/* Formatters                                                          */
@@ -701,9 +702,9 @@
 				{ id: 'payments', label: __('Payments', 'memberistic'), count: (detail.payments || []).length },
 				{ id: 'activity', label: __('Activity', 'memberistic'), count: (detail.activity || []).length },
 				{ id: 'notes', label: __('Notes', 'memberistic'), count: (detail.notes || []).length },
-				{ id: 'checkins', label: __('Check-ins', 'memberistic'), count: (detail.checkins || []).length },
+				CHECKINS_ENABLED ? { id: 'checkins', label: __('Check-ins', 'memberistic'), count: (detail.checkins || []).length } : null,
 				{ id: 'emails', label: __('Emails', 'memberistic'), count: emailCount },
-			];
+			].filter(Boolean);
 
 			return h(Fragment, null,
 				h('header', { className: 'mb-panel__header' },
