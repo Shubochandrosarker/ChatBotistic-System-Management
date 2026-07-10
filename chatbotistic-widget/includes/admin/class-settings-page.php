@@ -90,9 +90,9 @@ final class Settings_Page {
 							?>
 							<?php
 							printf(
-								/* translators: %s: dashboard.chatbotistic.com link */
+								/* translators: %s: chatbot.wpistic.cloud link */
 								' · ' . esc_html__( 'Manage widgets in %s.', 'chatbotistic-widget' ),
-								'<a href="' . esc_url( CBW_APP_BASE_URL ) . '" target="_blank" rel="noopener">dashboard.chatbotistic.com</a>'
+								'<a href="' . esc_url( CBW_APP_BASE_URL ) . '" target="_blank" rel="noopener">chatbot.wpistic.cloud</a>'
 							);
 							?>
 							<?php
@@ -124,9 +124,9 @@ final class Settings_Page {
 						<small class="cbw-hint">
 							<?php
 							printf(
-								/* translators: %s = dashboard.chatbotistic.com link */
+								/* translators: %s = chatbot.wpistic.cloud link */
 								esc_html__( 'Copy from your widget in %s.', 'chatbotistic-widget' ),
-								'<a href="' . esc_url( CBW_APP_BASE_URL ) . '" target="_blank" rel="noopener">dashboard.chatbotistic.com</a>'
+								'<a href="' . esc_url( CBW_APP_BASE_URL ) . '" target="_blank" rel="noopener">chatbot.wpistic.cloud</a>'
 							);
 							?>
 							<?php if ( License::is_active() ) : ?>

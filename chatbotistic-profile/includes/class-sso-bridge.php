@@ -1,6 +1,6 @@
 <?php
 /**
- * SSO hand-off to the standalone dashboard.chatbotistic.com app.
+ * SSO hand-off to the standalone chatbot.wpistic.cloud app.
  *
  * Mints a short-lived, HMAC-signed token asserting a logged-in member's
  * identity, live plan, and license status, and appends it to every
@@ -39,6 +39,15 @@ class SSO_Bridge {
 	 * and provisions/updates their org from the live plan + license — no
 	 * separate signup, no stale entitlements.
 	 *
+	 * The token must land on the dashboard app's `/api/sso/login` route
+	 * (see chatbotistic-app/src/app/api/sso/login/route.ts) — that route
+	 * verifies the token, provisions the Supabase user/org, and redirects
+	 * to /dashboard itself. Appending `?token=` to whatever bare path the
+	 * theme built (e.g. the site root) sends the browser to a page that
+	 * never reads the token at all, so the member never gets logged in.
+	 * We therefore always target {scheme}://{host}/api/sso/login, dropping
+	 * whatever path was originally requested.
+	 *
 	 * @param string $url  The plain dashboard URL the theme built.
 	 * @param string $path The path fragment that was requested.
 	 * @return string
@@ -52,7 +61,12 @@ class SSO_Bridge {
 		if ( ! $token ) {
 			return $url;
 		}
-		return add_query_arg( 'token', $token, $url );
+		$parts = wp_parse_url( $url );
+		if ( empty( $parts['scheme'] ) || empty( $parts['host'] ) ) {
+			return $url;
+		}
+		$origin = $parts['scheme'] . '://' . $parts['host'] . ( isset( $parts['port'] ) ? ':' . $parts['port'] : '' );
+		return add_query_arg( 'token', $token, $origin . '/api/sso/login' );
 	}
 
 	/**

@@ -5,7 +5,7 @@
  * Single-page docs: sticky sidebar + scrollspy, every article in one
  * continuous scroll (see docsScrollspy() in assets/js/theme.js and the
  * .docs2-* rules in assets/css/cb-fixes.css). Content mirrors the real,
- * shipped product only — the in-app docs at dashboard.chatbotistic.com/docs
+ * shipped product only — the in-app docs at chatbot.wpistic.cloud/docs
  * (chatbotistic-dashboard/src/app/docs/) are the source of truth for
  * every dashboard-side article here, kept in sync by hand since they're
  * two different codebases; the WordPress-plugin install steps are
@@ -356,7 +356,7 @@ $cb_faqs = array(
 					<h3><?php esc_html_e( 'Setting up a custom domain', 'chatbotistic' ); ?></h3>
 					<ol>
 						<li><?php echo wp_kses( __( 'Pick a subdomain you control, e.g. <code>chat.yourbrand.com</code>.', 'chatbotistic' ), array( 'code' => array() ) ); ?></li>
-						<li><?php echo wp_kses( __( 'Add a CNAME record pointing it at <code>dashboard.chatbotistic.com</code>.', 'chatbotistic' ), array( 'code' => array() ) ); ?></li>
+						<li><?php echo wp_kses( __( 'Add a CNAME record pointing it at <code>chatbot.wpistic.cloud</code>.', 'chatbotistic' ), array( 'code' => array() ) ); ?></li>
 						<li><?php esc_html_e( 'Enter that subdomain into the Custom Domain field and save.', 'chatbotistic' ); ?></li>
 						<li><?php esc_html_e( 'DNS propagation can take up to 24 hours; SSL is issued automatically once the domain resolves.', 'chatbotistic' ); ?></li>
 					</ol>

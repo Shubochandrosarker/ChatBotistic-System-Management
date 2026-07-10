@@ -236,7 +236,7 @@ class Admin {
 					<tr>
 						<th scope="row"><label for="cbc-dashboard-url"><?php esc_html_e( 'Dashboard URL', 'chatbotistic-connector' ); ?></label></th>
 						<td>
-							<input type="url" id="cbc-dashboard-url" name="dashboard_url" class="regular-text" value="<?php echo esc_attr( $dashboard_url ); ?>" placeholder="https://dashboard.chatbotistic.com">
+							<input type="url" id="cbc-dashboard-url" name="dashboard_url" class="regular-text" value="<?php echo esc_attr( $dashboard_url ); ?>" placeholder="https://chatbot.wpistic.cloud">
 							<p class="description"><?php esc_html_e( 'Link shown to members pointing to the standalone Chatbotistic dashboard app.', 'chatbotistic-connector' ); ?></p>
 						</td>
 					</tr>

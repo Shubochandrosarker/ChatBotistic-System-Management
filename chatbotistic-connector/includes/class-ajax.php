@@ -636,7 +636,7 @@ class Ajax {
 		}
 
 		$dashboard_url = isset( $_POST['dashboard_url'] ) ? esc_url_raw( wp_unslash( $_POST['dashboard_url'] ) ) : '';
-		$update['dashboard_url'] = '' !== $dashboard_url ? $dashboard_url : 'https://dashboard.chatbotistic.com';
+		$update['dashboard_url'] = '' !== $dashboard_url ? $dashboard_url : 'https://chatbot.wpistic.cloud';
 
 		$limits = array();
 		$raw    = isset( $_POST['plan_limits'] ) && is_array( $_POST['plan_limits'] ) ? wp_unslash( $_POST['plan_limits'] ) : array();
