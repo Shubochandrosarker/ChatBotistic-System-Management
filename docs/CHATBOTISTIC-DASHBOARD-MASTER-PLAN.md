@@ -260,3 +260,143 @@ Today the widget/lead engine is resold from Tochat.be (services.tochat.be) on a 
 ---
 
 *Sources: full audit of the three repositories in this workspace, including `chatbotistic-connector/includes/class-api.php` (Tochat API surface), `WPistic-WhatsApp-CRM/docs/saas-membership-bridge.md` (entitlement design), `supabase/migrations/009_org_tenancy.sql` (tenancy pattern), and the business-context notes (`Tools Details Draft.txt`, `Website links details.txt`).*
+
+---
+
+## Part 4 — Live Audit Update (2026-07-11)
+
+Follow-up pass, six days after Part 1–3 above, requested by the product
+owner: a bug + design audit of the now-renamed `ChatBotistic-App` repo (the
+`chatbotistic-dashboard` fork this plan called for), plus concrete
+integration steps now that real Tochat.be / Chatbotistic credentials and
+domains are in hand. Full detail lives in two new docs in `ChatBotistic-App`:
+`docs/dashboard-bug-audit-2026-07-11.md` and
+`docs/design-responsive-audit-2026-07-11.md`. Summary:
+
+### 4.1 What's confirmed fixed since Part 1
+
+- **The plaintext-password bug is fixed.** `chatbotistic-widget` now encrypts
+  `cbw_tochat_password` with the same `openssl_encrypt`/`AUTH_KEY` scheme as
+  the connector, and transparently migrates any legacy plaintext value on
+  next read (`class-api.php:20-37,46,62-72`). It only survives in an
+  archived `V1/` snapshot inside both plugin repos — recommend deleting or
+  clearly labeling those `V1/` trees so nobody rebuilds a distribution ZIP
+  from the stale copy.
+- **Connector drift is resolved.** `chatbotistic-connector`,
+  `chatbotistic-profile`, and `chatbotistic-widget` are now byte-identical
+  between `ChatBotistic-System-Management` and `chatbotistic-saas-connector`
+  (both at v3.2.2) — the "pick a canonical repo" action item from Part 1.3
+  is done; `chatbotistic-saas-connector` is correctly operating as the
+  dist-only mirror.
+- **The "docs page" the product owner flagged is almost certainly the
+  Next.js dashboard's `/docs`, not the WordPress theme's `page-docs.php`.**
+  The theme page is fully populated (14 articles, working scrollspy, no
+  broken includes) and already documents the white-label CNAME flow (see
+  4.3). Its header comment notes it's *hand-synced* with the dashboard's
+  `/docs` — a staleness risk worth a follow-up pass once the dashboard docs
+  are finalized, but not itself broken.
+
+### 4.2 What's confirmed broken (see the two new audit docs for full detail)
+
+- **Dark-mode "not working"** — real root cause found: `ThemeProvider`
+  initializes state to `"light"` before reading `localStorage`, so a stored
+  Dark preference visibly flashes back to light for 400–750ms on every page
+  load. Small, contained fix in `theme-provider.tsx`.
+- **Multi-user org bugs** — automations, WhatsApp config, tags, and
+  templates are still filtered by `user_id` in several places instead of
+  `org_id`, so any teammate other than the one who ran initial setup sees
+  "not connected" screens and 404s on their own automations. This is
+  probably the biggest contributor to "the dashboard is not working" if
+  more than one person has logged into the account — see bug-audit doc
+  items 1–3 and 6.
+- **Base UI accessibility warning** on every marketing page
+  (`nativeButton` vs. `<Link>` composition) — also the source of the visible
+  red error badge in the dev overlay.
+- **Rebrand to "Chatbotistic" hasn't started** on the dashboard's public
+  surface — nav, title, hero, docs, footer all still say "WPistic WhatsApp
+  CRM." Scope as its own task.
+
+### 4.3 Tochat.be integration — working steps with your actual credentials
+
+You provided a Chatbotistic API key, your white-label API base
+(`https://app.chatbotistic.com/api/`), your target dashboard domain
+(`https://chatbot.wpistic.cloud`), and your marketing domain
+(`https://www.chatbotistic.com`). Mapping those onto what already exists:
+
+1. **The lead-sync integration is already wired to your exact domain.**
+   `src/lib/chatbotistic/client.ts` in `ChatBotistic-App` defaults its base
+   URL to `https://app.chatbotistic.com` — matching your white-label API
+   domain exactly — and reads the key from `CHATBOTISTIC_API_KEY`. **Action:**
+   set `CHATBOTISTIC_API_KEY` in your hosting platform's environment-variable
+   UI (Vercel / Hostinger hPanel — wherever `chatbotistic-dashboard` deploys),
+   never in a committed file or `.env` checked into git. **Do not paste the
+   key into any repo, doc, or chat log that gets persisted** — treat the one
+   you shared as needing rotation once you've moved it into a secrets store,
+   since it's now been transmitted through this session.
+2. **This only covers leads.** The full Tochat.be surface (widgets, agents,
+   FAQs, bookings, campaigns, audiences, banners, payment links —
+   Part 1.2's table) is a *separate* API at `services.tochat.be`, authenticated
+   by **JWT from a master email+password** (`POST /api/authentication_token`),
+   not the lead API key. `chatbotistic-connector/includes/class-api.php`
+   already implements this correctly in PHP (JWT cached ~50min, auto-retry
+   on 401, `userClient` tenant tagging) — it's the reference implementation
+   to port. **Action needed from you:** confirm the master
+   email+password Tochat.be account credentials (the same ones already
+   configured as `CBC_API_EMAIL`/`CBC_API_PASSWORD` in the WordPress
+   connector, or in its DB-stored, encrypted settings) so the equivalent
+   `TochatClient` can be built in TypeScript for the dashboard. Same rule:
+   these go into deployment secrets, never into the repo.
+3. **Port `TochatClient` to TypeScript** (`ChatBotistic-App/src/lib/tochat/client.ts`),
+   mirroring `class-api.php`'s auth caching and endpoint coverage, plus an
+   `org_id ↔ userClient` mapping table (`userClient` becomes
+   `org-{org_uuid}`, migrated from the WordPress-era `cbc-{wp_user_id}`
+   pattern via a lookup table — Part 2.1's tenancy design already covers
+   this).
+4. **Build Widget Studio + Leads UI on top of it** (Part 2.2.A/C) — this is
+   the first sellable slice per the Part 2.3 roadmap (P1, 4–6 weeks) and is
+   unblocked as soon as step 2's credentials are in hand.
+5. **WhatsApp campaigns** — `ChatBotistic-App` already has a full broadcast
+   engine (Meta Cloud API / Twilio / Jasmin SMS, template + free-text sends,
+   per-recipient tracking — confirmed working in the bug audit). The
+   integration work here is *not* building campaign sending from scratch;
+   it's (a) syncing Tochat `campaigns`/`many_contacts` as an additional
+   audience-import source into the existing broadcast flow, and (b) fixing
+   the multi-user bugs in 4.2 so a whole team can actually use it.
+
+### 4.4 White-label CNAME multi-tenant offer — what already exists
+
+The theme's `page-docs.php` "White-label Setup" article already documents a
+working 4-step CNAME flow, gated to the Agency plan: pick a subdomain → add
+a CNAME record pointing at `chatbot.wpistic.cloud` → enter the subdomain in
+Settings → SSL auto-issues within ~24h of DNS propagation. `page-agency-white-label.php`
+is marketing copy only (no pricing/DNS specifics) — the real mechanics live
+in the docs article. To ship this for real (Part 2.2.G):
+
+1. **Custom-domain resolution middleware** in `ChatBotistic-App`
+   (`src/proxy.ts`) — a lookup from incoming `Host` header → org, so
+   `client-brand.com` and `chatbot.wpistic.cloud` both resolve to the same
+   app with different branding/tenant context.
+2. **Automated SSL issuance** for tenant-added CNAMEs — if deploying via
+   Vercel, its Domains API handles this per-project automatically; if
+   self-hosting on Hostinger/VPS per `DEPLOY.md`, this needs Caddy or
+   certbot automation triggered when a tenant adds a domain in Settings.
+3. **Brand-envelope enforcement in the dashboard UI** — logo, colors, hidden
+   Chatbotistic branding are already modeled in the Bridge's brand-envelope
+   (Part 1.1, `memberistic-licenseistic-bridge`) but need to actually be
+   read and applied by the Next.js app's layout/theme, not just carried as
+   unused SSO claims.
+4. **Pricing** — keep this priced per Part 3.2 (Agency $199/mo includes
+   white-label; Agency Pro $499/mo adds full custom domain) rather than
+   underpricing the CNAME offer standalone; the "very affordable" instinct
+   is right for customer acquisition but the white-label margin is what
+   funds the SSL/domain-management engineering above.
+
+### 4.5 Suggested next session
+
+The two new audit docs plus this section are the "complete plan with
+working steps" requested. Recommended next actions, in order: (1) fix the
+theme-provider hydration bug and the `user_id`→`org_id` query bugs — both
+small, contained, high-impact; (2) get the `services.tochat.be` master
+credentials into deployment secrets and port `TochatClient`; (3) start the
+Widget Studio UI. Each is independently shippable and matches the P0/P1
+phases already scoped in Part 2.3.
