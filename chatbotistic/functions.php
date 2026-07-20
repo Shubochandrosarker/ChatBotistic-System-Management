@@ -23,6 +23,8 @@ require_once CB_DIR . '/inc/v4-landing-data.php';
 require_once CB_DIR . '/inc/seo.php';
 require_once CB_DIR . '/inc/sitemap.php';
 require_once CB_DIR . '/inc/llms.php';
+require_once CB_DIR . '/inc/agent-discovery.php';
+require_once CB_DIR . '/inc/markdown.php';
 require_once CB_DIR . '/inc/forms.php';
 require_once CB_DIR . '/inc/memberistic.php';
 require_once CB_DIR . '/inc/login-branding.php';

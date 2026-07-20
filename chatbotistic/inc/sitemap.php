@@ -41,6 +41,10 @@ function cb_register_endpoints() {
 	add_rewrite_rule( '^category-sitemap\.xml/?$',     'index.php?cb_feed=sitemap-categories',  'top' );
 	add_rewrite_rule( '^llms\.txt/?$',                 'index.php?cb_feed=llms',                'top' );
 	add_rewrite_rule( '^llms-full\.txt/?$',            'index.php?cb_feed=llms-full',           'top' );
+	// Agent discovery — rendered in inc/agent-discovery.php.
+	add_rewrite_rule( '^\.well-known/api-catalog/?$',  'index.php?cb_feed=api-catalog',         'top' );
+	add_rewrite_rule( '^openapi\.json/?$',             'index.php?cb_feed=openapi',             'top' );
+	add_rewrite_rule( '^auth\.md/?$',                  'index.php?cb_feed=auth-md',             'top' );
 }
 add_action( 'init', 'cb_register_endpoints' );
 
@@ -52,7 +56,7 @@ add_action( 'init', 'cb_register_endpoints' );
  * set and re-flush automatically when the stored version drifts.
  */
 function cb_maybe_flush_rewrites() {
-	$rules_version = '2'; // bump whenever cb_register_endpoints() changes.
+	$rules_version = '3'; // bump whenever cb_register_endpoints() changes.
 	if ( (string) get_option( 'cb_sitemap_rules_version' ) === $rules_version ) {
 		return;
 	}
@@ -289,6 +293,21 @@ function cb_render_feed() {
 		exit;
 	}
 
+	if ( 'api-catalog' === $feed ) {
+		cb_render_api_catalog();
+		exit;
+	}
+
+	if ( 'openapi' === $feed ) {
+		cb_render_openapi();
+		exit;
+	}
+
+	if ( 'auth-md' === $feed ) {
+		cb_render_auth_md();
+		exit;
+	}
+
 	header( 'Content-Type: application/xml; charset=UTF-8' );
 	header( 'X-Robots-Tag: noindex, follow', true );
 	echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -378,6 +397,29 @@ function cb_render_urlset( $entries ) {
 }
 
 /**
+ * Content Signals (contentsignals.org) policy line — declares whether
+ * crawlers may use this site's content for search indexing, answering a
+ * live query (ai-input), and training a model (ai-train). Search + live
+ * AI answers are consistent with the AI-bot allowlist below; training a
+ * third party's model is a separate consent this site doesn't give by
+ * default. Filterable so the site owner can change the policy in one place.
+ *
+ * @return string
+ */
+function cb_content_signal_value() {
+	$signals = (array) apply_filters( 'cb_content_signal', array(
+		'search'   => 'yes',
+		'ai-input' => 'yes',
+		'ai-train' => 'no',
+	) );
+	$pairs = array();
+	foreach ( $signals as $key => $value ) {
+		$pairs[] = sanitize_key( $key ) . '=' . sanitize_key( $value );
+	}
+	return implode( ', ', $pairs );
+}
+
+/**
  * Comprehensive robots.txt — tuned for search engines and AI answer engines.
  *
  * @param string $output Default robots.txt body.
@@ -398,6 +440,7 @@ function cb_robots_txt( $output, $public ) {
 
 	// Default policy for all crawlers.
 	$L[] = 'User-agent: *';
+	$L[] = 'Content-Signal: ' . cb_content_signal_value();
 	$L[] = 'Allow: /';
 	$L[] = 'Disallow: /wp-admin/';
 	$L[] = 'Allow: /wp-admin/admin-ajax.php';
@@ -437,6 +480,7 @@ function cb_robots_txt( $output, $public ) {
 	foreach ( $ai_bots as $bot ) {
 		$L[] = 'User-agent: ' . $bot;
 	}
+	$L[] = 'Content-Signal: ' . cb_content_signal_value();
 	$L[] = 'Allow: /';
 	$L[] = 'Disallow: /wp-admin/';
 	$L[] = 'Disallow: /account/';
