@@ -143,6 +143,11 @@ if ( ! is_page_template( 'page-account.php' ) && ! is_404() ) {
 			<div class="footer-col footer-op-brand">
 				<?php echo cb_logo( array( 'class' => 'cb-logo--footer' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside helper. ?>
 				<p><?php esc_html_e( 'A WordPress-first WhatsApp AI chatbot platform. Turn every website visit into a conversation, then into a lead.', 'chatbotistic' ); ?></p>
+				<address class="footer-legal-address">
+					<strong><?php esc_html_e( 'Chatbotistic is a product of WordPressistic LLC.', 'chatbotistic' ); ?></strong><br>
+					<?php esc_html_e( '1209 MOUNTAIN ROAD PL NE STE N, ALBUQUERQUE, NM 87110, USA', 'chatbotistic' ); ?><br>
+					<?php esc_html_e( 'Part of the WPISTIC Ecosystem.', 'chatbotistic' ); ?>
+				</address>
 			</div>
 
 			<?php

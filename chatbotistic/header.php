@@ -11,7 +11,7 @@ $cb_logged_in = is_user_logged_in();
 $cb_user      = $cb_logged_in ? wp_get_current_user() : null;
 $cb_account   = home_url( '/account/' );
 $cb_signup    = cb_free_checkout_url();
-$cb_signin    = home_url( '/login/' );
+$cb_signin    = cb_dashboard_url( '/login/' );
 $cb_member    = $cb_logged_in ? cb_membership() : array( 'active' => false, 'plan_name' => '' );
 
 /**

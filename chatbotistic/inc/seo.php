@@ -187,11 +187,22 @@ function cb_json_ld() {
 	}
 
 	$org = array(
-		'@type'  => 'Organization',
-		'@id'    => $site_url . '#organization',
-		'name'   => $name,
-		'url'    => $site_url,
-		'sameAs' => array_values( array_filter( (array) apply_filters( 'cb_social_profiles', array(
+		'@type'       => 'Organization',
+		'@id'         => $site_url . '#organization',
+		'name'        => 'WordPressistic LLC',
+		'legalName'   => 'WordPressistic LLC',
+		'url'         => 'https://www.wordpressistic.com/',
+		'brand'       => array( '@type' => 'Brand', 'name' => $name ),
+		'address'     => array(
+			'@type'           => 'PostalAddress',
+			'streetAddress'   => '1209 MOUNTAIN ROAD PL NE STE N',
+			'addressLocality' => 'ALBUQUERQUE',
+			'addressRegion'   => 'NM',
+			'postalCode'      => '87110',
+			'addressCountry'  => 'US',
+		),
+		'description' => 'WordPressistic LLC builds WordPress-first AI automation products, including Chatbotistic.',
+		'sameAs'      => array_values( array_filter( (array) apply_filters( 'cb_social_profiles', array(
 			'https://twitter.com/wordpressistic',
 			'https://www.linkedin.com/company/wordpressistic',
 		) ) ) ),
