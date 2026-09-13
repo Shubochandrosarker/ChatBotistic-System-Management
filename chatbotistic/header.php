@@ -67,6 +67,25 @@ $cb_products = array(
 			var meta = document.querySelector('meta[data-theme-color]');
 			if ( meta ) { meta.setAttribute('content', '#04060c'); }
 		}
+
+		// Keep the paired wordmark correct even when a host cache serves an
+		// older deferred interaction bundle. The observer also follows a later
+		// theme toggle without adding another render-blocking request.
+		var syncLogos = function() {
+			var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+			var logos  = document.querySelectorAll('[data-logo-on-light][data-logo-on-dark]');
+			for ( var i = 0; i < logos.length; i++ ) {
+				var next = logos[i].getAttribute( isDark ? 'data-logo-on-dark' : 'data-logo-on-light' );
+				if ( next && logos[i].getAttribute('src') !== next ) {
+					logos[i].setAttribute('src', next);
+				}
+			}
+		};
+		syncLogos();
+		if ( window.MutationObserver ) {
+			new MutationObserver( syncLogos ).observe( document.documentElement, { attributes: true, attributeFilter: ['data-theme'] } );
+		}
+		document.addEventListener( 'DOMContentLoaded', syncLogos );
 	} catch (e) {
 		document.documentElement.setAttribute('data-theme', 'light');
 	}
