@@ -92,6 +92,35 @@ $cb_products = array(
 })();
 </script>
 <?php wp_head(); ?>
+<style id="cb-critical-public-fixes">
+/* Keep public dropdowns readable while an edge cache retires an older
+   optimized stylesheet. This is intentionally scoped to light mode. */
+:root[data-theme="light"] .cb-site .cb-dropdown,
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown,
+:root[data-theme="light"] .cb-site .cb-mobile-nav,
+:root:not([data-theme="dark"]) .cb-site .cb-mobile-nav {
+	background: rgba(255, 255, 255, .98) !important;
+	color: #183027 !important;
+	border-color: rgba(18, 140, 126, .20) !important;
+}
+:root[data-theme="light"] .cb-site .cb-dropdown a,
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown a,
+:root[data-theme="light"] .cb-site .cb-mobile-nav a,
+:root:not([data-theme="dark"]) .cb-site .cb-mobile-nav a {
+	color: #36564d !important;
+}
+:root[data-theme="light"] .cb-site .cb-dropdown a:hover,
+:root[data-theme="light"] .cb-site .cb-dropdown a:focus-visible,
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown a:hover,
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown a:focus-visible,
+:root[data-theme="light"] .cb-site .cb-mobile-nav a:hover,
+:root[data-theme="light"] .cb-site .cb-mobile-nav a:focus-visible,
+:root:not([data-theme="dark"]) .cb-site .cb-mobile-nav a:hover,
+:root:not([data-theme="dark"]) .cb-site .cb-mobile-nav a:focus-visible {
+	background: #eaf8f0 !important;
+	color: #0d6f64 !important;
+}
+</style>
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
