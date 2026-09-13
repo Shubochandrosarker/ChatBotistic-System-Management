@@ -61,8 +61,10 @@ function cb_enqueue_assets() {
 	// Single interactions script. Defer so it never blocks render.
 	wp_enqueue_script( 'cb-theme', CB_URI . '/assets/js/theme.js', array(), cb_asset_ver( '/assets/js/theme.js' ), true );
 
-	// Casual source-protection deterrent — not loaded for editors/admins.
-	if ( apply_filters( 'cb_enable_no_inspect', true ) && ! current_user_can( 'edit_posts' ) ) {
+	// Do not ship a client-side “no inspect” deterrent by default. It cannot
+	// protect source code, but it does block useful browser controls and adds a
+	// request for every visitor. A site-specific filter can opt in if required.
+	if ( apply_filters( 'cb_enable_no_inspect', false ) && ! current_user_can( 'edit_posts' ) ) {
 		wp_enqueue_script( 'cb-no-inspect', CB_URI . '/assets/js/no-inspect.js', array(), cb_asset_ver( '/assets/js/no-inspect.js' ), true );
 	}
 

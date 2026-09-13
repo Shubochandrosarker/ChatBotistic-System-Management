@@ -570,3 +570,254 @@ img, svg, video { max-width: 100%; }
 		animation: none !important;
 	}
 }
+
+/* =========================================================================
+   10. Light-theme contrast and performance pass
+   -------------------------------------------------------------------------
+   Several legacy V4 components keep their own dark tokens. The public site
+   is light-first, so reset those component-local values here rather than
+   relying on the page-level variables alone. This keeps icons, labels,
+   dropdowns and CTA copy readable on every public template.
+   ========================================================================= */
+:root[data-theme="light"] .cb-site,
+:root:not([data-theme="dark"]) .cb-site {
+	color-scheme: light;
+	--surface-header: rgba(247, 251, 249, .92);
+	--surface-dropdown: rgba(255, 255, 255, .98);
+}
+
+/* Header menus: white surface, ink text, mint hover state. The old
+   --surface-dropdown token intentionally used a dark navy value and made
+   light-mode submenu text appear almost invisible. */
+:root[data-theme="light"] .cb-site .cb-dropdown,
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown,
+:root[data-theme="light"] .cb-site .cb-mobile-nav,
+:root:not([data-theme="dark"]) .cb-site .cb-mobile-nav {
+	background: rgba(255, 255, 255, .98);
+	color: #183027;
+	border-color: rgba(18, 140, 126, .20);
+	box-shadow: 0 18px 42px -24px rgba(18, 140, 126, .55), 0 1px 0 rgba(255, 255, 255, .92);
+	-webkit-backdrop-filter: blur(16px);
+	backdrop-filter: blur(16px);
+}
+
+:root[data-theme="light"] .cb-site .cb-dropdown a,
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown a,
+:root[data-theme="light"] .cb-site .cb-mobile-nav a,
+:root:not([data-theme="dark"]) .cb-site .cb-mobile-nav a {
+	color: #36564d;
+}
+
+:root[data-theme="light"] .cb-site .cb-dropdown a:hover,
+:root[data-theme="light"] .cb-site .cb-dropdown a:focus-visible,
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown a:hover,
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown a:focus-visible,
+:root[data-theme="light"] .cb-site .cb-mobile-nav a:hover,
+:root[data-theme="light"] .cb-site .cb-mobile-nav a:focus-visible,
+:root:not([data-theme="dark"]) .cb-site .cb-mobile-nav a:hover,
+:root:not([data-theme="dark"]) .cb-site .cb-mobile-nav a:focus-visible {
+	color: #0d6f64;
+	background: #eaf8f0;
+}
+
+:root[data-theme="light"] .cb-site .cb-dropdown__head strong,
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown__head strong {
+	color: #183027;
+}
+
+:root[data-theme="light"] .cb-site .cb-dropdown__head .cb-dropdown__label,
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown__head .cb-dropdown__label {
+	color: #0d6f64;
+}
+
+:root[data-theme="light"] .cb-site .cb-dropdown__head > div[style],
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown__head > div[style] {
+	color: #0d6f64 !important;
+}
+
+:root[data-theme="light"] .cb-site .cb-dropdown__sep,
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown__sep {
+	background: rgba(24, 48, 39, .12);
+}
+
+:root[data-theme="light"] .cb-site .cb-dropdown__ico,
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown__ico {
+	background: rgba(37, 211, 102, .11);
+	border-color: rgba(18, 140, 126, .22);
+	color: #0d6f64;
+}
+
+:root[data-theme="light"] .cb-site .cb-dropdown__ico svg,
+:root:not([data-theme="dark"]) .cb-site .cb-dropdown__ico svg,
+:root[data-theme="light"] .cb-site .cb-caret,
+:root:not([data-theme="dark"]) .cb-site .cb-caret {
+	color: #0d6f64;
+}
+
+/* Public feature icons and numbered steps. Keep the green treatment bright
+   enough for SVG strokes while preserving the glossy card language. */
+:root[data-theme="light"] .cb-site .cb-feature__ico,
+:root:not([data-theme="dark"]) .cb-site .cb-feature__ico,
+:root[data-theme="light"] .cb-site .cb-step__num,
+:root:not([data-theme="dark"]) .cb-site .cb-step__num {
+	background: linear-gradient(135deg, #eaf8f0, #d9f3e5);
+	border-color: rgba(18, 140, 126, .22);
+	color: #0d6f64;
+}
+
+:root[data-theme="light"] .cb-site .cb-feature__ico svg,
+:root:not([data-theme="dark"]) .cb-site .cb-feature__ico svg,
+:root[data-theme="light"] .cb-site .cb-step__num svg,
+:root:not([data-theme="dark"]) .cb-site .cb-step__num svg {
+	color: #0d6f64;
+	stroke: currentColor;
+}
+
+:root[data-theme="light"] .cb-site .cb-step__num::after,
+:root:not([data-theme="dark"]) .cb-site .cb-step__num::after {
+	background: conic-gradient(from 0deg, #128c7e, #25d366, #75d6af, #128c7e);
+	opacity: .22;
+}
+
+:root[data-theme="light"] .cb-site .use-emoji,
+:root:not([data-theme="dark"]) .cb-site .use-emoji {
+	background: rgba(37, 211, 102, .11);
+	border-color: rgba(18, 140, 126, .20);
+	color: #0d6f64;
+}
+
+/* “How it works” pipeline. The icon tile previously stayed navy in light
+   mode, which made the Lucide strokes look missing in the screenshot. */
+:root[data-theme="light"] .cb-site .op-stepcard,
+:root:not([data-theme="dark"]) .cb-site .op-stepcard {
+	background: linear-gradient(180deg, rgba(255, 255, 255, .92), rgba(238, 248, 243, .78));
+	border-color: rgba(24, 48, 39, .13);
+	color: #183027;
+	box-shadow: 0 14px 30px -28px rgba(18, 140, 126, .72), inset 0 1px 0 rgba(255, 255, 255, .94);
+}
+
+:root[data-theme="light"] .cb-site .op-stepcard .op-node,
+:root:not([data-theme="dark"]) .cb-site .op-stepcard .op-node {
+	background: linear-gradient(135deg, #eaf8f0, #d9f3e5);
+	border-color: rgba(18, 140, 126, .24);
+	color: #0d6f64;
+	box-shadow: 0 8px 18px -14px rgba(18, 140, 126, .75);
+}
+
+:root[data-theme="light"] .cb-site .op-stepcard .op-node svg,
+:root:not([data-theme="dark"]) .cb-site .op-stepcard .op-node svg {
+	color: #0d6f64;
+	stroke: currentColor;
+}
+
+:root[data-theme="light"] .cb-site .op-stepcard .op-step-ix,
+:root:not([data-theme="dark"]) .cb-site .op-stepcard .op-step-ix {
+	color: #547067;
+}
+
+:root[data-theme="light"] .cb-site .op-stepcard h3,
+:root:not([data-theme="dark"]) .cb-site .op-stepcard h3 {
+	color: #183027;
+}
+
+:root[data-theme="light"] .cb-site .op-stepcard p,
+:root:not([data-theme="dark"]) .cb-site .op-stepcard p {
+	color: #52665e;
+}
+
+:root[data-theme="light"] .cb-site .op-stepcard:not(:last-child)::after,
+:root:not([data-theme="dark"]) .cb-site .op-stepcard:not(:last-child)::after {
+	background: rgba(18, 140, 126, .24);
+}
+
+:root[data-theme="light"] .cb-site .op-stepcard.live,
+:root:not([data-theme="dark"]) .cb-site .op-stepcard.live {
+	background: linear-gradient(180deg, rgba(234, 248, 240, .98), rgba(255, 255, 255, .90));
+	border-color: rgba(18, 140, 126, .34);
+}
+
+:root[data-theme="light"] .cb-site .op-stepcard.live .op-node,
+:root:not([data-theme="dark"]) .cb-site .op-stepcard.live .op-node {
+	background: linear-gradient(135deg, #d9f3e5, #c6edda);
+	border-color: rgba(18, 140, 126, .34);
+	color: #0d6f64;
+}
+
+/* The operational footer CTA is a light card in public light mode. Reset its
+   private dark token set so plain headings and status copy remain readable. */
+:root[data-theme="light"] .cb-site .footer-cta,
+:root:not([data-theme="dark"]) .cb-site .footer-cta {
+	--bg-0: #f7fbf9;
+	--bg-1: #eef8f3;
+	--bg-2: #e2f2ea;
+	--text: #183027;
+	--text-soft: #52665e;
+	--text-dim: #6e8279;
+	--line: rgba(24, 48, 39, .12);
+	--line-soft: rgba(24, 48, 39, .08);
+	--line-strong: rgba(18, 140, 126, .20);
+	--tint-surface: 24, 48, 39;
+	--green: #128c7e;
+	--cyan: #25d366;
+	--signal-active: #25d366;
+	--signal-ok: #128c7e;
+	--infrastructure-line: var(--line);
+	--infrastructure-line-strong: var(--line-strong);
+	--steel-surface: #e2f2ea;
+	background: linear-gradient(135deg, #ffffff 0%, #eaf8f0 100%);
+	color: #183027;
+}
+
+:root[data-theme="light"] .cb-site .footer-cta h2,
+:root:not([data-theme="dark"]) .cb-site .footer-cta h2 {
+	color: #183027;
+}
+
+:root[data-theme="light"] .cb-site .footer-cta p,
+:root:not([data-theme="dark"]) .cb-site .footer-cta p,
+:root[data-theme="light"] .cb-site .footer-eco-badge,
+:root:not([data-theme="dark"]) .cb-site .footer-eco-badge {
+	color: #52665e;
+}
+
+/* Docs active states used a dark-mode-only lavender value. */
+:root[data-theme="light"] .cb-site .docs2-side a.is-active,
+:root:not([data-theme="dark"]) .cb-site .docs2-side a.is-active,
+:root[data-theme="light"] .cb-site .docs2-mobile-nav a.is-active,
+:root:not([data-theme="dark"]) .cb-site .docs2-mobile-nav a.is-active {
+	color: #0d6f64;
+	background: #eaf8f0;
+	border-color: rgba(18, 140, 126, .34);
+}
+
+:root[data-theme="light"] .cb-site .doc-callout,
+:root:not([data-theme="dark"]) .cb-site .doc-callout {
+	color: #36564d;
+	background: linear-gradient(135deg, rgba(37, 211, 102, .10), rgba(18, 140, 126, .05));
+	border-color: rgba(18, 140, 126, .22);
+}
+
+/* Keep the glossy treatment on desktop, but avoid expensive backdrop blur on
+   narrow devices where it costs more than it contributes. */
+@media (max-width: 720px) {
+	.cb-site .cb-header,
+	.cb-site .cb-dropdown,
+	.cb-site .cb-mobile-nav,
+	.cb-site .glass,
+	.cb-site .cb-glass,
+	.cb-site .cbk-top {
+		-webkit-backdrop-filter: none;
+		backdrop-filter: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cb-site *,
+	.cb-site *::before,
+	.cb-site *::after {
+		animation-duration: .01ms !important;
+		animation-iteration-count: 1 !important;
+		scroll-behavior: auto !important;
+		transition-duration: .01ms !important;
+	}
+}
