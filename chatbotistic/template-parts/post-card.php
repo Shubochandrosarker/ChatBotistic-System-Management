@@ -8,9 +8,9 @@
 defined( 'ABSPATH' ) || exit;
 ?>
 <article class="cb-post cb-reveal">
-	<a class="cb-post__thumb" href="<?php the_permalink(); ?>" aria-hidden="true" tabindex="-1">
+	<a class="cb-post__thumb" href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Read %s', 'chatbotistic' ), get_the_title() ) ); ?>">
 		<?php if ( has_post_thumbnail() ) : ?>
-			<?php the_post_thumbnail( 'medium_large', array( 'loading' => 'lazy', 'alt' => '' ) ); ?>
+			<?php the_post_thumbnail( 'medium_large', array( 'loading' => 'lazy', 'alt' => wp_strip_all_tags( get_the_title() ) ) ); ?>
 		<?php endif; ?>
 	</a>
 	<div class="cb-post__body">

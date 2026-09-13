@@ -59,11 +59,7 @@ function cb_login_message( $message ) {
 	ob_start();
 	?>
 	<div class="cb-login-brand">
-		<?php if ( has_custom_logo() ) : ?>
-			<?php echo wp_kses_post( preg_replace( '#</?a[^>]*>#i', '', get_custom_logo() ) ); ?>
-		<?php else : ?>
-			<img class="cb-login-brand__img" src="<?php echo esc_url( CB_URI . '/assets/images/chatbotistic-logo.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" width="242" height="60" />
-		<?php endif; ?>
+		<img class="cb-login-brand__img skip-lazy" src="<?php echo esc_url( CB_URI . '/assets/images/chatbotistic-logo-on-dark.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" width="480" height="94" loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1" />
 	</div>
 	<?php
 	return ob_get_clean();

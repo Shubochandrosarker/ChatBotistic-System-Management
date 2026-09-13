@@ -75,6 +75,31 @@ function cb_enqueue_assets() {
 add_action( 'wp_enqueue_scripts', 'cb_enqueue_assets' );
 
 /**
+ * Avoid shipping WordPress editor CSS on templates that do not render blocks.
+ *
+ * The public marketing pages are PHP templates, while blog posts and any
+ * editor-authored page may still contain Gutenberg blocks. Keep block styles
+ * for those views and remove the unused core bundles everywhere else.
+ */
+function cb_dequeue_unused_block_assets() {
+	if ( is_admin() ) {
+		return;
+	}
+
+	$cb_queried = get_queried_object();
+	$cb_has_blocks = $cb_queried instanceof WP_Post && has_blocks( $cb_queried->post_content );
+	if ( $cb_has_blocks ) {
+		return;
+	}
+
+	foreach ( array( 'wp-block-library', 'wp-block-library-theme', 'classic-theme-styles', 'global-styles', 'core-block-supports' ) as $cb_handle ) {
+		wp_dequeue_style( $cb_handle );
+		wp_deregister_style( $cb_handle );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'cb_dequeue_unused_block_assets', 100 );
+
+/**
  * Defer the theme script for a faster first paint.
  *
  * @param string $tag    Script tag.

@@ -268,10 +268,10 @@ function cb_dashboard_url( $path = '' ) {
 /**
  * Brand logo markup.
  *
- * Prefers a Customizer custom logo when one is set; otherwise falls back to
- * the bundled neon wordmark shipped with the theme. Returns a linked logo so
- * it can be dropped into the header, footer, and auth/checkout top bars with
- * consistent branding everywhere.
+ * Returns the paired product wordmark so the public shell can use the dark
+ * wordmark on light surfaces and the light wordmark on dark surfaces. The
+ * inline CSS variables keep the first paint correct even when LiteSpeed
+ * rewrites or combines the theme stylesheet.
  *
  * @param array $args {
  *     @type string $class Extra class on the <a> wrapper. Default ''.
@@ -283,19 +283,20 @@ function cb_logo( $args = array() ) {
 	$args  = wp_parse_args( $args, array( 'class' => '', 'link' => true ) );
 	$name  = get_bloginfo( 'name' );
 
-	if ( has_custom_logo() ) {
-		$inner = get_custom_logo();
-		// get_custom_logo() already returns a linked <img>; strip its anchor so
-		// we control the wrapper consistently.
-		$inner = preg_replace( '#</?a[^>]*>#i', '', $inner );
-	} else {
-		$src   = CB_URI . '/assets/images/chatbotistic-logo.png';
-		$inner = sprintf(
-			'<img src="%1$s" alt="%2$s" class="cb-logo__img" width="242" height="60" decoding="async" />',
-			esc_url( $src ),
-			esc_attr( $name )
-		);
-	}
+	// Use the product's own paired wordmarks rather than a site-wide custom
+	// logo. The dark wordmark belongs on light surfaces; the light wordmark
+	// belongs on dark surfaces. CSS handles the first paint and theme.js keeps
+	// the real image src aligned after a visitor toggles the theme.
+	$logo_on_light = CB_URI . '/assets/images/chatbotistic-logo-on-light.png';
+	$logo_on_dark  = CB_URI . '/assets/images/chatbotistic-logo-on-dark.png';
+	$logo_style    = '--cb-logo-on-light:url(' . esc_url( $logo_on_light ) . ');--cb-logo-on-dark:url(' . esc_url( $logo_on_dark ) . ');';
+	$inner         = sprintf(
+		'<img src="%1$s" data-logo-on-light="%1$s" data-logo-on-dark="%2$s" alt="%3$s" class="cb-logo__img skip-lazy" width="480" height="94" loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1" style="%4$s" />',
+		esc_url( $logo_on_light ),
+		esc_url( $logo_on_dark ),
+		esc_attr( $name ),
+		esc_attr( $logo_style )
+	);
 
 	$class = trim( 'cb-logo ' . $args['class'] );
 

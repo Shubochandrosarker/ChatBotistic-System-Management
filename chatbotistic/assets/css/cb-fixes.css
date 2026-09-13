@@ -21,10 +21,14 @@ img, svg, video { max-width: 100%; }
 .cb-logo__img {
 	display: block; height: 40px; width: auto;
 	max-width: 220px; object-fit: contain;
+	content: var(--cb-logo-on-light, none);
 }
+.cb-logo__img[data-logo-on-light] { content: var(--cb-logo-on-light); }
+:root[data-theme="dark"] .cb-logo__img[data-logo-on-dark] { content: var(--cb-logo-on-dark); }
 .cb-logo--footer .cb-logo__img { height: 44px; max-width: 240px; }
 .cb-logo--auth .cb-logo__img,
 .cbk-top .cb-logo__img { height: 36px; max-width: 200px; }
+.cb-logo__img[data-no-lazy], .cb-login-brand__img[data-no-lazy] { opacity: 1 !important; }
 /* the bundled wordmark already contains the icon + name, so hide the legacy
    inline mark/text fallbacks if they ever render alongside it. */
 .cb-logo .cb-logo__img ~ .cb-logo__mark,
@@ -306,7 +310,7 @@ img, svg, video { max-width: 100%; }
 .docs2-side::-webkit-scrollbar { width: 6px; }
 .docs2-side::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 3px; }
 .docs2-group { margin-bottom: 22px; }
-.docs2-group h5 { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin: 0 0 8px; font-weight: 500; }
+.docs2-group h2 { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin: 0 0 8px; font-weight: 500; }
 .docs2-side a { display: block; padding: 6px 10px; margin-left: -10px; border-radius: 8px; color: var(--text-soft); text-decoration: none; border-left: 2px solid transparent; font-size: 13.5px; }
 .docs2-side a:hover { background: var(--glass); color: var(--text); }
 .docs2-side a.is-active { background: rgba(79,139,255,0.12); color: #cfdcff; border-left-color: var(--blue); font-weight: 500; }
@@ -770,14 +774,44 @@ img, svg, video { max-width: 100%; }
 
 :root[data-theme="light"] .cb-site .footer-cta h2,
 :root:not([data-theme="dark"]) .cb-site .footer-cta h2 {
-	color: #183027;
+	color: #183027 !important;
 }
 
 :root[data-theme="light"] .cb-site .footer-cta p,
 :root:not([data-theme="dark"]) .cb-site .footer-cta p,
 :root[data-theme="light"] .cb-site .footer-eco-badge,
 :root:not([data-theme="dark"]) .cb-site .footer-eco-badge {
-	color: #52665e;
+	color: #36564d !important;
+}
+
+:root[data-theme="light"] .cb-site .footer-cta p,
+:root:not([data-theme="dark"]) .cb-site .footer-cta p,
+:root[data-theme="light"] .cb-site .footer-cta .footer-status,
+:root:not([data-theme="dark"]) .cb-site .footer-cta .footer-status,
+:root[data-theme="light"] .cb-site .footer-cta .footer-status .sd,
+:root:not([data-theme="dark"]) .cb-site .footer-cta .footer-status .sd {
+	color: #36564d !important;
+}
+
+:root[data-theme="light"] .cb-site .use-card b,
+:root:not([data-theme="dark"]) .cb-site .use-card b,
+:root[data-theme="light"] .cb-site .use-card span,
+:root:not([data-theme="dark"]) .cb-site .use-card span,
+:root[data-theme="light"] .cb-site .problem-card h3,
+:root:not([data-theme="dark"]) .cb-site .problem-card h3,
+:root[data-theme="light"] .cb-site .problem-card p,
+:root:not([data-theme="dark"]) .cb-site .problem-card p {
+	color: #183027 !important;
+}
+
+:root[data-theme="light"] .cb-site .problem-card p,
+:root:not([data-theme="dark"]) .cb-site .problem-card p {
+	color: #52665e !important;
+}
+
+:root[data-theme="light"] .cb-site .use-card span,
+:root:not([data-theme="dark"]) .cb-site .use-card span {
+	color: #52665e !important;
 }
 
 /* Docs active states used a dark-mode-only lavender value. */

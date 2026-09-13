@@ -105,7 +105,7 @@ $cb_faqs = array(
 			<aside class="docs2-side" aria-label="<?php esc_attr_e( 'Documentation sections', 'chatbotistic' ); ?>">
 				<?php foreach ( $cb_doc_groups as $cb_group ) : ?>
 					<div class="docs2-group">
-						<h5><?php echo esc_html( $cb_group['label'] ); ?></h5>
+						<h2><?php echo esc_html( $cb_group['label'] ); ?></h2>
 						<?php foreach ( $cb_group['items'] as $cb_id => $cb_title ) : ?>
 							<a href="#<?php echo esc_attr( $cb_id ); ?>"><?php echo esc_html( $cb_title ); ?></a>
 						<?php endforeach; ?>

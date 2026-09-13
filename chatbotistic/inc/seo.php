@@ -60,13 +60,7 @@ function cb_share_image() {
 			return $src[0];
 		}
 	}
-	if ( has_custom_logo() ) {
-		$src = wp_get_attachment_image_src( (int) get_theme_mod( 'custom_logo' ), 'full' );
-		if ( $src ) {
-			return $src[0];
-		}
-	}
-	return apply_filters( 'cb_default_share_image', '' );
+	return apply_filters( 'cb_default_share_image', CB_URI . '/assets/images/chatbotistic-og.png' );
 }
 
 /**
@@ -86,13 +80,7 @@ function cb_share_image_for( $post ) {
 			return $src[0];
 		}
 	}
-	if ( has_custom_logo() ) {
-		$src = wp_get_attachment_image_src( (int) get_theme_mod( 'custom_logo' ), 'full' );
-		if ( $src ) {
-			return $src[0];
-		}
-	}
-	return apply_filters( 'cb_default_share_image', '' );
+	return apply_filters( 'cb_default_share_image', CB_URI . '/assets/images/chatbotistic-og.png' );
 }
 
 /**
@@ -133,6 +121,8 @@ function cb_head_meta() {
 	printf( '<meta property="og:locale" content="%s">' . "\n", esc_attr( get_locale() ) );
 	if ( $image ) {
 		printf( '<meta property="og:image" content="%s">' . "\n", esc_url( $image ) );
+		printf( '<meta property="og:image:width" content="1200">' . "\n" );
+		printf( '<meta property="og:image:height" content="630">' . "\n" );
 	}
 
 	// Twitter.
@@ -180,11 +170,7 @@ function cb_json_ld() {
 
 	$site_url = home_url( '/' );
 	$name     = get_bloginfo( 'name' );
-	$logo     = '';
-	if ( has_custom_logo() ) {
-		$src  = wp_get_attachment_image_src( (int) get_theme_mod( 'custom_logo' ), 'full' );
-		$logo = $src ? $src[0] : '';
-	}
+	$logo     = CB_URI . '/assets/images/chatbotistic-logo-on-light.png';
 
 	$org = array(
 		'@type'       => 'Organization',

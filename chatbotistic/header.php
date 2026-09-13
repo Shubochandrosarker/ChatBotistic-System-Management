@@ -92,12 +92,12 @@ $cb_products = array(
 			<a class="cb-nav__link<?php echo cb_nav_active_attrs( 'page-pricing.php', 'pricing' ); ?>" href="<?php echo esc_url( home_url( '/pricing/' ) ); ?>"><?php esc_html_e( 'Pricing', 'chatbotistic' ); ?></a>
 			<a class="cb-nav__link<?php echo cb_nav_active_attrs( 'page-use-cases.php', 'use-cases' ); ?>" href="<?php echo esc_url( home_url( '/use-cases/' ) ); ?>"><?php esc_html_e( 'Use cases', 'chatbotistic' ); ?></a>
 
-			<div class="cb-has-menu" data-menu aria-expanded="false">
-				<button type="button" class="cb-nav__link" data-menu-trigger aria-haspopup="true">
+			<div class="cb-has-menu" data-menu data-open="false">
+				<button id="cb-products-trigger" type="button" class="cb-nav__link" data-menu-trigger aria-haspopup="menu" aria-expanded="false" aria-controls="cb-products-menu">
 					<?php esc_html_e( 'Products', 'chatbotistic' ); ?>
 					<svg class="cb-caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
 				</button>
-				<div class="cb-dropdown" role="menu">
+				<div id="cb-products-menu" class="cb-dropdown" role="menu" aria-labelledby="cb-products-trigger">
 					<?php foreach ( $cb_products as $cb_p ) : ?>
 						<a href="<?php echo esc_url( home_url( '/' . $cb_p[0] . '/' ) ); ?>" role="menuitem">
 							<span class="cb-dropdown__ico"><?php cb_icon( $cb_p[1], 16 ); ?></span>
@@ -108,6 +108,7 @@ $cb_products = array(
 			</div>
 
 			<a class="cb-nav__link<?php echo cb_nav_active_attrs( 'page-docs.php', 'docs' ); ?>" href="<?php echo esc_url( home_url( '/docs/' ) ); ?>"><?php esc_html_e( 'Docs', 'chatbotistic' ); ?></a>
+			<a class="cb-nav__link<?php echo ( is_home() || is_singular( 'post' ) || is_category() || is_tag() ) ? ' is-active" aria-current="page' : ''; ?>" href="<?php echo esc_url( home_url( '/blog/' ) ); ?>"><?php esc_html_e( 'Blog', 'chatbotistic' ); ?></a>
 		</nav>
 
 		<div class="cb-header__cta">
@@ -117,8 +118,8 @@ $cb_products = array(
 				<span class="cb-theme-toggle__ico cb-theme-toggle__ico--moon"><?php cb_icon( 'moon', 17 ); ?></span>
 			</button>
 
-			<div class="cb-account-menu" data-menu aria-expanded="false">
-				<button type="button" class="cb-icon-btn" data-menu-trigger aria-haspopup="true" aria-label="<?php esc_attr_e( 'Account', 'chatbotistic' ); ?>">
+			<div class="cb-account-menu" data-menu data-open="false">
+				<button id="cb-account-trigger" type="button" class="cb-icon-btn" data-menu-trigger aria-haspopup="menu" aria-expanded="false" aria-controls="cb-account-menu" aria-label="<?php esc_attr_e( 'Account', 'chatbotistic' ); ?>">
 					<?php if ( $cb_logged_in ) : ?>
 						<?php echo get_avatar( $cb_user->ID, 48 ); ?>
 					<?php else : ?>
@@ -126,7 +127,7 @@ $cb_products = array(
 					<?php endif; ?>
 					<?php if ( $cb_logged_in ) : ?><span class="cb-dot" aria-hidden="true"></span><?php endif; ?>
 				</button>
-				<div class="cb-dropdown" role="menu">
+				<div id="cb-account-menu" class="cb-dropdown" role="menu" aria-labelledby="cb-account-trigger">
 					<?php if ( $cb_logged_in ) : ?>
 						<div class="cb-dropdown__head">
 							<div class="cb-dropdown__label"><?php esc_html_e( 'Signed in', 'chatbotistic' ); ?></div>
@@ -159,7 +160,7 @@ $cb_products = array(
 				<?php echo $cb_logged_in ? esc_html__( 'Open Dashboard', 'chatbotistic' ) : esc_html__( 'Get Started', 'chatbotistic' ); ?>
 			</a>
 
-			<button type="button" class="cb-icon-btn cb-burger" data-burger aria-expanded="false" aria-label="<?php esc_attr_e( 'Menu', 'chatbotistic' ); ?>">
+			<button type="button" class="cb-icon-btn cb-burger" data-burger aria-expanded="false" aria-controls="cb-mobile-nav" aria-label="<?php esc_attr_e( 'Menu', 'chatbotistic' ); ?>">
 				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
 			</button>
 		</div>
@@ -172,7 +173,7 @@ $cb_products = array(
  * backdrop-filter establishes a containing block, which would otherwise trap
  * this position:fixed drawer inside the 72px bar and collapse it to nothing.
  */ ?>
-<nav class="cb-mobile-nav" data-mobile-nav aria-label="<?php esc_attr_e( 'Mobile', 'chatbotistic' ); ?>">
+<nav id="cb-mobile-nav" class="cb-mobile-nav" data-mobile-nav aria-label="<?php esc_attr_e( 'Mobile', 'chatbotistic' ); ?>">
 	<?php if ( $cb_logged_in ) : ?>
 		<div class="cb-mobile-nav__user">
 			<?php echo get_avatar( $cb_user->ID, 40 ); ?>
@@ -194,6 +195,7 @@ $cb_products = array(
 	<?php endforeach; ?>
 	<div class="cb-mobile-nav__group"><?php esc_html_e( 'More', 'chatbotistic' ); ?></div>
 	<a href="<?php echo esc_url( home_url( '/docs/' ) ); ?>"><?php esc_html_e( 'Docs', 'chatbotistic' ); ?></a>
+	<a href="<?php echo esc_url( home_url( '/blog/' ) ); ?>"><?php esc_html_e( 'Blog', 'chatbotistic' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/about/' ) ); ?>"><?php esc_html_e( 'About', 'chatbotistic' ); ?></a>
 	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact', 'chatbotistic' ); ?></a>
 	<div class="cb-mobile-nav__cta">

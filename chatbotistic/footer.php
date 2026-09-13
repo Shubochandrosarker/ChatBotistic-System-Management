@@ -21,6 +21,7 @@ $cb_product = array(
 	array( '/pricing/',                 __( 'Pricing', 'chatbotistic' ) ),
 );
 $cb_resources = array(
+	array( '/blog/',         __( 'Blog', 'chatbotistic' ) ),
 	array( '/docs/',         __( 'Documentation', 'chatbotistic' ) ),
 	array( '/tutorials/',    __( 'Tutorials', 'chatbotistic' ) ),
 	array( '/faqs/',         __( 'FAQs', 'chatbotistic' ) ),
@@ -160,7 +161,7 @@ if ( ! is_page_template( 'page-account.php' ) && ! is_404() ) {
 			foreach ( $cb_cols as $cb_heading => $cb_links ) :
 				?>
 				<div class="footer-col">
-					<h5><?php echo esc_html( $cb_heading ); ?></h5>
+					<h2 class="footer-col__heading"><?php echo esc_html( $cb_heading ); ?></h2>
 					<?php
 					foreach ( $cb_links as $cb_link ) :
 						$cb_external = 0 === strpos( $cb_link[0], 'http' );

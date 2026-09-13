@@ -48,6 +48,10 @@
 		function applyTheme(theme, persist) {
 			root.setAttribute('data-theme', theme);
 			if (btn) { btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false'); }
+			document.querySelectorAll('[data-logo-on-light][data-logo-on-dark]').forEach(function (logo) {
+				var src = theme === 'dark' ? logo.getAttribute('data-logo-on-dark') : logo.getAttribute('data-logo-on-light');
+				if (src && logo.getAttribute('src') !== src) { logo.setAttribute('src', src); }
+			});
 			var metaColor = document.querySelector('meta[data-theme-color]');
 			if (metaColor) { metaColor.setAttribute('content', theme === 'dark' ? '#04060c' : '#f8f9fd'); }
 			if (persist) {
@@ -203,22 +207,28 @@
 	/* ---- Header dropdowns (Products menu, account menu) ---- */
 	function dropdowns() {
 		var menus = document.querySelectorAll('[data-menu]');
+		function setOpen(menu, open) {
+			menu.setAttribute('data-open', open ? 'true' : 'false');
+			var trigger = menu.querySelector('[data-menu-trigger]');
+			if (trigger) { trigger.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+		}
 		menus.forEach(function (menu) {
 			var trigger = menu.querySelector('[data-menu-trigger]');
 			if (!trigger) { return; }
+			setOpen(menu, false);
 
 			trigger.addEventListener('click', function (e) {
 				e.preventDefault();
 				e.stopPropagation();
-				var open = menu.getAttribute('aria-expanded') === 'true';
+				var open = trigger.getAttribute('aria-expanded') === 'true';
 				closeAll();
-				menu.setAttribute('aria-expanded', open ? 'false' : 'true');
+				setOpen(menu, !open);
 			});
 		});
 
 		document.addEventListener('click', function (e) {
 			menus.forEach(function (menu) {
-				if (!menu.contains(e.target)) { menu.setAttribute('aria-expanded', 'false'); }
+				if (!menu.contains(e.target)) { setOpen(menu, false); }
 			});
 		});
 		document.addEventListener('keydown', function (e) {
@@ -226,7 +236,7 @@
 		});
 
 		function closeAll() {
-			menus.forEach(function (m) { m.setAttribute('aria-expanded', 'false'); });
+			menus.forEach(function (m) { setOpen(m, false); });
 		}
 	}
 
