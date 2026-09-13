@@ -34,7 +34,7 @@ release mirror is `Shubochandrosarker/chatbotistic-saas-connector`.
 │    stores its Tochat credentials AES-256-CBC encrypted at rest)            │
 └────────────────────────────────────────────────────────────────────────────┘
 
-┌───────────────── crm.chatbotistic.com (separate app) ───────────────────────┐
+┌───────────────── app.chatbotistic.com (separate app) ───────────────────────┐
 │  Next.js 16 + Supabase multi-tenant dashboard — widgets, landing pages,   │
 │  leads, campaigns, team inbox, white-label. Lives in                      │
 │  ChatBotistic-App (github.com/Shubochandrosarker/ChatBotistic-App),       │
@@ -47,8 +47,8 @@ release mirror is `Shubochandrosarker/chatbotistic-saas-connector`.
 | Domain | Role |
 |---|---|
 | `www.chatbotistic.com` | Marketing site / SaaS (WordPress + Memberistic + Licenseistic) |
-| `app.chatbotistic.com` | White-label API host (CNAME → services.tochat.be) — API + widget loader. Never serves the dashboard. |
-| `crm.chatbotistic.com` | The custom dashboard/CRM app (ChatBotistic-App repo) |
+| `app.chatbotistic.com` | Customer-facing dashboard and branded widget-loader façade. |
+| `services.tochat.be` | Provider backend API and public widget source. |
 
 ## What's in this repo
 
@@ -85,7 +85,7 @@ not vendored here — they are the user's existing plugins.
 5. **`dist/chatbotistic-connector.zip`** — Chatbotistic → Settings → enter
    your white-label account email + password, and (optionally) override
    the `dashboard_url` setting if you're self-hosting the dashboard app
-   somewhere other than `https://crm.chatbotistic.com`.
+   somewhere other than `https://app.chatbotistic.com`.
    Place `[chatbotistic_dashboard]` on a members-only page.
 6. **`dist/chatbotistic-widget.zip`** — give this to customers. They
    install on their own WordPress site, paste their license key from the
@@ -93,7 +93,7 @@ not vendored here — they are the user's existing plugins.
 
 ## What's new in V2
 
-- **Standalone dashboard app** (`dashboard.chatbotistic.com`) — see the
+- **Standalone dashboard app** (`app.chatbotistic.com`) — see the
   `chatbotistic-dashboard/` folder in `ChatBotistic-Complete-System-Management`.
   This repo's connector plugin now links members to it alongside its own
   in-page shortcode dashboard.
@@ -111,10 +111,9 @@ not vendored here — they are the user's existing plugins.
 
 ## What's new in this sync
 
-- **Domains repointed to the chatbotistic.com brand** (all plugins) —
-  the white-label API base is now `app.chatbotistic.com` (was
-  services.tochat.be) and the dashboard app's canonical home is
-  `crm.chatbotistic.com` (was chatbot.wpistic.cloud). The connector
+- **Domains repointed to the Chatbotistic brand** (all plugins) —
+  the white-label dashboard is `app.chatbotistic.com` and the provider API
+  remains `services.tochat.be`. The connector
   ships a one-time migration rewriting any stored `dashboard_url`
   still pointing at the retired wpistic.cloud deployment.
 - **Analytics strictly per-customer** (`chatbotistic-widget`) — the
@@ -127,10 +126,10 @@ not vendored here — they are the user's existing plugins.
   the auto-generated SSO secret was printed inline in the admin
   notice; it is now revealed only through a nonce-gated AJAX action.
 
-- **Dashboard app repointed to `chatbot.wpistic.cloud`** (`chatbotistic-profile`,
+- **Dashboard app repointed to `app.chatbotistic.com`** (`chatbotistic-profile`,
   `chatbotistic-widget`, `chatbotistic-connector`) — the real dashboard app
   is `ChatBotistic-App` (a Chatbotistic white-label of WPistic WhatsApp CRM),
-  deployed on Hostinger hPanel — not `dashboard.chatbotistic.com`. Every
+  deployed on Hostinger hPanel — not the retired CRM or wpistic.cloud aliases. Every
   hard-coded fallback default repointed.
 - **SSO login redirect fixed** (`chatbotistic-profile`) — `SSO_Bridge::filter_dashboard_url()`
   was appending `?token=` to the bare dashboard URL instead of routing to
@@ -140,15 +139,13 @@ not vendored here — they are the user's existing plugins.
   `{scheme}://{host}/api/sso/login`.
 - **Dead-domain fix (historical)** (`chatbotistic-connector`, `chatbotistic-widget`) —
   `CBC_APP_BASE` / `CBW_APP_BASE_URL` and every user-facing "manage widgets
-  in…" hint pointed at `app.chatbotistic.com`, a domain nothing else in the
-  stack uses. Corrected to `dashboard.chatbotistic.com` (matching the
-  dashboard app's own default and the theme's `cb_dashboard_url()`), and
-  the widget's brand URLs corrected to `www.chatbotistic.com`.
-- **Widget embed snippet fix** (`chatbotistic-connector`) — the "copy
-  snippet" AJAX handler was still emitting the old
-  `/build/bundle.js?key=` loader shape; corrected to the current
-  `/widget/{id}/load.js` shape the widget plugin and dashboard app's own
-  embed dialog actually use.
+  in…" hint now resolves to the canonical `app.chatbotistic.com` dashboard;
+  provider API traffic remains on `services.tochat.be`.
+- **Widget embed snippet fix** (`chatbotistic-connector`, widget plugin) —
+  all install surfaces now emit the branded
+  `/install-widget/bundle.js?key=` loader. The app proxies the public widget
+  script from `services.tochat.be` without moving authenticated API traffic
+  onto the dashboard origin.
 - **`cb_dashboard_url` filter restored** (`chatbotistic-connector`) — the
   member portal's "Open Full Dashboard" link had regressed to a plain,
   unfiltered URL, silently dropping SSO-token minting and white-label

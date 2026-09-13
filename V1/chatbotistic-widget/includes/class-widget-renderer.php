@@ -33,10 +33,9 @@ final class Widget_Renderer {
 		}
 
 		printf(
-			'<!-- Chatbotistic Widget v%1$s -->%2$s<script async src="%3$s/widget/%4$s/load.js"></script>%2$s',
+			'<!-- Chatbotistic Widget v%1$s -->%2$s<script defer src="https://app.chatbotistic.com/install-widget/bundle.js?key=%3$s"></script>%2$s',
 			esc_attr( CBW_VERSION ),
 			"\n",
-			esc_url( CBW_API_BASE ),
 			rawurlencode( $key )
 		);
 	}

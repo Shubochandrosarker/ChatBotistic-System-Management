@@ -56,7 +56,7 @@ Data API: `https://services.tochat.be` (API-Platform/Hydra). Auth: master email+
 | Targeting rules | `GET/POST/DELETE /api/v2/widget_rules[/{id}]` |
 | Payment links / transactions | `/api/v2/payment_links`, `/api/v2/transactions` |
 | Landing links | `GET /api/landing-links/{widgetId}` |
-| Embed | `https://services.tochat.be/widget/{key}/load.js` |
+| Embed | `https://app.chatbotistic.com/install-widget/bundle.js?key={key}` |
 
 License server: `https://chatbotistic.com/wp-json/licenseistic/v1` — `POST /activate`, `/heartbeat`, `/deactivate`; responses enriched by the Bridge with tier caps + white-label brand fields.
 
@@ -84,7 +84,7 @@ A standalone multi-tenant SaaS dashboard (Next.js 16 + Supabase, cloned from WPi
                │ HMAC SSO (existing pattern: src/lib/sso)
                ▼
 ┌────────────────────────────────────────────────────────────────┐
-│  dashboard.chatbotistic.com (NEW — Next.js 16 + Supabase)      │
+│  app.chatbotistic.com (Next.js 16 + Supabase)                   │
 │  Org tenancy (RLS, migration-009 pattern) · Roles enforced     │
 │                                                                │
 │  Widget Studio │ Bookings │ Leads/CRM │ Shared Inbox │ Ads     │
@@ -318,15 +318,14 @@ domains are in hand. Full detail lives in two new docs in `ChatBotistic-App`:
 
 ### 4.3 Tochat.be integration — working steps with your actual credentials
 
-You provided a Chatbotistic API key, your white-label API base
-(`https://app.chatbotistic.com/api/`), your target dashboard domain
-(`https://chatbot.wpistic.cloud`), and your marketing domain
+The current architecture uses the provider API at
+(`https://services.tochat.be`), the target dashboard domain
+(`https://app.chatbotistic.com`), and the Chatbotistic marketing domain
 (`https://www.chatbotistic.com`). Mapping those onto what already exists:
 
 1. **The lead-sync integration is already wired to your exact domain.**
-   `src/lib/chatbotistic/client.ts` in `ChatBotistic-App` defaults its base
-   URL to `https://app.chatbotistic.com` — matching your white-label API
-   domain exactly — and reads the key from `CHATBOTISTIC_API_KEY`. **Action:**
+   `src/lib/chatbotistic/client.ts` in `ChatBotistic-App` reads its base URL
+   and key from deployment configuration. **Action:**
    set `CHATBOTISTIC_API_KEY` in your hosting platform's environment-variable
    UI (Vercel / Hostinger hPanel — wherever `chatbotistic-dashboard` deploys),
    never in a committed file or `.env` checked into git. **Do not paste the
@@ -365,17 +364,17 @@ You provided a Chatbotistic API key, your white-label API base
 
 ### 4.4 White-label CNAME multi-tenant offer — what already exists
 
-The theme's `page-docs.php` "White-label Setup" article already documents a
-working 4-step CNAME flow, gated to the Agency plan: pick a subdomain → add
-a CNAME record pointing at `chatbot.wpistic.cloud` → enter the subdomain in
-Settings → SSL auto-issues within ~24h of DNS propagation. `page-agency-white-label.php`
-is marketing copy only (no pricing/DNS specifics) — the real mechanics live
-in the docs article. To ship this for real (Part 2.2.G):
+The dashboard and provider API are separate origins: `app.chatbotistic.com`
+serves the branded dashboard and install façade, while `services.tochat.be`
+remains the provider backend. The retired CRM and wpistic.cloud aliases must
+not be used in new CNAME instructions. Any future customer custom-domain
+feature needs explicit host routing, TLS, tenancy, and abuse controls before
+it is advertised as available. To ship this for real (Part 2.2.G):
 
 1. **Custom-domain resolution middleware** in `ChatBotistic-App`
    (`src/proxy.ts`) — a lookup from incoming `Host` header → org, so
-   `client-brand.com` and `chatbot.wpistic.cloud` both resolve to the same
-   app with different branding/tenant context.
+   `client-brand.com` resolves to the same app with different branding and
+   tenant context.
 2. **Automated SSL issuance** for tenant-added CNAMEs — if deploying via
    Vercel, its Domains API handles this per-project automatically; if
    self-hosting on Hostinger/VPS per `DEPLOY.md`, this needs Caddy or

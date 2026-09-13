@@ -33,6 +33,50 @@ img, svg, video { max-width: 100%; }
 	.cb-logo__img { height: 34px; max-width: 170px; }
 }
 
+/* Chatbotistic public-site alignment: match the app's light WhatsApp-green
+   visual language while keeping the existing PHP templates and responsive
+   layout intact. This final layer intentionally avoids multi-hue gradients. */
+:root[data-theme="light"], :root:not([data-theme="dark"]) {
+	--bg-0: #f7fbf9;
+	--bg-1: #eef8f3;
+	--bg-2: #e2f2ea;
+	--bg-3: #d4ecdf;
+	--line: rgba(24, 48, 39, .12);
+	--line-soft: rgba(24, 48, 39, .07);
+	--line-strong: rgba(24, 48, 39, .2);
+	--glass: rgba(24, 48, 39, .035);
+	--glass-2: rgba(24, 48, 39, .06);
+	--text: #183027;
+	--text-soft: #52665e;
+	--text-dim: #7d9289;
+	--blue: #128c7e;
+	--blue-bright: #0d6f64;
+	--violet: #25d366;
+	--cyan: #75d6af;
+	--green: #128c7e;
+	--grad-primary: linear-gradient(135deg, #128c7e 0%, #25d366 100%);
+	--grad-button: linear-gradient(135deg, #128c7e 0%, #25d366 100%);
+	--grad-success: linear-gradient(135deg, #128c7e 0%, #75d6af 100%);
+	--grad-text: linear-gradient(120deg, #183027 0%, #0d6f64 52%, #128c7e 100%);
+	--tint-surface: 24, 48, 39;
+	--surface-header: rgba(247, 251, 249, .84);
+}
+
+.site, .cb-site {
+	background:
+		radial-gradient(900px 520px at 88% -180px, rgba(37, 211, 102, .12), transparent 62%),
+		radial-gradient(800px 520px at -140px 220px, rgba(18, 140, 126, .09), transparent 62%),
+		linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 60%, var(--bg-0) 100%);
+}
+
+.cb-card, .cb-glass, .f-card, .price-card, .cbk-card, .cbk-summary {
+	box-shadow: 0 14px 34px -26px rgba(18, 140, 126, .42), inset 0 1px 0 rgba(255, 255, 255, .78);
+}
+.cb-eyebrow, .section-eyebrow { background: rgba(37, 211, 102, .1); border-color: rgba(18, 140, 126, .24); color: var(--blue-bright); }
+.cb-eyebrow::before, .section-eyebrow .dot { background: #25d366; box-shadow: 0 0 10px rgba(37, 211, 102, .55); }
+.cbk-summary { background: radial-gradient(420px 220px at 100% 0%, rgba(37, 211, 102, .14), transparent 62%), linear-gradient(180deg, rgba(255, 255, 255, .72), rgba(238, 248, 243, .72)); }
+.doc-callout { background: linear-gradient(135deg, rgba(37, 211, 102, .1), rgba(18, 140, 126, .05)); border-color: rgba(18, 140, 126, .22); }
+
 /* ---------- 3. Mobile drawer -------------------------------------------- */
 .cb-mobile-nav__user {
 	display: flex; align-items: center; gap: 12px;

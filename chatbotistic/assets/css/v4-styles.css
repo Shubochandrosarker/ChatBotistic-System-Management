@@ -16,10 +16,10 @@
   /* Light ground: a very light, slightly cool lavender-white — not pure
      white/grey. Elevated "glass" surfaces get a touch of --tint-surface
      ink instead of extra brightness (see --tint-surface below). */
-  --bg-0:#f8f9fd;
-  --bg-1:#eef1f9;
-  --bg-2:#e6eaf6;
-  --bg-3:#dde3f4;
+  --bg-0:#f7fbf9;
+  --bg-1:#eef8f3;
+  --bg-2:#e2f2ea;
+  --bg-3:#d4ecdf;
   /* Lines/glass are expressed as a themed "ink" tint so the same alpha
      values used for dark-mode "white on dark" automatically become
      "ink on light" — see rgba(var(--tint-surface), X) usage throughout. */
@@ -28,19 +28,19 @@
   --line-strong:rgba(15,23,42,0.20);
   --glass:rgba(15,23,42,0.035);
   --glass-2:rgba(15,23,42,0.06);
-  --text:#131a2c;
-  --text-soft:#4a5372;
-  --text-dim:#7b8399;
+  --text:#183027;
+  --text-soft:#52665e;
+  --text-dim:#7d9289;
   /* Brand accents — same hues as dark mode, lightness/saturation tuned
      so they clear ~3-4.5:1 contrast against the light ground (cyan,
      green, amber and pink needed the most correction; blue/violet only
      a light nudge). Dark mode keeps the original vivid values verbatim. */
-  --blue:#3169e0;
-  --blue-bright:#2455c7;
-  --violet:#7d4cf0;
-  --cyan:#0e93a8;
-  --green:#0f9d6e;
-  --pink:#d6428f;
+  --blue:#128c7e;
+  --blue-bright:#0d6f64;
+  --violet:#25d366;
+  --cyan:#75d6af;
+  --green:#128c7e;
+  --pink:#2f9e75;
   --amber:#b8720a;
   --danger:#d1385c;
   --radius-sm:10px;
@@ -49,10 +49,10 @@
   --radius-xl:28px;
   --shadow-soft:0 10px 40px -12px rgba(15,23,42,0.14);
   --shadow-glow:0 0 0 1px rgba(49,105,224,0.16), 0 20px 50px -22px rgba(49,105,224,0.22);
-  --grad-primary:linear-gradient(135deg,var(--blue) 0%,var(--violet) 60%,var(--cyan) 100%);
-  --grad-button:linear-gradient(135deg,#3f7dff 0%,#8452e8 100%);
-  --grad-success:linear-gradient(135deg,var(--green) 0%,var(--cyan) 100%);
-  --grad-text:linear-gradient(120deg,#182449 0%,#3454c9 48%,#6d3fe8 100%);
+  --grad-primary:linear-gradient(135deg,#128c7e 0%,#25d366 100%);
+  --grad-button:linear-gradient(135deg,#128c7e 0%,#25d366 100%);
+  --grad-success:linear-gradient(135deg,#128c7e 0%,#75d6af 100%);
+  --grad-text:linear-gradient(120deg,#183027 0%,#0d6f64 52%,#128c7e 100%);
   /* RGB triplet spliced into rgba(var(--tint-surface), X) — the same
      alpha values that read as "white glass on dark" in dark mode read
      as "ink wash on light" here, so every surface/hover tint adapts
@@ -60,7 +60,7 @@
   --tint-surface:15,23,42;
   /* Sticky translucent bars (header, checkout top bar, portal top bar)
      and solid-ish overlay panels (dropdowns, mobile nav, modals). */
-  --surface-header:rgba(248,249,253,0.78);
+  --surface-header:rgba(247,251,249,0.82);
   --surface-dropdown:rgba(var(--tint-surface),0.98);
   --font-display:'Sora','Space Grotesk',system-ui,sans-serif;
   --font-body:'Manrope',system-ui,sans-serif;
@@ -134,34 +134,34 @@
 }
 
 :root[data-theme="light"]{
-  --bg-0:#f8f9fd;
-  --bg-1:#eef1f9;
-  --bg-2:#e6eaf6;
-  --bg-3:#dde3f4;
+  --bg-0:#f7fbf9;
+  --bg-1:#eef8f3;
+  --bg-2:#e2f2ea;
+  --bg-3:#d4ecdf;
   --line:rgba(15,23,42,0.12);
   --line-soft:rgba(15,23,42,0.07);
   --line-strong:rgba(15,23,42,0.20);
   --glass:rgba(15,23,42,0.035);
   --glass-2:rgba(15,23,42,0.06);
-  --text:#131a2c;
-  --text-soft:#4a5372;
-  --text-dim:#7b8399;
-  --blue:#3169e0;
-  --blue-bright:#2455c7;
-  --violet:#7d4cf0;
-  --cyan:#0e93a8;
-  --green:#0f9d6e;
-  --pink:#d6428f;
+  --text:#183027;
+  --text-soft:#52665e;
+  --text-dim:#7d9289;
+  --blue:#128c7e;
+  --blue-bright:#0d6f64;
+  --violet:#25d366;
+  --cyan:#75d6af;
+  --green:#128c7e;
+  --pink:#2f9e75;
   --amber:#b8720a;
   --danger:#d1385c;
   --shadow-soft:0 10px 40px -12px rgba(15,23,42,0.14);
   --shadow-glow:0 0 0 1px rgba(49,105,224,0.16), 0 20px 50px -22px rgba(49,105,224,0.22);
-  --grad-primary:linear-gradient(135deg,var(--blue) 0%,var(--violet) 60%,var(--cyan) 100%);
-  --grad-button:linear-gradient(135deg,#3f7dff 0%,#8452e8 100%);
-  --grad-success:linear-gradient(135deg,var(--green) 0%,var(--cyan) 100%);
-  --grad-text:linear-gradient(120deg,#182449 0%,#3454c9 48%,#6d3fe8 100%);
+  --grad-primary:linear-gradient(135deg,#128c7e 0%,#25d366 100%);
+  --grad-button:linear-gradient(135deg,#128c7e 0%,#25d366 100%);
+  --grad-success:linear-gradient(135deg,#128c7e 0%,#75d6af 100%);
+  --grad-text:linear-gradient(120deg,#183027 0%,#0d6f64 52%,#128c7e 100%);
   --tint-surface:15,23,42;
-  --surface-header:rgba(248,249,253,0.78);
+  --surface-header:rgba(247,251,249,0.82);
   --surface-dropdown:rgba(var(--tint-surface),0.98);
 }
 

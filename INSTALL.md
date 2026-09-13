@@ -46,13 +46,15 @@ Customers install **only** `chatbotistic-widget/` (Plugin). They need:
    license is active. Optional per-page / per-URL overrides live on the
    same screen.
 
-The plugin then prints the loader
-(`https://services.tochat.be/widget/<key>/load.js`) on the public site.
+The plugin then prints the branded loader
+(`https://app.chatbotistic.com/install-widget/bundle.js?key=<key>`) on the
+public site. Chatbotistic proxies the public widget JavaScript to the
+provider backend; credentials never reach the browser.
 No theme edits, no code snippets required.
 
 ## Chatbotistic Dashboard (`ChatBotistic-App`, separate repo)
 
-The standalone dashboard app served at `chatbot.wpistic.cloud` lives in
+The standalone dashboard app served at `app.chatbotistic.com` lives in
 its own repo (github.com/Shubochandrosarker/ChatBotistic-App) and
 deploys to Hostinger hPanel — see that repo's `README.md` and
 `DEPLOY.md` for the full build/deploy process; it isn't part of this

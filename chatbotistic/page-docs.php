@@ -5,7 +5,7 @@
  * Single-page docs: sticky sidebar + scrollspy, every article in one
  * continuous scroll (see docsScrollspy() in assets/js/theme.js and the
  * .docs2-* rules in assets/css/cb-fixes.css). Content mirrors the real,
- * shipped product only — the in-app docs at chatbot.wpistic.cloud/docs
+ * shipped product only — the in-app docs at app.chatbotistic.com/docs
  * (chatbotistic-dashboard/src/app/docs/) are the source of truth for
  * every dashboard-side article here, kept in sync by hand since they're
  * two different codebases; the WordPress-plugin install steps are
@@ -67,7 +67,7 @@ $cb_doc_groups = array(
 	),
 );
 
-$cb_embed_snippet = '<script async src="https://services.tochat.be/widget/YOUR_WIDGET_ID/load.js"></script>';
+$cb_embed_snippet = '<script defer src="https://app.chatbotistic.com/install-widget/bundle.js?key=YOUR_WIDGET_ID"></script>';
 
 $cb_faqs = array(
 	array( __( 'Do I need a Meta Business account?', 'chatbotistic' ), __( 'Only if you want to send Campaigns from the dashboard. If you\'re fine replying manually, connect your personal WhatsApp number instead — no Meta account needed.', 'chatbotistic' ) ),
@@ -356,9 +356,9 @@ $cb_faqs = array(
 					<h3><?php esc_html_e( 'Setting up a custom domain', 'chatbotistic' ); ?></h3>
 					<ol>
 						<li><?php echo wp_kses( __( 'Pick a subdomain you control, e.g. <code>chat.yourbrand.com</code>.', 'chatbotistic' ), array( 'code' => array() ) ); ?></li>
-						<li><?php echo wp_kses( __( 'Add a CNAME record pointing it at <code>chatbot.wpistic.cloud</code>.', 'chatbotistic' ), array( 'code' => array() ) ); ?></li>
-						<li><?php esc_html_e( 'Enter that subdomain into the Custom Domain field and save.', 'chatbotistic' ); ?></li>
-						<li><?php esc_html_e( 'DNS propagation can take up to 24 hours; SSL is issued automatically once the domain resolves.', 'chatbotistic' ); ?></li>
+						<li><?php echo wp_kses( __( 'Keep the Chatbotistic dashboard at <code>app.chatbotistic.com</code>. The backend API remains on <code>services.tochat.be</code>.', 'chatbotistic' ), array( 'code' => array() ) ); ?></li>
+						<li><?php esc_html_e( 'Do not point the dashboard hostname at the backend API: that would bypass the branded dashboard and can cause a routing failure.', 'chatbotistic' ); ?></li>
+						<li><?php esc_html_e( 'If you need another customer-facing hostname later, provision it as a separate app route and verify TLS, host routing, and the white-label provider configuration first.', 'chatbotistic' ); ?></li>
 					</ol>
 					<div class="doc-callout">
 						<?php echo cb_get_icon( 'tag', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

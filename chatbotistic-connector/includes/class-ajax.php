@@ -915,8 +915,8 @@ class Ajax {
 	 */
 	private function embed_code( string $widget_id ): string {
 		return sprintf(
-			'<script async src="%s/widget/%s/load.js"></script>',
-			esc_url( CBC_API_BASE ),
+			'<script defer src="%s/install-widget/bundle.js?key=%s"></script>',
+			esc_url( CBC_APP_BASE ),
 			rawurlencode( $widget_id )
 		);
 	}
