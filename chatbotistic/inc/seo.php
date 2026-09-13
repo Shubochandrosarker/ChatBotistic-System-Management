@@ -102,6 +102,9 @@ function cb_head_meta() {
 	if ( $desc ) {
 		printf( '<meta name="description" content="%s">' . "\n", esc_attr( $desc ) );
 	}
+	if ( is_singular( 'post' ) ) {
+		printf( '<meta name="author" content="%s">' . "\n", esc_attr( get_the_author() ) );
+	}
 	printf( '<link rel="canonical" href="%s">' . "\n", esc_url( $url ) );
 
 	// AI-assistant discovery — llmstxt.org standard. Crawlers look for
@@ -232,17 +235,30 @@ function cb_json_ld() {
 
 	// Article schema on posts.
 	if ( is_singular( 'post' ) ) {
-		$post    = get_queried_object();
-		$graph[] = array(
+		$post          = get_queried_object();
+		$article       = array(
 			'@type'         => 'Article',
 			'@id'           => get_permalink() . '#article',
 			'headline'      => get_the_title(),
+			'description'   => cb_meta_description(),
+			'image'         => cb_share_image(),
+			'inLanguage'    => get_locale(),
 			'datePublished' => get_the_date( 'c' ),
 			'dateModified'  => get_the_modified_date( 'c' ),
-			'author'        => array( '@type' => 'Person', 'name' => get_the_author_meta( 'display_name', $post->post_author ) ),
+			'author'        => array(
+				'@type' => 'Person',
+				'name'  => get_the_author_meta( 'display_name', $post->post_author ),
+				'url'   => get_author_posts_url( $post->post_author ),
+			),
 			'publisher'     => array( '@id' => $site_url . '#organization' ),
 			'mainEntityOfPage' => get_permalink(),
 		);
+		$article['wordCount'] = str_word_count( wp_strip_all_tags( $post->post_content ) );
+		$sections = wp_get_post_categories( $post->ID, array( 'fields' => 'names' ) );
+		if ( $sections ) {
+			$article['articleSection'] = array_values( $sections );
+		}
+		$graph[] = $article;
 	}
 
 	// Breadcrumbs on inner pages.

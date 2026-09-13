@@ -28,6 +28,7 @@ $cb_resources = array(
 	array( '/support/',      __( 'Get Support', 'chatbotistic' ) ),
 	array( '/book-demo/',    __( 'Book a Demo', 'chatbotistic' ) ),
 	array( '/affiliate/',    __( 'Affiliate Program', 'chatbotistic' ) ),
+	array( '/sitemap/',      __( 'HTML Sitemap', 'chatbotistic' ) ),
 );
 $cb_company = array(
 	array( '/about/',                __( 'About', 'chatbotistic' ) ),

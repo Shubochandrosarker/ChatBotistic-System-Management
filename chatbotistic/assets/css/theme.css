@@ -444,6 +444,15 @@ p { margin: 0; }
 .cb-page-hero { padding: 76px 0 56px; text-align: center; border-bottom: 1px solid var(--cb-line); }
 .cb-page-hero .cb-h1 { max-width: 860px; margin: 16px auto 14px; }
 .cb-page-hero .cb-lead { max-width: 640px; margin: 0 auto; }
+.cb-kicker { display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px; border: 1px solid rgba(37,211,102,.28); border-radius: 999px; color: var(--cb-indigo-2); font-family: var(--cb-font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+.cb-kicker::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--cb-green); box-shadow: 0 0 0 4px rgba(37,211,102,.12); }
+.cb-sitemap-page .cb-grid { margin-top: 0; }
+.cb-sitemap-group { padding: 26px; }
+.cb-sitemap-group h2 { margin: 0; font-size: 22px; }
+.cb-sitemap-group ul { display: grid; gap: 9px; margin: 18px 0 0; padding: 0; list-style: none; }
+.cb-sitemap-group li { margin: 0; }
+.cb-sitemap-group a { display: block; padding: 10px 12px; border-radius: 10px; color: var(--cb-soft); text-decoration: none; transition: color .2s ease, background-color .2s ease, transform .2s ease; }
+.cb-sitemap-group a:hover, .cb-sitemap-group a:focus-visible { color: var(--cb-text); background: rgba(37,211,102,.09); transform: translateX(3px); }
 .cb-breadcrumb { display: flex; gap: 8px; justify-content: center; font-size: 13px; color: var(--cb-dim); margin-bottom: 4px; }
 .cb-breadcrumb a:hover { color: var(--cb-text); }
 

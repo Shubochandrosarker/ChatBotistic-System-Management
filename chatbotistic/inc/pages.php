@@ -59,6 +59,7 @@ function cb_page_map() {
 		'support'             => array( 'title' => 'Get Support', 'template' => 'page-support.php' ),
 		'account'             => array( 'title' => 'Account', 'template' => 'page-account.php' ),
 		'blog'                => array( 'title' => 'Blog', 'template' => '' ),
+		'sitemap'             => array( 'title' => 'HTML Sitemap', 'template' => 'page-html-sitemap.php' ),
 		'privacy-policy'      => array( 'title' => 'Privacy Policy', 'template' => 'page-legal.php' ),
 		'terms'               => array( 'title' => 'Terms of Service', 'template' => 'page-legal.php' ),
 		'refund-policy'       => array( 'title' => 'Refund Policy', 'template' => 'page-legal.php' ),
