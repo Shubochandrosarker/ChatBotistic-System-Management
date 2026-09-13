@@ -26,6 +26,7 @@ $cb_cases = function_exists( 'cb_v4_use_cases' ) ? cb_v4_use_cases() : array();
 
 	<section class="section">
 		<div class="container" style="display:flex;flex-direction:column;gap:18px;">
+			<h2 class="text-grad" style="margin:0 0 4px;"><?php esc_html_e( 'Use cases by industry', 'chatbotistic' ); ?></h2>
 			<?php
 			$cb_i = 0;
 			foreach ( $cb_cases as $cb_slug => $cb_c ) :

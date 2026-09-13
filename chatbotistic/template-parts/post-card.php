@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 	</a>
 	<div class="cb-post__body">
 		<div class="cb-post__meta"><?php echo esc_html( get_the_date() ); ?></div>
-		<h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+		<h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
 		<p class="cb-post__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 22 ) ); ?></p>
 		<a class="cb-btn cb-btn--link" href="<?php the_permalink(); ?>"><?php esc_html_e( 'Read more', 'chatbotistic' ); ?> &rarr;</a>
 	</div>
