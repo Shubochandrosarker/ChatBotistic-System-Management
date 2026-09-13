@@ -103,7 +103,9 @@ function cb_head_meta() {
 		printf( '<meta name="description" content="%s">' . "\n", esc_attr( $desc ) );
 	}
 	if ( is_singular( 'post' ) ) {
-		printf( '<meta name="author" content="%s">' . "\n", esc_attr( get_the_author() ) );
+		$author_name = get_the_author();
+		$author_name = $author_name ? $author_name : 'Shubo Chandra Sarker';
+		printf( '<meta name="author" content="%s">' . "\n", esc_attr( $author_name ) );
 	}
 	printf( '<link rel="canonical" href="%s">' . "\n", esc_url( $url ) );
 
@@ -236,6 +238,9 @@ function cb_json_ld() {
 	// Article schema on posts.
 	if ( is_singular( 'post' ) ) {
 		$post          = get_queried_object();
+		$author_name   = get_the_author_meta( 'display_name', $post->post_author );
+		$author_name   = $author_name ? $author_name : 'Shubo Chandra Sarker';
+		$author_url    = $post->post_author ? get_author_posts_url( $post->post_author ) : 'https://www.wordpressistic.com/';
 		$article       = array(
 			'@type'         => 'Article',
 			'@id'           => get_permalink() . '#article',
@@ -247,8 +252,8 @@ function cb_json_ld() {
 			'dateModified'  => get_the_modified_date( 'c' ),
 			'author'        => array(
 				'@type' => 'Person',
-				'name'  => get_the_author_meta( 'display_name', $post->post_author ),
-				'url'   => get_author_posts_url( $post->post_author ),
+				'name'  => $author_name,
+				'url'   => $author_url,
 			),
 			'publisher'     => array( '@id' => $site_url . '#organization' ),
 			'mainEntityOfPage' => get_permalink(),
