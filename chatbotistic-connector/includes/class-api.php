@@ -143,6 +143,10 @@ class API {
 		return self::request( '/api/v2/faq_grps', 'POST', $payload );
 	}
 
+	public static function faq_get( string $id ) {
+		return self::request( '/api/v2/faq_grps/' . rawurlencode( $id ), 'GET' );
+	}
+
 	public static function faq_update( string $id, array $payload ) {
 		return self::request( '/api/v2/faq_grps/' . rawurlencode( $id ), 'PUT', $payload );
 	}

@@ -1,6 +1,6 @@
 <?php
 /**
- * SSO hand-off to the standalone chatbot.wpistic.cloud app.
+ * SSO hand-off to the standalone app.chatbotistic.com dashboard.
  *
  * Mints a short-lived, HMAC-signed token asserting a logged-in member's
  * identity, live plan, and license status, and appends it to every
@@ -31,6 +31,7 @@ class SSO_Bridge {
 		add_filter( 'cb_dashboard_url', array( __CLASS__, 'filter_dashboard_url' ), 10, 2 );
 		add_action( 'admin_notices', array( __CLASS__, 'maybe_show_secret_notice' ) );
 		add_action( 'admin_post_cbp_dismiss_sso_notice', array( __CLASS__, 'handle_dismiss_notice' ) );
+		add_action( 'wp_ajax_cbp_reveal_sso_secret', array( __CLASS__, 'handle_reveal_secret' ) );
 	}
 
 	/**
@@ -248,6 +249,11 @@ class SSO_Bridge {
 	 * One-time admin notice surfacing the auto-generated secret so it can
 	 * be copied into the dashboard app's environment. Dismissible; never
 	 * shown once a wp-config constant is in place.
+	 *
+	 * The secret value itself is NEVER embedded in the page HTML (it
+	 * would leak via screen-shares, browser cache, HTML source, and
+	 * support tickets with a screenshot) — the notice renders a
+	 * nonce-gated "Reveal" button backed by handle_reveal_secret().
 	 */
 	public static function maybe_show_secret_notice(): void {
 		if ( ! current_user_can( 'manage_options' ) || self::secret_is_constant() ) {
@@ -257,21 +263,39 @@ class SSO_Bridge {
 			return;
 		}
 
-		$secret      = self::secret();
 		$dismiss_url = wp_nonce_url(
 			admin_url( 'admin-post.php?action=cbp_dismiss_sso_notice' ),
 			'cbp_dismiss_sso_notice'
+		);
+		$reveal_url = wp_nonce_url(
+			admin_url( 'admin-ajax.php?action=cbp_reveal_sso_secret' ),
+			'cbp_reveal_sso_secret'
 		);
 
 		echo '<div class="notice notice-info is-dismissible"><p><strong>' .
 			esc_html__( 'Chatbotistic — Dashboard SSO', 'chatbotistic-profile' ) .
 			'</strong> ' .
 			esc_html__( 'is active with an auto-generated secret. Set the identical value as SSO_SHARED_SECRET in the dashboard app\'s environment (and, optionally, define CB_SSO_SHARED_SECRET in this site\'s wp-config.php so it survives a database restore):', 'chatbotistic-profile' ) .
-			'</p><p><code style="user-select:all;padding:6px 10px;background:#f0f0f1;display:inline-block;">' .
-			esc_html( $secret ) .
-			'</code></p><p><a href="' . esc_url( $dismiss_url ) . '">' .
+			'</p><p><button type="button" class="button" id="cbp-reveal-sso-secret" data-url="' . esc_url( $reveal_url ) . '">' .
+			esc_html__( 'Reveal secret', 'chatbotistic-profile' ) .
+			'</button> <code id="cbp-sso-secret-value" style="user-select:all;padding:6px 10px;background:#f0f0f1;display:none;"></code></p>' .
+			'<p><a href="' . esc_url( $dismiss_url ) . '">' .
 			esc_html__( "I've copied it, dismiss this", 'chatbotistic-profile' ) .
 			'</a></p></div>';
+		echo '<script>document.addEventListener("click",function(e){var b=e.target&&e.target.closest?e.target.closest("#cbp-reveal-sso-secret"):null;if(!b)return;e.preventDefault();b.disabled=true;b.textContent="' . esc_js( __( 'Loading…', 'chatbotistic-profile' ) ) . '";fetch(b.dataset.url).then(function(r){return r.json()}).then(function(d){var c=document.getElementById("cbp-sso-secret-value");if(d&&d.secret){c.textContent=d.secret;c.style.display="inline-block";b.parentNode.removeChild(b);}else{b.textContent="' . esc_js( __( 'Failed — reload and retry', 'chatbotistic-profile' ) ) . '";b.disabled=false;}}).catch(function(){b.textContent="' . esc_js( __( 'Failed — reload and retry', 'chatbotistic-profile' ) ) . '";b.disabled=false;});});</script>';
+	}
+
+	/**
+	 * AJAX: reveal the auto-generated SSO secret to a site admin.
+	 * Nonce + manage_options gated; the value is only ever in the
+	 * AJAX response, never rendered into page HTML.
+	 */
+	public static function handle_reveal_secret(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => 'forbidden' ), 403 );
+		}
+		check_ajax_referer( 'cbp_reveal_sso_secret' );
+		wp_send_json_success( array( 'secret' => self::secret() ) );
 	}
 
 	public static function handle_dismiss_notice(): void {

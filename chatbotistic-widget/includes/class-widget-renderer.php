@@ -21,6 +21,9 @@ final class Widget_Renderer {
 
 		$key = Targeting::resolve_for_current_request();
 		if ( ! $key ) return;
+		// A configured key is not an authorization grant. Rendering is allowed
+		// only for a widget returned by the active license's own catalog.
+		if ( ! License::is_widget_allowed( $key ) ) return;
 
 		// Free tier hard cap: only one widget can ever render.
 		$caps = License::get_caps();

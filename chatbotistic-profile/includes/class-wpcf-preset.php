@@ -192,8 +192,8 @@ class WPCF_Preset {
 				. '— The ' . $brand . " team\n" . $site_url;
 		}
 
-		$dashboard_url = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url() : 'https://chatbot.wpistic.cloud';
-		$docs_url      = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url( 'docs' ) : 'https://chatbot.wpistic.cloud/docs';
+		$dashboard_url = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url() : 'https://app.chatbotistic.com';
+		$docs_url      = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url( 'docs' ) : 'https://app.chatbotistic.com/docs';
 
 		$body  = '<p style="margin:0 0 16px 0;">Hey {name},</p>';
 		$body .= '<p style="margin:0 0 16px 0;">' . sprintf(

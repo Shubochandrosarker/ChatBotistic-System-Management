@@ -174,8 +174,8 @@ class Emails_Automation {
 		$support_url   = home_url( '/support/' );
 		$plugin_url    = home_url( '/account/?view=install' );
 		$license_key   = (string) get_user_meta( $user_id, 'mlb_license_key', true );
-		$dashboard_url = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url() : 'https://chatbot.wpistic.cloud';
-		$docs_url      = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url( 'docs' ) : 'https://chatbot.wpistic.cloud/docs';
+		$dashboard_url = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url() : 'https://app.chatbotistic.com';
+		$docs_url      = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url( 'docs' ) : 'https://app.chatbotistic.com/docs';
 
 		$body  = '<p style="margin:0 0 16px 0;">' . sprintf( esc_html__( 'Hi %s, welcome aboard!', 'chatbotistic-profile' ), esc_html( $display ) ) . '</p>';
 		$body .= '<p style="margin:0 0 20px 0;">' . sprintf( esc_html__( '%s turns your WordPress site into a WhatsApp-powered lead machine — build AI chat widgets, route conversations to your WhatsApp agents, and capture every lead automatically, all without leaving WordPress.', 'chatbotistic-profile' ), esc_html( $brand ) ) . '</p>';
@@ -252,7 +252,7 @@ class Emails_Automation {
 		$member_name   = (string) ( $m['full_name'] ?? '' );
 		$member_name   = '' !== $member_name ? $member_name : __( 'there', 'chatbotistic-profile' );
 		$billing_url   = home_url( '/account/?view=billing' );
-		$dashboard_url = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url() : 'https://chatbot.wpistic.cloud';
+		$dashboard_url = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url() : 'https://app.chatbotistic.com';
 
 		$latest_payment = null;
 		$payments_repo  = '\WordPressistic\Memberistic\Database\Payments_Repository';
@@ -442,8 +442,8 @@ class Emails_Automation {
 
 		$brand         = self::brand_label();
 		$site          = home_url( '/' );
-		$dashboard_url = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url() : 'https://chatbot.wpistic.cloud';
-		$docs_url      = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url( 'docs' ) : 'https://chatbot.wpistic.cloud/docs';
+		$dashboard_url = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url() : 'https://app.chatbotistic.com';
+		$docs_url      = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url( 'docs' ) : 'https://app.chatbotistic.com/docs';
 
 		$submitted_line = '<p style="margin:0 0 4px 0;font-size:13px;color:#6b7280;">' . esc_html__( 'Submitted:', 'chatbotistic-profile' ) . ' {date} &middot; ' . esc_html__( 'Form:', 'chatbotistic-profile' ) . ' {form}</p>';
 		$message_block  = '<blockquote style="margin:12px 0 20px 0;padding:12px 16px;background:#f9fafb;border-left:3px solid ' . Email_Template::BRAND_GREEN . ';font-size:14px;color:#374151;">{message}</blockquote>';
@@ -558,8 +558,8 @@ class Emails_Automation {
 		if ( ! is_email( $email ) ) { return; }
 
 		$brand         = self::brand_label();
-		$docs_url      = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url( 'docs' ) : 'https://chatbot.wpistic.cloud/docs';
-		$dashboard_url = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url() : 'https://chatbot.wpistic.cloud';
+		$docs_url      = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url( 'docs' ) : 'https://app.chatbotistic.com/docs';
+		$dashboard_url = function_exists( 'cb_dashboard_url' ) ? cb_dashboard_url() : 'https://app.chatbotistic.com';
 
 		$body  = '<p style="margin:0 0 16px 0;">' . esc_html__( "Hi there,", 'chatbotistic-profile' ) . '</p>';
 		$body .= '<p style="margin:0 0 20px 0;">' . sprintf( esc_html__( "You're on the %s list. Here's what to expect:", 'chatbotistic-profile' ), esc_html( $brand ) ) . '</p>';

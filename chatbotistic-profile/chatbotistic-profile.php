@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       Chatbotistic Profile for Memberistic
  * Plugin URI:        https://chatbotistic.com
- * Description:       One-install configuration profile for chatbotistic.com — replaces Memberistic's default plans with the 5 Chatbotistic plans (Free Forever / Starter / Growth / Agency / Lifetime), creates branded member-facing pages, auto-approves memberships on payment, auto-activates free signups, hides waiver UI, overrides every transactional email with chatbotistic.com URLs, seeds the Memberistic → Licenseistic Bridge caps, and mints signed SSO tokens for the standalone chatbot.wpistic.cloud app.
- * Version:           1.3.4
+ * Description:       One-install configuration profile for chatbotistic.com — replaces Memberistic's default plans with the 5 Chatbotistic plans (Free Forever / Starter / Growth / Agency / Lifetime), creates branded member-facing pages, auto-approves memberships on payment, auto-activates free signups, hides waiver UI, overrides every transactional email with chatbotistic.com URLs, seeds the Memberistic → Licenseistic Bridge caps, and mints signed SSO tokens for the standalone app.chatbotistic.com dashboard.
+ * Version:           1.3.5
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            WordPressistic

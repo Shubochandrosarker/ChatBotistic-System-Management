@@ -84,7 +84,7 @@ class Plugin {
 		( new Emails_Automation() )->register();
 
 		// Mints the signed SSO token that hands a logged-in member off to
-		// chatbot.wpistic.cloud, carrying their live plan + license
+		// crm.chatbotistic.com, carrying their live plan + license
 		// status. Hooks into the theme's existing `cb_dashboard_url`
 		// filter, so every "Open Dashboard" link becomes SSO'd with no
 		// theme changes required.

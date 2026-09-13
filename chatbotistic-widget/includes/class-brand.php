@@ -69,7 +69,7 @@ final class Brand {
 
 	/**
 	 * For Lifetime tier with a custom-domain license — overrides the
-	 * Licenseistic validation host. Pro/Agency/Free hit chatbotistic.com.
+	 * Licenseistic validation host. Paid and free plans use the WPistic API.
 	 */
 	public static function license_base_url(): string {
 		if ( defined( 'CBW_BRAND_OVERRIDE_LICENSE_BASE' ) ) {
@@ -83,7 +83,7 @@ final class Brand {
 			}
 			return $custom . '/wp-json/licenseistic/v1';
 		}
-		return defined( 'CBW_LICENSE_BASE_URL' ) ? CBW_LICENSE_BASE_URL : 'https://chatbotistic.com/wp-json/licenseistic/v1';
+		return defined( 'CBW_LICENSE_BASE_URL' ) ? CBW_LICENSE_BASE_URL : 'https://api.wpistic.com/api/v1/licenses';
 	}
 
 	/**

@@ -85,8 +85,9 @@ class Store {
 
 	/**
 	 * URL of the standalone Chatbotistic dashboard app
-	 * (https://chatbot.wpistic.cloud), where members will eventually
-	 * manage widgets more richly than this in-WordPress connector does.
+	 * (https://app.chatbotistic.com), where members manage widgets,
+	 * agents and analytics more richly than this in-WordPress
+	 * connector does.
 	 *
 	 * Falls back to the shipped default until an admin overrides it via the
 	 * Settings screen.
@@ -94,7 +95,7 @@ class Store {
 	 * @return string
 	 */
 	public static function dashboard_url(): string {
-		return (string) self::setting( 'dashboard_url', 'https://chatbot.wpistic.cloud' );
+		return (string) self::setting( 'dashboard_url', 'https://app.chatbotistic.com' );
 	}
 
 	/**

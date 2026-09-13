@@ -4,11 +4,17 @@ namespace Chatbotistic_Widget;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Chatbotistic / Tochat backend API client.
+ * Chatbotistic white-label (tochat.be) API client.
  *
- * The Chatbotistic master account on services.tochat.be is what powers widget
- * analytics. The user signs in once with Chatbotistic credentials; the plugin
- * caches a JWT in a transient and reuses it for stats + referral queries.
+ * The site owner signs in once with their own Chatbotistic account
+ * (app.chatbotistic.com); the plugin caches a JWT in a transient and
+ * reuses it for stats + referral queries.
+ *
+ * SECURITY: every query MUST be scoped to a widget key the site is
+ * allowed to see — Analytics_Page::allowed_widget_keys() enforces this
+ * before any call. Never fetch stats for an arbitrary UUID with these
+ * credentials: on shared accounts that would leak other customers'
+ * data.
  */
 final class API {
 
@@ -147,6 +153,25 @@ final class API {
 	}
 
 	// ── Endpoints ─────────────────────────────────────────────────────────────
+
+	/**
+	 * List widgets from the connected customer's own Tochat account.
+	 *
+	 * The account JWT is the primary tenant boundary. This method deliberately
+	 * does not accept a userClient or arbitrary filter from the browser.
+	 */
+	public static function get_widgets() {
+		$data = self::get( '/api/v2/widgets?itemsPerPage=100' );
+		if ( is_wp_error( $data ) ) {
+			return $data;
+		}
+		foreach ( [ 'hydra:member', 'member', 'data', 'items' ] as $key ) {
+			if ( isset( $data[ $key ] ) && is_array( $data[ $key ] ) ) {
+				return $data[ $key ];
+			}
+		}
+		return array_values( array_filter( $data, 'is_array' ) );
+	}
 
 	public static function get_widget_stats( string $widget_id ) {
 		return self::get( '/api/v2/widget_stats/' . rawurlencode( $widget_id ) );

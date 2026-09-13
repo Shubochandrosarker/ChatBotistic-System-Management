@@ -226,7 +226,7 @@ final class License_Page {
 	/**
 	 * Manual "Refresh widgets" — pulls the current Chatbotistic-side widget
 	 * catalog without waiting for the next 12h heartbeat. Useful right
-	 * after a customer creates a new widget in chatbot.wpistic.cloud
+	 * after a customer creates a new widget in app.chatbotistic.com
 	 * and wants it to appear in their WP dropdown immediately.
 	 */
 	public static function handle_refresh_widgets(): void {
@@ -252,8 +252,8 @@ final class License_Page {
 	}
 
 	/**
-	 * Reachability test — sends a heartbeat to /licenseistic/v1/heartbeat
-	 * with the saved key (or a probe ping if no key). Reports whether the
+	 * Reachability test — validates the saved activation token against the
+	 * WPistic public Licenseistic SDK. Reports whether the
 	 * license server is reachable without changing any local state.
 	 */
 	public static function handle_test_connection(): void {

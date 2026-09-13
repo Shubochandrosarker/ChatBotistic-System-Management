@@ -3,7 +3,7 @@
  * Plugin Name:       Chatbotistic Connector
  * Plugin URI:        https://chatbotistic.com
  * Description:       Self-hosted dashboard for Chatbotistic users — provisions and manages WhatsApp widgets, agents, FAQs, leads and analytics through the Tochat.be API. Membership-gated via Memberistic. Users never leave your site.
- * Version: 3.2.2
+ * Version: 3.4.0
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            WordPressistic
@@ -16,14 +16,15 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'CBC_VERSION',  '3.2.2' );
+define( 'CBC_VERSION',  '3.4.0' );
 define( 'CBC_FILE',     __FILE__ );
 define( 'CBC_DIR',      plugin_dir_path( __FILE__ ) );
 define( 'CBC_URL',      plugin_dir_url( __FILE__ ) );
 define( 'CBC_BASENAME', plugin_basename( __FILE__ ) );
 
 /**
- * Tochat.be provider URL — where the actual API + widget script live.
+ * Chatbotistic white-label API URL (our white-label of tochat.be) —
+ * where the actual API + widget script live.
  *
  * Can be overridden per-deployment by defining CBC_API_BASE in wp-config.php
  * BEFORE this plugin loads (e.g. for a staging deployment pointed at a
@@ -34,15 +35,14 @@ if ( ! defined( 'CBC_API_BASE' ) ) {
 }
 
 /**
- * White-label customer-facing URL. This is what end-users see in their
- * dashboards, emails, and "manage widgets in chatbot.wpistic.cloud"
- * hints. Default is chatbot.wpistic.cloud (the real dashboard app's
- * domain — see chatbotistic-dashboard's own NEXT_PUBLIC_SITE_URL default
- * and the theme's cb_dashboard_url()); sub-brands and reseller
- * deployments override via wp-config.
+ * Customer-facing dashboard (CRM) URL. This is what end-users see in their
+ * dashboards, emails, and "manage widgets in app.chatbotistic.com"
+ * hints. Sub-brands and reseller deployments can override via wp-config.
+ * The provider API remains services.tochat.be and is never used as the
+ * customer-facing dashboard origin.
  */
 if ( ! defined( 'CBC_APP_BASE' ) ) {
-	define( 'CBC_APP_BASE', 'https://chatbot.wpistic.cloud' );
+	define( 'CBC_APP_BASE', 'https://app.chatbotistic.com' );
 }
 
 /**
@@ -82,6 +82,20 @@ add_action( 'plugins_loaded', function (): void {
 	// Keep the schema current (dbDelta is additive and safe).
 	if ( get_option( 'cbc_db_version' ) !== Chatbotistic\Connector\Activator::DB_VERSION ) {
 		Chatbotistic\Connector\Activator::install();
+	}
+
+	// One-time migration: repoint previously saved dashboard URLs to the
+	// canonical app origin. The old CRM hostname is a temporary migration
+	// alias and must not remain in customer-facing links.
+	if ( '1' !== get_option( 'cbc_dashboard_url_migrated_340', '' ) ) {
+		$settings = get_option( 'cbc_settings', array() );
+		if ( is_array( $settings ) && isset( $settings['dashboard_url'] )
+			&& ( false !== strpos( (string) $settings['dashboard_url'], 'chatbot.wpistic.cloud' )
+				|| false !== strpos( (string) $settings['dashboard_url'], 'crm.chatbotistic.com' ) ) ) {
+			$settings['dashboard_url'] = 'https://app.chatbotistic.com';
+			update_option( 'cbc_settings', $settings );
+		}
+		update_option( 'cbc_dashboard_url_migrated_340', '1' );
 	}
 
 	load_plugin_textdomain( 'chatbotistic-connector', false, dirname( CBC_BASENAME ) . '/languages' );

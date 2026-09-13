@@ -6,9 +6,9 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Licenseistic client.
  *
- * Talks to chatbotistic.com/wp-json/licenseistic/v1/* :
+ * Talks to the WPistic Licenseistic public plugin SDK:
  *   POST  /activate    — validates key, registers this domain, returns plan caps.
- *   POST  /heartbeat   — daily ping so the master can track active installs.
+ *   POST  /validate    — validates the installation activation token.
  *   POST  /deactivate  — releases this domain from the user's license.
  *
  * Expected JSON response shape (success):
@@ -34,6 +34,7 @@ final class License {
 	const OPT_INSTANCE = 'cbw_license_instance_id';
 	const OPT_GRACE    = 'cbw_license_grace_since';
 	const OPT_WIDGETS  = 'cbw_license_widget_list';
+	const OPT_ACTIVATION = 'cbw_license_activation_token';
 
 	/**
 	 * Grace window after the license server becomes unreachable. Premium
@@ -91,15 +92,18 @@ final class License {
 			return new \WP_Error( 'cbw_license_empty', __( 'Please enter your license key.', 'chatbotistic-widget' ) );
 		}
 
-		// Step 1: register this domain against the license.
-		$res = self::call_license_endpoint( 'activate', array_merge( [
-			'license_key' => $key,
-			'product'     => CBW_PRODUCT_SLUG,
-			'site_url'    => home_url(),
-			'domain'      => wp_parse_url( home_url(), PHP_URL_HOST ),
-			'instance_id' => self::instance_id(),
-			'site_title'  => get_bloginfo( 'name' ),
-		], self::diagnostics() ) );
+		// Register this installation against the WPistic license server.
+		$res = self::call_license_endpoint( 'activate', [
+			'key'             => $key,
+			'domain'          => (string) wp_parse_url( home_url(), PHP_URL_HOST ),
+			'installation_uuid' => self::instance_id(),
+			'site_url'        => home_url(),
+			'home_url'        => home_url(),
+			'environment'     => 'production',
+			'product_version' => CBW_VERSION,
+			'wp_version'      => get_bloginfo( 'version' ),
+			'php_version'     => PHP_VERSION,
+		] );
 
 		if ( is_wp_error( $res ) ) return $res;
 
@@ -107,27 +111,22 @@ final class License {
 			$msg = self::envelope_message( $res ) ?: __( 'License could not be activated.', 'chatbotistic-widget' );
 			return new \WP_Error( 'cbw_license_rejected', $msg );
 		}
+		$activation_token = sanitize_text_field( (string) ( $res['activation_token'] ?? '' ) );
+		if ( '' === $activation_token ) {
+			return new \WP_Error( 'cbw_activation_missing', __( 'The license server did not return an installation token.', 'chatbotistic-widget' ) );
+		}
 
 		update_option( self::OPT_KEY, $key );
-
-		// Step 2: pull plan caps. /activate only confirms the domain; the plan
-		// entitlements live behind /entitlements.
-		$flat = self::fetch_entitlements( $key );
-		if ( is_array( $flat ) ) {
-			update_option( self::OPT_STATUS,  sanitize_key( $flat['status'] ?: 'active' ) );
-			update_option( self::OPT_TIER,    sanitize_key( $flat['tier']   ?: 'free' ) );
-			update_option( self::OPT_PAYLOAD, self::clean_payload( $flat ) );
-		} else {
-			// Domain is registered but entitlements weren't reachable yet; treat
-			// as active and let the next heartbeat fill in the caps.
-			update_option( self::OPT_STATUS, 'active' );
-			update_option( self::OPT_TIER,   'free' );
-		}
+		update_option( self::OPT_ACTIVATION, $activation_token );
+		$flat = self::flatten_entitlements( $res );
+		update_option( self::OPT_STATUS, sanitize_key( $flat['status'] ?: 'active' ) );
+		update_option( self::OPT_TIER, sanitize_key( $flat['tier'] ?: 'free' ) );
+		update_option( self::OPT_PAYLOAD, self::clean_payload( $flat ) );
 
 		update_option( self::OPT_LASTSEEN, time() );
 		delete_option( self::OPT_GRACE );
 
-		// Step 3: auto-fetch this user's widgets so the admin UI can offer a
+		// Step 2: auto-fetch this user's widgets so the admin UI can offer a
 		// dropdown instead of a "paste widget key" field (docx Step 11
 		// "Better future method"). Best-effort: if the call fails the
 		// dropdown stays empty and the user can still paste a key.
@@ -140,13 +139,11 @@ final class License {
 		$key = self::get_key();
 		if ( '' === $key ) return true;
 
-		$res = self::call_license_endpoint( 'deactivate', [
-			'license_key' => $key,
-			'product'     => CBW_PRODUCT_SLUG,
-			'site_url'    => home_url(),
-			'domain'      => wp_parse_url( home_url(), PHP_URL_HOST ),
-			'instance_id' => self::instance_id(),
-		] );
+		$token = (string) get_option( self::OPT_ACTIVATION, '' );
+		$res = $token ? self::call_license_endpoint( 'deactivate', [
+			'activation_token' => $token,
+			'installation_uuid' => self::instance_id(),
+		] ) : true;
 
 		delete_option( self::OPT_KEY );
 		delete_option( self::OPT_STATUS );
@@ -154,6 +151,7 @@ final class License {
 		delete_option( self::OPT_PAYLOAD );
 		delete_option( self::OPT_LASTSEEN );
 		delete_option( self::OPT_WIDGETS );
+		delete_option( self::OPT_ACTIVATION );
 
 		return is_wp_error( $res ) ? $res : true;
 	}
@@ -162,13 +160,13 @@ final class License {
 	public static function deactivate_silently(): void {
 		$key = self::get_key();
 		if ( '' === $key ) return;
-		self::call_license_endpoint( 'deactivate', [
-			'license_key' => $key,
-			'product'     => CBW_PRODUCT_SLUG,
-			'site_url'    => home_url(),
-			'domain'      => wp_parse_url( home_url(), PHP_URL_HOST ),
-			'instance_id' => self::instance_id(),
-		], 5 );
+		$token = (string) get_option( self::OPT_ACTIVATION, '' );
+		if ( $token ) {
+			self::call_license_endpoint( 'deactivate', [
+				'activation_token' => $token,
+				'installation_uuid' => self::instance_id(),
+			], 5 );
+		}
 	}
 
 	/**
@@ -192,17 +190,7 @@ final class License {
 		$last = (int) get_option( self::OPT_LASTSEEN, 0 );
 		if ( $last && ( time() - $last ) < ( ( 12 * HOUR_IN_SECONDS ) - HOUR_IN_SECONDS ) ) return;
 
-		// Best-effort ping so the master records this install's last-seen. Its
-		// result doesn't drive local state — /entitlements is authoritative.
-		self::call_license_endpoint( 'heartbeat', array_merge( [
-			'license_key' => $key,
-			'product'     => CBW_PRODUCT_SLUG,
-			'site_url'    => home_url(),
-			'domain'      => wp_parse_url( home_url(), PHP_URL_HOST ),
-			'instance_id' => self::instance_id(),
-		], self::diagnostics() ) );
-
-		$ent = self::request_entitlements( $key );
+		$ent = self::request_validation();
 
 		// Case 1: transient failure — apply the grace window.
 		if ( is_wp_error( $ent ) ) {
@@ -272,40 +260,51 @@ final class License {
 		return is_array( $cached ) ? $cached : [];
 	}
 
+	public static function is_widget_allowed( string $widget_key ): bool {
+		if ( ! self::is_active() || '' === $widget_key ) {
+			return false;
+		}
+		foreach ( self::get_widget_list() as $row ) {
+			if ( is_array( $row ) && isset( $row['key'] ) && hash_equals( (string) $row['key'], $widget_key ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
-	 * Pull the user's widgets from /licenseistic/v1/widgets and cache them
-	 * for the dropdown. Best-effort -- on failure the cache is unchanged
-	 * (so a brief outage doesn't wipe a working dropdown).
+	 * Pull the user's widgets from their own Tochat account and cache them
+	 * for the dropdown. The account JWT is the data boundary; the license
+	 * entitlement then caps how many are usable in this plugin.
 	 *
 	 * @return array|\WP_Error On success the same array stored in OPT_WIDGETS.
 	 */
 	public static function refresh_widget_list() {
-		$key = self::get_key();
-		if ( '' === $key ) {
-			return new \WP_Error( 'cbw_no_license', __( 'No license key is set; cannot fetch widgets.', 'chatbotistic-widget' ) );
+		if ( ! self::is_active() ) {
+			return new \WP_Error( 'cbw_license_inactive', __( 'Activate a valid license before loading widgets.', 'chatbotistic-widget' ) );
 		}
 
-		$res = self::request_get( '/widgets', [
-			'license_key' => $key,
-			'site_url'    => home_url(),
-			'instance_id' => self::instance_id(),
-		] );
-
-		if ( is_wp_error( $res ) || ! self::envelope_ok( $res ) ) {
-			return is_wp_error( $res ) ? $res : new \WP_Error( 'cbw_widgets_failed', self::envelope_message( $res ) ?: __( 'Could not load widgets.', 'chatbotistic-widget' ) );
+		$list = API::get_widgets();
+		if ( is_wp_error( $list ) ) {
+			return $list;
 		}
 
-		$list = isset( $res['widgets'] ) && is_array( $res['widgets'] ) ? $res['widgets'] : [];
 		$clean = [];
 		foreach ( $list as $row ) {
 			if ( ! is_array( $row ) ) {
 				continue;
 			}
+			$key = sanitize_text_field( (string) ( $row['key'] ?? $row['uuid'] ?? $row['id'] ?? '' ) );
+			if ( '' === $key ) continue;
 			$clean[] = [
-				'id'   => isset( $row['id'] )   ? sanitize_text_field( (string) $row['id'] )   : '',
+				'id'   => sanitize_text_field( (string) ( $row['id'] ?? $key ) ),
 				'name' => isset( $row['name'] ) ? sanitize_text_field( (string) $row['name'] ) : '',
-				'key'  => isset( $row['key'] )  ? sanitize_text_field( (string) $row['key'] )  : '',
+				'key'  => $key,
 			];
+		}
+		$limit = (int) self::get_cap( 'max_widgets', 1 );
+		if ( -1 !== $limit ) {
+			$clean = array_slice( $clean, 0, max( 0, $limit ) );
 		}
 		update_option( self::OPT_WIDGETS, $clean );
 		return $clean;
@@ -343,66 +342,29 @@ final class License {
 		return $data;
 	}
 
-	/** GET request (for read endpoints like /entitlements). */
-	private static function request_get( string $path, array $query, int $timeout = 15 ) {
-		$url = add_query_arg( $query, rtrim( Brand::license_base_url(), '/' ) . $path );
-		$res = wp_remote_get( $url, [
-			'timeout'   => $timeout,
-			'sslverify' => true,
-			'headers'   => [
-				'Accept'       => 'application/json',
-				'X-CBW-Plugin' => CBW_VERSION,
-			],
+	private static function request_validation() {
+		$token = (string) get_option( self::OPT_ACTIVATION, '' );
+		if ( '' === $token ) {
+			return new \WP_Error( 'cbw_activation_missing', __( 'This site has no active license installation token.', 'chatbotistic-widget' ) );
+		}
+		return self::request( '/validate', [
+			'activation_token'  => $token,
+			'domain'            => (string) wp_parse_url( home_url(), PHP_URL_HOST ),
+			'environment'       => 'production',
+			'installation_uuid' => self::instance_id(),
+			'plugin_version'    => CBW_VERSION,
 		] );
-
-		if ( is_wp_error( $res ) ) {
-			return new \WP_Error( 'cbw_license_network', __( 'Could not reach the license server. Please try again.', 'chatbotistic-widget' ), $res->get_error_message() );
-		}
-
-		$code = (int) wp_remote_retrieve_response_code( $res );
-		$data = json_decode( wp_remote_retrieve_body( $res ), true );
-
-		if ( $code >= 500 ) {
-			return new \WP_Error( 'cbw_license_server', __( 'License server error. Please try again in a moment.', 'chatbotistic-widget' ) );
-		}
-		if ( ! is_array( $data ) ) {
-			return new \WP_Error( 'cbw_license_bad_response', __( 'Unexpected response from the license server.', 'chatbotistic-widget' ) );
-		}
-		return $data;
-	}
-
-	/** Raw /entitlements request (array envelope or WP_Error). */
-	private static function request_entitlements( string $key ) {
-		return self::request_get( '/entitlements', [
-			'license_key' => $key,
-			'site_url'    => home_url(),
-			'instance_id' => self::instance_id(),
-		] );
-	}
-
-	/**
-	 * Fetch + flatten entitlements. Returns a flat caps array on success, or
-	 * null when the server is unreachable or rejects the key.
-	 *
-	 * @param string $key License key.
-	 * @return array|null
-	 */
-	private static function fetch_entitlements( string $key ): ?array {
-		$res = self::request_entitlements( $key );
-		if ( is_wp_error( $res ) || ! self::envelope_ok( $res ) ) {
-			return null;
-		}
-		return self::flatten_entitlements( $res );
 	}
 
 	/** Whether a Licenseistic response envelope indicates success. */
 	private static function envelope_ok( $res ): bool {
-		return is_array( $res ) && ( ! empty( $res['success'] ) || ! empty( $res['ok'] ) );
+		return is_array( $res ) && ( ! empty( $res['success'] ) || ! empty( $res['ok'] ) || ! empty( $res['valid'] ) );
 	}
 
 	/** Human message from a Licenseistic response envelope. */
 	private static function envelope_message( $res ): string {
-		return is_array( $res ) && isset( $res['message'] ) ? (string) $res['message'] : '';
+		if ( ! is_array( $res ) ) return '';
+		return isset( $res['message'] ) ? (string) $res['message'] : (string) ( $res['error']['message'] ?? '' );
 	}
 
 	/**
@@ -417,17 +379,24 @@ final class License {
 		$ent  = isset( $data['entitlements'] ) && is_array( $data['entitlements'] ) ? $data['entitlements'] : [];
 
 		$flat = [
-			'status'     => (string) ( $data['status'] ?? '' ),
+			'status'     => ! empty( $data['valid'] ) ? 'active' : (string) ( $data['status'] ?? '' ),
 			'tier'       => (string) ( $data['plan'] ?? ( $data['tier'] ?? 'free' ) ),
 			'plan_name'  => (string) ( $data['plan_name'] ?? '' ),
 			'expires_at' => (string) ( $data['expires_at'] ?? '' ),
 		];
 
-		foreach ( [ 'max_widgets', 'max_agents', 'max_domains' ] as $k ) {
-			if ( isset( $ent[ $k ] ) ) {
-				$flat[ $k ] = (int) $ent[ $k ];
-			} elseif ( isset( $data[ $k ] ) ) {
-				$flat[ $k ] = (int) $data[ $k ];
+		$entitlement_map = [
+			'max_widgets' => 'chatbotistic.widgets.max',
+			'max_agents'  => 'chatbotistic.agents.max',
+			'max_domains' => 'chatbotistic.domains.max',
+		];
+		foreach ( $entitlement_map as $output => $key ) {
+			if ( isset( $ent[ $key ] ) ) {
+				$flat[ $output ] = (int) $ent[ $key ];
+			} elseif ( isset( $ent[ $output ] ) ) {
+				$flat[ $output ] = (int) $ent[ $output ];
+			} elseif ( isset( $data[ $output ] ) ) {
+				$flat[ $output ] = (int) $data[ $output ];
 			}
 		}
 		foreach ( [ 'white_label', 'branding' ] as $k ) {
@@ -447,7 +416,7 @@ final class License {
 	}
 
 	/**
-	 * Call short alias endpoints first, then fall back to canonical Licenseistic routes.
+	 * Call the WPistic Licenseistic public plugin SDK routes.
 	 *
 	 * @param string $action  activate|deactivate|heartbeat
 	 * @param array  $body    Request payload.
@@ -455,30 +424,11 @@ final class License {
 	 * @return array|\WP_Error
 	 */
 	private static function call_license_endpoint( string $action, array $body, int $timeout = 15 ) {
-		$short = [
+		return self::request( [
 			'activate'   => '/activate',
 			'deactivate' => '/deactivate',
-			'heartbeat'  => '/heartbeat',
-		];
-		$canonical = [
-			'activate'   => '/license/activate',
-			'deactivate' => '/license/deactivate',
-			'heartbeat'  => '/license/ping',
-		];
-
-		$first = self::request( $short[ $action ] ?? '/activate', $body, $timeout );
-		if ( ! is_wp_error( $first ) ) {
-			return $first;
-		}
-
-		$msg = (string) $first->get_error_message();
-		$recoverable = in_array( $first->get_error_code(), [ 'cbw_license_bad_response', 'cbw_license_server' ], true )
-			|| false !== stripos( $msg, 'Unexpected response' );
-		if ( ! $recoverable ) {
-			return $first;
-		}
-
-		return self::request( $canonical[ $action ] ?? '/license/activate', $body, $timeout );
+			'heartbeat'  => '/validate',
+		][ $action ] ?? '/activate', $body, $timeout );
 	}
 
 	/**
@@ -513,7 +463,7 @@ final class License {
 		if ( '' !== $id ) {
 			return $id;
 		}
-		$id = wp_generate_password( 24, false, false );
+		$id = wp_generate_uuid4();
 		update_option( self::OPT_INSTANCE, $id );
 		return $id;
 	}

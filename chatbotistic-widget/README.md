@@ -29,7 +29,7 @@ The official WordPress plugin for installing your Chatbotistic WhatsApp + AI cha
 
 1. Install + activate the plugin.
 2. **Chatbotistic → License** — paste your license key (free or paid). Get one at [chatbotistic.com/register](https://chatbotistic.com/register).
-3. **Chatbotistic → Widgets** — paste your widget key from [app.chatbotistic.com](https://app.chatbotistic.com) and (optional) connect your Chatbotistic account for analytics.
+3. **Chatbotistic → Widgets** — select a widget returned from your own Chatbotistic account in [app.chatbotistic.com](https://app.chatbotistic.com) and connect that account for analytics. Only widgets belonging to your account and active license are ever queried.
 4. **Chatbotistic → Analytics** — view live KPIs, top referral sources and recent leads.
 
 ## License

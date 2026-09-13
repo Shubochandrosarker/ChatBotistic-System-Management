@@ -164,6 +164,35 @@ class Ajax {
 		return $operator;
 	}
 
+	/**
+	 * Fetch an FAQ group and verify both its operator parent and tenant tag.
+	 * Never trust operator_id supplied by the browser for an update/delete.
+	 *
+	 * @param string $group_id FAQ group UUID.
+	 * @param string $operator_id Expected operator UUID.
+	 * @param string $user_client Expected userClient.
+	 * @return array FAQ group resource.
+	 */
+	private function owned_faq_group( string $group_id, string $operator_id, string $user_client ): array {
+		$group = API::faq_get( $group_id );
+		if ( is_wp_error( $group ) ) {
+			wp_send_json_error( array( 'message' => __( 'FAQ group not found.', 'chatbotistic-connector' ) ), 404 );
+		}
+
+		$parent = $group['whatsapp'] ?? '';
+		$parent_id = is_array( $parent ) ? (string) ( $parent['id'] ?? '' ) : '';
+		if ( ! $parent_id && is_string( $parent ) ) {
+			$prefix = '/api/v2/whatsapp_operators/';
+			$parent_id = str_starts_with( $parent, $prefix ) ? substr( $parent, strlen( $prefix ) ) : '';
+		}
+		if ( $parent_id !== $operator_id ) {
+			wp_send_json_error( array( 'message' => __( 'FAQ group not found.', 'chatbotistic-connector' ) ), 404 );
+		}
+
+		$this->owned_operator( $operator_id, $user_client );
+		return $group;
+	}
+
 	// ── Dashboard ─────────────────────────────────────────────────────────
 
 	/**
@@ -514,6 +543,9 @@ class Ajax {
 		);
 
 		$group_id = $this->post( 'group_id' );
+		if ( $group_id ) {
+			$this->owned_faq_group( $group_id, $operator_id, $client );
+		}
 		$result   = $group_id ? API::faq_update( $group_id, $payload ) : API::faq_create( $payload );
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ), 502 );
@@ -531,6 +563,7 @@ class Ajax {
 		$this->owned_operator( $operator_id, $client );
 
 		$group_id = $this->post( 'group_id' );
+		$this->owned_faq_group( $group_id, $operator_id, $client );
 		$result   = API::faq_delete( $group_id );
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ), 502 );
@@ -549,7 +582,9 @@ class Ajax {
 
 		$filters = array( 'business.userClient' => $client );
 		if ( $this->post( 'widget_id' ) ) {
-			$filters['business.id'] = $this->post( 'widget_id' );
+			$widget_id = $this->post( 'widget_id' );
+			$this->owned_widget( $widget_id, $client );
+			$filters['business.id'] = $widget_id;
 		}
 		if ( $this->post( 'from' ) ) {
 			$filters['created[after]'] = $this->post( 'from' );
@@ -636,7 +671,7 @@ class Ajax {
 		}
 
 		$dashboard_url = isset( $_POST['dashboard_url'] ) ? esc_url_raw( wp_unslash( $_POST['dashboard_url'] ) ) : '';
-		$update['dashboard_url'] = '' !== $dashboard_url ? $dashboard_url : 'https://chatbot.wpistic.cloud';
+		$update['dashboard_url'] = '' !== $dashboard_url ? $dashboard_url : 'https://app.chatbotistic.com';
 
 		$limits = array();
 		$raw    = isset( $_POST['plan_limits'] ) && is_array( $_POST['plan_limits'] ) ? wp_unslash( $_POST['plan_limits'] ) : array();

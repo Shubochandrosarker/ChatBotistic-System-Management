@@ -21,10 +21,24 @@ final class Analytics_Page {
 
 		Admin::upgrade_banner_if_free();
 
-		$widget_keys = Targeting::configured_keys();
+		$widget_keys = self::allowed_widget_keys();
 		$default_key = Targeting::default_key();
-		$selected    = isset( $_GET['widget'] ) ? sanitize_text_field( wp_unslash( $_GET['widget'] ) ) : $default_key; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ! $selected && ! empty( $widget_keys ) ) $selected = $widget_keys[0];
+		$requested   = isset( $_GET['widget'] ) ? sanitize_text_field( wp_unslash( $_GET['widget'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		// SECURITY: the requested widget must be one this site is allowed
+		// to see — either configured for display here or present in this
+		// license's widget catalog. A raw ?widget=<uuid> pointing at
+		// someone else's widget is ignored, never queried: with the
+		// platform's shared API account connected, an unvalidated id
+		// would leak other customers' stats.
+		$selected = '';
+		if ( '' !== $requested && in_array( $requested, $widget_keys, true ) ) {
+			$selected = $requested;
+		} elseif ( '' !== $default_key && in_array( $default_key, $widget_keys, true ) ) {
+			$selected = $default_key;
+		} elseif ( ! empty( $widget_keys ) ) {
+			$selected = $widget_keys[0];
+		}
 
 		if ( ! API::is_connected() ) {
 			self::render_connect_cta();
@@ -32,10 +46,10 @@ final class Analytics_Page {
 			return;
 		}
 
-		if ( empty( $widget_keys ) ) {
+		if ( '' === $selected ) {
 			?>
 			<div class="cbw-notice cbw-notice--info">
-				<?php esc_html_e( 'Configure a widget key on the Widgets tab first.', 'chatbotistic-widget' ); ?>
+				<?php esc_html_e( 'No accessible widgets yet — configure a widget key on the Widgets tab or activate your license to pull your catalog.', 'chatbotistic-widget' ); ?>
 			</div>
 			<?php
 			Admin::footer();
@@ -79,6 +93,26 @@ final class Analytics_Page {
 		require CBW_PLUGIN_PATH . 'includes/admin/views/analytics-tabs/leads.php';
 
 		Admin::footer();
+	}
+
+	/**
+	 * Return only configured widget keys that are also present in the
+	 * license-scoped catalog pulled from this customer's own account. The
+	 * intersection is intentional: a manually entered UUID is never enough
+	 * to authorize an analytics query.
+	 *
+	 * @return string[]
+	 */
+	private static function allowed_widget_keys(): array {
+		$keys   = array_values( Targeting::configured_keys() );
+		$remote = method_exists( License::class, 'get_widget_list' ) ? (array) License::get_widget_list() : array();
+		$owned = array();
+		foreach ( $remote as $rw ) {
+			if ( is_array( $rw ) && isset( $rw['key'] ) && '' !== (string) $rw['key'] ) {
+				$owned[] = (string) $rw['key'];
+			}
+		}
+		return array_values( array_intersect( array_unique( array_filter( $keys ) ), array_unique( $owned ) ) );
 	}
 
 	private static function render_connect_cta(): void {

@@ -3,7 +3,7 @@
  * Plugin Name:       Chatbotistic Widget
  * Plugin URI:        https://chatbotistic.com/wordpress-plugin
  * Description:       WhatsApp + AI chat widget for WordPress, by Chatbotistic. A WordPressistic product.
- * Version:           1.2.3
+ * Version:           1.4.0
  * Requires at least: 5.6
  * Requires PHP:      7.4
  * Author:            Chatbotistic (a WordPressistic product)
@@ -23,7 +23,7 @@ define( 'CBW_PLUGIN_FILE',     __FILE__ );
 define( 'CBW_PLUGIN_PATH',     plugin_dir_path( __FILE__ ) );
 define( 'CBW_PLUGIN_URL',      plugin_dir_url( __FILE__ ) );
 define( 'CBW_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
-define( 'CBW_VERSION',         '1.2.3' );
+define( 'CBW_VERSION',         '1.4.0' );
 
 // ── Branding (real defaults so promo/app links resolve; a white-label site
 //    can override any of these via wp-config.php, and the Brand class still
@@ -34,17 +34,15 @@ if ( ! defined( 'CBW_BRAND_HOMEPAGE') ) { define( 'CBW_BRAND_HOMEPAGE', 'https:/
 if ( ! defined( 'CBW_REGISTER_URL'  ) ) { define( 'CBW_REGISTER_URL',   'https://www.chatbotistic.com/register/' ); }
 if ( ! defined( 'CBW_PRICING_URL'   ) ) { define( 'CBW_PRICING_URL',    'https://www.chatbotistic.com/pricing/' ); }
 if ( ! defined( 'CBW_DOCS_URL'      ) ) { define( 'CBW_DOCS_URL',       'https://www.chatbotistic.com/docs/' ); }
-// The dashboard app's real, current domain (see chatbotistic-dashboard's
-// own NEXT_PUBLIC_SITE_URL default and cb_dashboard_url()'s default on
-// the theme side) — was pointing at the dead app.chatbotistic.com.
-if ( ! defined( 'CBW_APP_BASE_URL'  ) ) { define( 'CBW_APP_BASE_URL',   'https://chatbot.wpistic.cloud' ); }
+// The dashboard app's canonical customer-facing domain.
+if ( ! defined( 'CBW_APP_BASE_URL'  ) ) { define( 'CBW_APP_BASE_URL',   'https://app.chatbotistic.com' ); }
 
-// ── License server (default to chatbotistic.com; Lifetime tier with a
-//    custom_domain in its license overrides at runtime via Brand) ──────────────
-if ( ! defined( 'CBW_LICENSE_BASE_URL' ) ) { define( 'CBW_LICENSE_BASE_URL', 'https://chatbotistic.com/wp-json/licenseistic/v1' ); }
-if ( ! defined( 'CBW_PRODUCT_SLUG'     ) ) { define( 'CBW_PRODUCT_SLUG',     'chatbotistic-widget' ); }
+// ── WPistic license server (Lifetime tier with a custom_domain in its
+//    license still overrides at runtime via Brand) ─────────────────────────────
+if ( ! defined( 'CBW_LICENSE_BASE_URL' ) ) { define( 'CBW_LICENSE_BASE_URL', 'https://api.wpistic.com/api/v1/licenses' ); }
+if ( ! defined( 'CBW_PRODUCT_SLUG'     ) ) { define( 'CBW_PRODUCT_SLUG',     'chatbotistic' ); }
 
-// ── Tochat backend API ──────────────────────────────────────────────────────
+// ── Chatbotistic white-label backend API (our white-label of tochat.be) ─────
 if ( ! defined( 'CBW_API_BASE' ) ) { define( 'CBW_API_BASE', 'https://services.tochat.be' ); }
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
