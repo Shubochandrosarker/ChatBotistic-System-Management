@@ -4,17 +4,18 @@ namespace Chatbotistic_Widget;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Chatbotistic white-label (tochat.be) API client.
+ * Chatbotistic plugin API client (v1.5.0+).
  *
- * The site owner signs in once with their own Chatbotistic account
- * (app.chatbotistic.com); the plugin caches a JWT in a transient and
- * reuses it for stats + referral queries.
+ * Auth is the license activation token — the same token class-license.php
+ * obtains on activation (POST /license/activate on CBW_API_BASE). No email
+ * or password is stored; the license key is the customer's only secret.
  *
- * SECURITY: every query MUST be scoped to a widget key the site is
+ * All calls go through app.chatbotistic.com's /api/plugin/* routes, which
+ * scope every query to the license's own organization on the server side.
+ *
+ * SECURITY: every query MUST still be scoped to a widget key the site is
  * allowed to see — Analytics_Page::allowed_widget_keys() enforces this
- * before any call. Never fetch stats for an arbitrary UUID with these
- * credentials: on shared accounts that would leak other customers'
- * data.
+ * before any call.
  */
 final class API {
 
@@ -110,7 +111,9 @@ final class API {
 	}
 
 	public static function is_connected(): bool {
-		return self::get_email() && self::get_password();
+		// v1.5.0+: the license activation token is the API session.
+		return \Chatbotistic_Widget\License::is_active()
+			&& '' !== (string) get_option( \Chatbotistic_Widget\License::OPT_ACTIVATION, '' );
 	}
 
 	public static function clear_token(): void {
@@ -123,49 +126,30 @@ final class API {
 		$token = get_transient( self::TOKEN_TRANSIENT );
 		if ( $token ) return $token;
 
-		$email = self::get_email();
-		$pass  = self::get_password();
-		if ( ! $email || ! $pass ) {
-			return new \WP_Error( 'cbw_no_credentials', __( 'Connect your Chatbotistic account first.', 'chatbotistic-widget' ) );
+		// The license activation token IS the API session token in v1.5.0+.
+		$token = (string) get_option( \Chatbotistic_Widget\License::OPT_ACTIVATION, '' );
+		if ( '' === $token ) {
+			return new \WP_Error( 'cbw_no_credentials', __( 'Activate your Chatbotistic license first.', 'chatbotistic-widget' ) );
 		}
-
-		$res = wp_remote_post( Brand::api_base_url() . '/api/authentication_token', [
-			'timeout' => 20,
-			'headers' => [ 'Content-Type' => 'application/json' ],
-			'body'    => wp_json_encode( [ 'email' => $email, 'password' => $pass ] ),
-		] );
-
-		if ( is_wp_error( $res ) ) {
-			return new \WP_Error( 'cbw_api_network', __( 'Could not reach Chatbotistic. Please try again.', 'chatbotistic-widget' ) );
-		}
-		$code = (int) wp_remote_retrieve_response_code( $res );
-		$data = json_decode( wp_remote_retrieve_body( $res ), true );
-
-		if ( 401 === $code ) {
-			return new \WP_Error( 'cbw_api_auth', __( 'Invalid Chatbotistic credentials.', 'chatbotistic-widget' ) );
-		}
-		if ( 200 !== $code || empty( $data['token'] ) ) {
-			return new \WP_Error( 'cbw_api_unexpected', __( 'Unexpected response from Chatbotistic.', 'chatbotistic-widget' ) );
-		}
-
-		set_transient( self::TOKEN_TRANSIENT, sanitize_text_field( $data['token'] ), self::TOKEN_TTL );
-		return $data['token'];
+		set_transient( self::TOKEN_TRANSIENT, $token, self::TOKEN_TTL );
+		return $token;
 	}
 
 	// ── Endpoints ─────────────────────────────────────────────────────────────
 
 	/**
-	 * List widgets from the connected customer's own Tochat account.
+	 * Widget catalog for this license's organization.
 	 *
-	 * The account JWT is the primary tenant boundary. This method deliberately
-	 * does not accept a userClient or arbitrary filter from the browser.
+	 * GET /widgets on the plugin API (Bearer = license activation token).
+	 * The server scopes the list to the license's own org — nothing
+	 * client-side can widen it.
 	 */
 	public static function get_widgets() {
-		$data = self::get( '/api/v2/widgets?itemsPerPage=100' );
+		$data = self::get( '/widgets' );
 		if ( is_wp_error( $data ) ) {
 			return $data;
 		}
-		foreach ( [ 'hydra:member', 'member', 'data', 'items' ] as $key ) {
+		foreach ( [ 'widgets', 'hydra:member', 'member', 'data', 'items' ] as $key ) {
 			if ( isset( $data[ $key ] ) && is_array( $data[ $key ] ) ) {
 				return $data[ $key ];
 			}
@@ -173,26 +157,51 @@ final class API {
 		return array_values( array_filter( $data, 'is_array' ) );
 	}
 
+	/**
+	 * Full analytics bundle (summary + leads + referrals) for one widget.
+	 * Cached in a transient so the three tab views share one API call.
+	 *
+	 * GET /stats?widget=<id>&days=<n>&leads=<limit>
+	 */
+	private static function get_stats_bundle( string $widget_id, int $days = 365, int $limit = 25 ) {
+		$cache_key = 'cbw_stats_' . md5( $widget_id . '|' . $days . '|' . $limit );
+		$cached = get_transient( $cache_key );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+		$qs = http_build_query( [
+			'widget' => $widget_id,
+			'days'   => max( 1, min( 365, $days ) ),
+			'leads'  => max( 1, min( 100, $limit ) ),
+		] );
+		$data = self::get( '/stats?' . $qs );
+		if ( is_wp_error( $data ) ) {
+			return $data;
+		}
+		set_transient( $cache_key, $data, 5 * MINUTE_IN_SECONDS );
+		return $data;
+	}
+
 	public static function get_widget_stats( string $widget_id ) {
-		return self::get( '/api/v2/widget_stats/' . rawurlencode( $widget_id ) );
+		$bundle = self::get_stats_bundle( $widget_id );
+		if ( is_wp_error( $bundle ) ) return $bundle;
+		$summary = is_array( $bundle['summary'] ?? null ) ? $bundle['summary'] : [];
+		// Views expect the tochat widget_stats shape.
+		return array_merge( $summary, [ 'totalLeads' => $summary['totalLeads'] ?? 0 ] );
 	}
 
 	public static function get_widget_referrals( string $widget_id, int $days = 365 ) {
-		$qs = http_build_query( [
-			'order' => 'desc',
-			'from'  => wp_date( 'Y-m-d', strtotime( "-{$days} days" ) ),
-			'to'    => wp_date( 'Y-m-d', strtotime( '-1 day' ) ),
-		] );
-		return self::get( '/api/v2/' . rawurlencode( $widget_id ) . '/referer-graph?' . $qs );
+		$bundle = self::get_stats_bundle( $widget_id, $days );
+		if ( is_wp_error( $bundle ) ) return $bundle;
+		$ref = $bundle['referrals'] ?? [];
+		return is_array( $ref ) && isset( $ref['referers'] ) ? $ref : [ 'referers' => is_array( $ref ) ? $ref : [] ];
 	}
 
 	public static function get_leads( string $widget_id, int $limit = 25 ) {
-		$qs = http_build_query( [
-			'business.uuid' => $widget_id,
-			'order[id]'     => 'desc',
-			'itemsPerPage'  => $limit,
-		] );
-		return self::get( '/api/v2/stats?' . $qs );
+		$bundle = self::get_stats_bundle( $widget_id, 365, $limit );
+		if ( is_wp_error( $bundle ) ) return $bundle;
+		$leads = $bundle['leads'] ?? [];
+		return [ 'hydra:member' => is_array( $leads ) ? $leads : [] ];
 	}
 
 	// ── HTTP helper ───────────────────────────────────────────────────────────

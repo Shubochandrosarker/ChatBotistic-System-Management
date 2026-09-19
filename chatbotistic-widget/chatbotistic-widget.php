@@ -23,7 +23,7 @@ define( 'CBW_PLUGIN_FILE',     __FILE__ );
 define( 'CBW_PLUGIN_PATH',     plugin_dir_path( __FILE__ ) );
 define( 'CBW_PLUGIN_URL',      plugin_dir_url( __FILE__ ) );
 define( 'CBW_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
-define( 'CBW_VERSION',         '1.4.0' );
+define( 'CBW_VERSION',         '1.5.0' );
 
 // ── Branding (real defaults so promo/app links resolve; a white-label site
 //    can override any of these via wp-config.php, and the Brand class still
@@ -39,11 +39,11 @@ if ( ! defined( 'CBW_APP_BASE_URL'  ) ) { define( 'CBW_APP_BASE_URL',   'https:/
 
 // ── WPistic license server (Lifetime tier with a custom_domain in its
 //    license still overrides at runtime via Brand) ─────────────────────────────
-if ( ! defined( 'CBW_LICENSE_BASE_URL' ) ) { define( 'CBW_LICENSE_BASE_URL', 'https://api.wpistic.com/api/v1/licenses' ); }
+if ( ! defined( 'CBW_LICENSE_BASE_URL' ) ) { define( 'CBW_LICENSE_BASE_URL', 'https://app.chatbotistic.com/api/plugin/license' ); }
 if ( ! defined( 'CBW_PRODUCT_SLUG'     ) ) { define( 'CBW_PRODUCT_SLUG',     'chatbotistic' ); }
 
 // ── Chatbotistic white-label backend API (our white-label of tochat.be) ─────
-if ( ! defined( 'CBW_API_BASE' ) ) { define( 'CBW_API_BASE', 'https://services.tochat.be' ); }
+if ( ! defined( 'CBW_API_BASE' ) ) { define( 'CBW_API_BASE', 'https://app.chatbotistic.com/api/plugin' ); }
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 require_once CBW_PLUGIN_PATH . 'includes/class-plugin.php';

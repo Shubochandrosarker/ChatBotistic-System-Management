@@ -199,7 +199,7 @@ final class Settings_Page {
 		<div class="cbw-card">
 			<h2 class="cbw-card__title"><?php esc_html_e( 'Connect Chatbotistic Account', 'chatbotistic-widget' ); ?></h2>
 			<p class="cbw-card__sub">
-				<?php esc_html_e( 'Connect with your Chatbotistic email + password to unlock the in-dashboard Analytics tab (live leads, referral sources, conversion stats).', 'chatbotistic-widget' ); ?>
+				<?php esc_html_e( 'Analytics (live leads, referral sources, conversion stats) unlocks automatically when your license is active — no extra login needed. The fields below are only for legacy installs.', 'chatbotistic-widget' ); ?>
 			</p>
 
 			<?php if ( $api_connected ) : ?>

@@ -141,8 +141,10 @@ final class License {
 
 		$token = (string) get_option( self::OPT_ACTIVATION, '' );
 		$res = $token ? self::call_license_endpoint( 'deactivate', [
-			'activation_token' => $token,
+			'activation_token'  => $token,
 			'installation_uuid' => self::instance_id(),
+			'site_url'          => home_url(),
+			'key'               => $key,
 		] ) : true;
 
 		delete_option( self::OPT_KEY );
@@ -163,8 +165,10 @@ final class License {
 		$token = (string) get_option( self::OPT_ACTIVATION, '' );
 		if ( $token ) {
 			self::call_license_endpoint( 'deactivate', [
-				'activation_token' => $token,
+				'activation_token'  => $token,
 				'installation_uuid' => self::instance_id(),
+				'site_url'          => home_url(),
+				'key'               => $key,
 			], 5 );
 		}
 	}
@@ -213,6 +217,15 @@ final class License {
 		update_option( self::OPT_PAYLOAD, self::clean_payload( $flat ) );
 		update_option( self::OPT_LASTSEEN, time() );
 		delete_option( self::OPT_GRACE );
+
+		// Rolling token: the server returns a freshly-minted installation
+		// token on every validate/heartbeat. Persist it so a healthy install
+		// never lets its token age past the TTL (which would lock the
+		// analytics API out even though the license itself is fine).
+		$refreshed = sanitize_text_field( (string) ( $ent['activation_token'] ?? '' ) );
+		if ( '' !== $refreshed && $refreshed !== (string) get_option( self::OPT_ACTIVATION, '' ) ) {
+			update_option( self::OPT_ACTIVATION, $refreshed );
+		}
 
 		// Refresh the widget dropdown so any widget the customer created in
 		// the Chatbotistic portal since the last heartbeat shows up.
