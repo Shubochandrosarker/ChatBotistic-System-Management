@@ -30,6 +30,40 @@ if ( is_user_logged_in() ) {
 	$prefill_name  = $current_user->display_name ?: trim( $current_user->first_name . ' ' . $current_user->last_name );
 	$prefill_email = $current_user->user_email;
 }
+
+/*
+ * Free plans never touch Stripe: the checkout handler activates them
+ * directly. So when Stripe is disabled, keep the page usable by
+ * offering exactly those plans instead of a dead-end placeholder.
+ * The classification mirrors Stripe_Service::handle_checkout_request
+ * (plan settings are authoritative, prices are the legacy fallback;
+ * contact-only plans stay excluded either way).
+ */
+$stripe_enabled = Stripe_Service::is_enabled();
+$free_plans     = array();
+$selected_is_free = false;
+foreach ( $plans as $plan ) {
+	$plan_settings = json_decode( (string) ( $plan['settings'] ?? '' ), true );
+	$plan_settings = is_array( $plan_settings ) ? $plan_settings : array();
+	$is_contact_only = ! empty( $plan_settings['contact_only'] );
+	$requires_payment = array_key_exists( 'requires_payment', $plan_settings )
+		? (bool) $plan_settings['requires_payment']
+		: ( (float) $plan['monthly_price'] > 0 || (float) $plan['annual_price'] > 0 );
+	$is_free_plan = ! $is_contact_only && ! $requires_payment
+		&& (float) $plan['monthly_price'] <= 0 && (float) $plan['annual_price'] <= 0;
+	if ( $is_free_plan ) {
+		$free_plans[] = $plan;
+		if ( $selected_plan && (int) $plan['id'] === (int) $selected_plan['id'] ) {
+			$selected_is_free = true;
+		}
+	}
+}
+if ( ! $stripe_enabled ) {
+	$plans = $free_plans;
+	if ( $selected_plan && ! $selected_is_free ) {
+		$selected_plan = null; // Falls back to the first free plan below.
+	}
+}
 ?>
 <div class="memberistic-frontend memberistic-co-shell">
 	<div class="memberistic-co-step-pip">
@@ -41,7 +75,7 @@ if ( is_user_logged_in() ) {
 	<h2 class="memberistic-co-title"><?php esc_html_e( 'COMPLETE YOUR ENROLLMENT', 'memberistic' ); ?></h2>
 	<p class="memberistic-co-sub"><?php esc_html_e( 'Almost there. Set up your account and membership details, then continue to secure Stripe checkout.', 'memberistic' ); ?></p>
 
-	<?php if ( ! Stripe_Service::is_enabled() ) : ?>
+	<?php if ( ! $stripe_enabled && empty( $plans ) ) : ?>
 		<div class="memberistic-placeholder">
 			<p><?php esc_html_e( 'Online checkout is not enabled yet. Please contact staff to start your membership.', 'memberistic' ); ?></p>
 		</div>
@@ -62,7 +96,15 @@ if ( is_user_logged_in() ) {
 					<div class="name" id="memberistic-summary-name"><?php echo esc_html( strtoupper( $summary_plan['name'] ) ); ?></div>
 					<div class="tag" id="memberistic-summary-tag"><?php echo esc_html( $summary_is_lifetime ? __( 'Lifetime Access', 'memberistic' ) : ( 'annual' === $selected_cycle ? __( 'Annual Billing', 'memberistic' ) : __( 'Monthly Billing', 'memberistic' ) ) ); ?></div>
 				</div>
-				<div class="price" id="memberistic-summary-price"><?php echo $summary_mask_price ? '***<span>/'. esc_html__( 'access', 'memberistic' ) .'</span>' : '$' . esc_html( number_format( $summary_price, 2 ) ) . '<span>/' . esc_html( 'annual' === $selected_cycle ? __( 'yr', 'memberistic' ) : __( 'mo', 'memberistic' ) ) . '</span>'; ?></div>
+				<div class="price" id="memberistic-summary-price"><?php
+					if ( $summary_is_lifetime ) {
+						echo '***<span>/' . esc_html__( 'access', 'memberistic' ) . '</span>';
+					} elseif ( $summary_price <= 0.0 ) {
+						echo esc_html__( 'Free', 'memberistic' );
+					} else {
+						echo '$' . esc_html( number_format( $summary_price, 2 ) ) . '<span>/' . esc_html( 'annual' === $selected_cycle ? __( 'yr', 'memberistic' ) : __( 'mo', 'memberistic' ) ) . '</span>';
+					}
+				?></div>
 			</div>
 		</div>
 
@@ -106,10 +148,14 @@ if ( is_user_logged_in() ) {
 				<input id="memberistic_phone" name="phone" type="tel" placeholder="(602) 555 1234">
 			</div>
 
-			<div class="memberistic-co-section">
-				<h3><span class="n">3</span> <?php esc_html_e( 'Payment', 'memberistic' ); ?></h3>
-				<p class="memberistic-co-note"><?php esc_html_e( 'Payment is processed securely on Stripe in the next step.', 'memberistic' ); ?></p>
-			</div>
+				<div class="memberistic-co-section">
+					<h3><span class="n">3</span> <?php esc_html_e( 'Payment', 'memberistic' ); ?></h3>
+					<?php if ( $stripe_enabled ) : ?>
+						<p class="memberistic-co-note"><?php esc_html_e( 'Payment is processed securely on Stripe in the next step.', 'memberistic' ); ?></p>
+					<?php else : ?>
+						<p class="memberistic-co-note"><?php esc_html_e( 'This plan is free — your membership activates immediately, no payment needed.', 'memberistic' ); ?></p>
+					<?php endif; ?>
+				</div>
 
 			<div class="memberistic-co-section memberistic-co-section--terms">
 				<label class="memberistic-checkbox-line">
@@ -159,7 +205,7 @@ if ( is_user_logged_in() ) {
 		}
 		summaryTag.textContent = cycle === 'annual' ? '<?php echo esc_js( __( 'Annual Billing', 'memberistic' ) ); ?>' : '<?php echo esc_js( __( 'Monthly Billing', 'memberistic' ) ); ?>';
 		var price = Number(priceFor(cycle, p) || 0);
-		summaryPrice.innerHTML = (price <= 0 ? '***<span>/access</span>' : ('$' + priceFor(cycle, p) + '<span>/' + (cycle === 'annual' ? 'yr' : 'mo') + '</span>'));
+		summaryPrice.innerHTML = price <= 0 ? '<?php echo esc_js( __( 'Free', 'memberistic' ) ); ?>' : ('$' + priceFor(cycle, p) + '<span>/' + (cycle === 'annual' ? 'yr' : 'mo') + '</span>');
 	}
 
 	function priceFor(cycle, p) {
