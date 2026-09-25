@@ -344,3 +344,77 @@
 	.memberistic-frontend button[type="submit"],
 	.memberistic-frontend .memberistic-checkout-form button { width: 100%; }
 }
+
+/* =========================================================================
+   Checkout V2 skin (.memberistic-co-*) — the plugin's checkout template
+   ships a dark "V1" design meant for dark standalone sites; on this light
+   brand it rendered as black boxes with unreadable inputs. The branded
+   frame (.cbk-*) in cb-fixes.css supplies the page around the shortcode,
+   so here we reskin the shortcode itself with the site's teal/green
+   tokens. Summary banner stays the plugin's dark/gold — it reads as a
+   deliberate premium card on the light background.
+   ========================================================================= */
+.memberistic-co-shell {
+	padding: 6px 0 0;
+	color: var(--text, #183027);
+	max-width: 560px;
+}
+/* The branded frame already renders its own h1 + sub — drop the shortcode's
+   duplicates (scoped so dark standalone pages keep them). */
+.cbk .memberistic-co-title,
+.cbk .memberistic-co-sub { display: none; }
+
+.memberistic-co-step-pip { color: var(--text-dim, #7d9289); }
+.memberistic-co-step-pip .dot { background: rgba(var(--tint-surface), 0.16); }
+.memberistic-co-step-pip .dot.cur { background: var(--blue, #128c7e); }
+
+.memberistic-co-section {
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(240, 250, 245, 0.9));
+	border: 1px solid rgba(18, 140, 126, 0.16);
+	border-radius: var(--cb-r, 14px);
+	box-shadow: 0 14px 34px -26px rgba(18, 140, 126, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.78);
+	padding: 22px;
+}
+
+.memberistic-co-section h3 { color: var(--text, #183027); }
+.memberistic-co-section h3 .n {
+	border: 1px solid rgba(18, 140, 126, 0.4);
+	color: var(--blue, #128c7e);
+	border-radius: 8px;
+}
+
+.memberistic-co-label { color: var(--text-soft, #425c52); }
+
+.memberistic-frontend .memberistic-co-form input,
+.memberistic-frontend .memberistic-co-form select {
+	background: #fff;
+	border: 1px solid rgba(18, 140, 126, 0.2);
+	border-radius: 12px;
+	color: var(--text, #183027);
+}
+.memberistic-frontend .memberistic-co-form input:focus,
+.memberistic-frontend .memberistic-co-form select:focus {
+	border-color: var(--blue, #128c7e);
+	box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.16);
+	outline: none;
+}
+.memberistic-frontend .memberistic-co-form input:-webkit-autofill {
+	-webkit-text-fill-color: var(--text, #183027);
+	-webkit-box-shadow: 0 0 0 1000px #fff inset;
+	caret-color: var(--text, #183027);
+	transition: background-color 9999s ease-in-out 0s;
+}
+
+.memberistic-co-note { color: var(--text-soft, #425c52); }
+
+.memberistic-co-section--terms {
+	background: linear-gradient(135deg, rgba(37, 211, 102, 0.08), rgba(18, 140, 126, 0.04));
+	border-color: rgba(18, 140, 126, 0.24);
+}
+.memberistic-checkbox-line { color: var(--text-soft, #425c52); cursor: pointer; }
+.memberistic-checkbox-line input { accent-color: var(--blue, #128c7e); }
+
+@media (max-width: 768px) {
+	.memberistic-co-shell { padding: 2px 0 0; }
+	.memberistic-co-section { padding: 18px; }
+}
